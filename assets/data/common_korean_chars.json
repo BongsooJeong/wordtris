@@ -1,0 +1,1817 @@
+{
+  "top100": [
+    "기",
+    "이",
+    "다",
+    "리",
+    "지",
+    "사",
+    "자",
+    "수",
+    "대",
+    "가",
+    "스",
+    "전",
+    "도",
+    "정",
+    "시",
+    "화",
+    "아",
+    "비",
+    "하",
+    "무",
+    "고",
+    "소",
+    "구",
+    "동",
+    "조",
+    "부",
+    "상",
+    "성",
+    "산",
+    "장",
+    "제",
+    "주",
+    "공",
+    "유",
+    "로",
+    "어",
+    "물",
+    "인",
+    "선",
+    "적",
+    "르",
+    "신",
+    "오",
+    "계",
+    "의",
+    "보",
+    "거",
+    "마",
+    "우",
+    "방",
+    "연",
+    "치",
+    "미",
+    "경",
+    "라",
+    "레",
+    "일",
+    "나",
+    "중",
+    "트",
+    "개",
+    "원",
+    "불",
+    "모",
+    "세",
+    "단",
+    "관",
+    "학",
+    "식",
+    "반",
+    "분",
+    "금",
+    "문",
+    "양",
+    "드",
+    "진",
+    "바",
+    "위",
+    "발",
+    "호",
+    "질",
+    "재",
+    "그",
+    "회",
+    "생",
+    "해",
+    "파",
+    "교",
+    "간",
+    "서",
+    "음",
+    "실",
+    "법",
+    "국",
+    "용",
+    "배",
+    "안",
+    "포",
+    "천",
+    "두"
+  ],
+  "top101_200": [
+    "차",
+    "통",
+    "체",
+    "감",
+    "당",
+    "노",
+    "종",
+    "강",
+    "작",
+    "명",
+    "석",
+    "심",
+    "각",
+    "영",
+    "타",
+    "광",
+    "형",
+    "내",
+    "합",
+    "은",
+    "삼",
+    "속",
+    "매",
+    "행",
+    "토",
+    "복",
+    "절",
+    "초",
+    "한",
+    "근",
+    "피",
+    "프",
+    "과",
+    "크",
+    "증",
+    "역",
+    "저",
+    "직",
+    "루",
+    "에",
+    "여",
+    "청",
+    "판",
+    "설",
+    "약",
+    "니",
+    "등",
+    "름",
+    "군",
+    "박",
+    "목",
+    "만",
+    "면",
+    "염",
+    "백",
+    "들",
+    "열",
+    "추",
+    "업",
+    "민",
+    "락",
+    "운",
+    "독",
+    "외",
+    "건",
+    "결",
+    "살",
+    "임",
+    "래",
+    "후",
+    "변",
+    "입",
+    "환",
+    "예",
+    "망",
+    "랑",
+    "출",
+    "요",
+    "카",
+    "병",
+    "권",
+    "림",
+    "색",
+    "알",
+    "디",
+    "표",
+    "평",
+    "송",
+    "태",
+    "덕",
+    "탄",
+    "야",
+    "러",
+    "철",
+    "막",
+    "애",
+    "돌",
+    "집",
+    "달",
+    "격"
+  ],
+  "top201_300": [
+    "력",
+    "급",
+    "황",
+    "벌",
+    "말",
+    "육",
+    "창",
+    "점",
+    "항",
+    "류",
+    "새",
+    "코",
+    "귀",
+    "투",
+    "채",
+    "축",
+    "현",
+    "극",
+    "순",
+    "글",
+    "접",
+    "갈",
+    "량",
+    "티",
+    "허",
+    "언",
+    "악",
+    "터",
+    "검",
+    "메",
+    "봉",
+    "버",
+    "골",
+    "풍",
+    "침",
+    "남",
+    "승",
+    "닥",
+    "본",
+    "편",
+    "술",
+    "압",
+    "죽",
+    "득",
+    "왕",
+    "밀",
+    "렁",
+    "누",
+    "암",
+    "손",
+    "향",
+    "담",
+    "취",
+    "농",
+    "충",
+    "온",
+    "족",
+    "곡",
+    "난",
+    "탈",
+    "울",
+    "베",
+    "별",
+    "테",
+    "론",
+    "록",
+    "굴",
+    "란",
+    "참",
+    "머",
+    "데",
+    "착",
+    "준",
+    "브",
+    "립",
+    "견",
+    "령",
+    "혼",
+    "처",
+    "응",
+    "까",
+    "궁",
+    "옥",
+    "월",
+    "게",
+    "좌",
+    "총",
+    "줄",
+    "더",
+    "팔",
+    "번",
+    "린",
+    "폐",
+    "네",
+    "혈",
+    "험",
+    "둥",
+    "함",
+    "활",
+    "와"
+  ],
+  "totalRank": [
+    {
+      "char": "기",
+      "count": 19317,
+      "percent": "1.62"
+    },
+    {
+      "char": "이",
+      "count": 18803,
+      "percent": "1.57"
+    },
+    {
+      "char": "다",
+      "count": 16804,
+      "percent": "1.41"
+    },
+    {
+      "char": "리",
+      "count": 16183,
+      "percent": "1.35"
+    },
+    {
+      "char": "지",
+      "count": 14789,
+      "percent": "1.24"
+    },
+    {
+      "char": "사",
+      "count": 13565,
+      "percent": "1.14"
+    },
+    {
+      "char": "자",
+      "count": 11481,
+      "percent": "0.96"
+    },
+    {
+      "char": "수",
+      "count": 11367,
+      "percent": "0.95"
+    },
+    {
+      "char": "대",
+      "count": 9892,
+      "percent": "0.83"
+    },
+    {
+      "char": "가",
+      "count": 9629,
+      "percent": "0.81"
+    },
+    {
+      "char": "스",
+      "count": 9494,
+      "percent": "0.79"
+    },
+    {
+      "char": "전",
+      "count": 9429,
+      "percent": "0.79"
+    },
+    {
+      "char": "도",
+      "count": 8675,
+      "percent": "0.73"
+    },
+    {
+      "char": "정",
+      "count": 8574,
+      "percent": "0.72"
+    },
+    {
+      "char": "시",
+      "count": 8484,
+      "percent": "0.71"
+    },
+    {
+      "char": "화",
+      "count": 8244,
+      "percent": "0.69"
+    },
+    {
+      "char": "아",
+      "count": 8055,
+      "percent": "0.67"
+    },
+    {
+      "char": "비",
+      "count": 7870,
+      "percent": "0.66"
+    },
+    {
+      "char": "하",
+      "count": 7865,
+      "percent": "0.66"
+    },
+    {
+      "char": "무",
+      "count": 7793,
+      "percent": "0.65"
+    },
+    {
+      "char": "고",
+      "count": 7537,
+      "percent": "0.63"
+    },
+    {
+      "char": "소",
+      "count": 7534,
+      "percent": "0.63"
+    },
+    {
+      "char": "구",
+      "count": 7497,
+      "percent": "0.63"
+    },
+    {
+      "char": "동",
+      "count": 7496,
+      "percent": "0.63"
+    },
+    {
+      "char": "조",
+      "count": 7443,
+      "percent": "0.62"
+    },
+    {
+      "char": "부",
+      "count": 7441,
+      "percent": "0.62"
+    },
+    {
+      "char": "상",
+      "count": 7415,
+      "percent": "0.62"
+    },
+    {
+      "char": "성",
+      "count": 6950,
+      "percent": "0.58"
+    },
+    {
+      "char": "산",
+      "count": 6935,
+      "percent": "0.58"
+    },
+    {
+      "char": "장",
+      "count": 6930,
+      "percent": "0.58"
+    },
+    {
+      "char": "제",
+      "count": 6650,
+      "percent": "0.56"
+    },
+    {
+      "char": "주",
+      "count": 6489,
+      "percent": "0.54"
+    },
+    {
+      "char": "공",
+      "count": 6354,
+      "percent": "0.53"
+    },
+    {
+      "char": "유",
+      "count": 6336,
+      "percent": "0.53"
+    },
+    {
+      "char": "로",
+      "count": 6049,
+      "percent": "0.51"
+    },
+    {
+      "char": "어",
+      "count": 5921,
+      "percent": "0.50"
+    },
+    {
+      "char": "물",
+      "count": 5856,
+      "percent": "0.49"
+    },
+    {
+      "char": "인",
+      "count": 5721,
+      "percent": "0.48"
+    },
+    {
+      "char": "선",
+      "count": 5502,
+      "percent": "0.46"
+    },
+    {
+      "char": "적",
+      "count": 5491,
+      "percent": "0.46"
+    },
+    {
+      "char": "르",
+      "count": 5429,
+      "percent": "0.45"
+    },
+    {
+      "char": "신",
+      "count": 5404,
+      "percent": "0.45"
+    },
+    {
+      "char": "오",
+      "count": 5277,
+      "percent": "0.44"
+    },
+    {
+      "char": "계",
+      "count": 5270,
+      "percent": "0.44"
+    },
+    {
+      "char": "의",
+      "count": 5183,
+      "percent": "0.43"
+    },
+    {
+      "char": "보",
+      "count": 5161,
+      "percent": "0.43"
+    },
+    {
+      "char": "거",
+      "count": 5135,
+      "percent": "0.43"
+    },
+    {
+      "char": "마",
+      "count": 5122,
+      "percent": "0.43"
+    },
+    {
+      "char": "우",
+      "count": 5102,
+      "percent": "0.43"
+    },
+    {
+      "char": "방",
+      "count": 5027,
+      "percent": "0.42"
+    },
+    {
+      "char": "연",
+      "count": 5019,
+      "percent": "0.42"
+    },
+    {
+      "char": "치",
+      "count": 4998,
+      "percent": "0.42"
+    },
+    {
+      "char": "미",
+      "count": 4976,
+      "percent": "0.42"
+    },
+    {
+      "char": "경",
+      "count": 4964,
+      "percent": "0.42"
+    },
+    {
+      "char": "라",
+      "count": 4867,
+      "percent": "0.41"
+    },
+    {
+      "char": "레",
+      "count": 4832,
+      "percent": "0.40"
+    },
+    {
+      "char": "일",
+      "count": 4741,
+      "percent": "0.40"
+    },
+    {
+      "char": "나",
+      "count": 4699,
+      "percent": "0.39"
+    },
+    {
+      "char": "중",
+      "count": 4631,
+      "percent": "0.39"
+    },
+    {
+      "char": "트",
+      "count": 4582,
+      "percent": "0.38"
+    },
+    {
+      "char": "개",
+      "count": 4574,
+      "percent": "0.38"
+    },
+    {
+      "char": "원",
+      "count": 4491,
+      "percent": "0.38"
+    },
+    {
+      "char": "불",
+      "count": 4460,
+      "percent": "0.37"
+    },
+    {
+      "char": "모",
+      "count": 4425,
+      "percent": "0.37"
+    },
+    {
+      "char": "세",
+      "count": 4396,
+      "percent": "0.37"
+    },
+    {
+      "char": "단",
+      "count": 4271,
+      "percent": "0.36"
+    },
+    {
+      "char": "관",
+      "count": 4225,
+      "percent": "0.35"
+    },
+    {
+      "char": "학",
+      "count": 4144,
+      "percent": "0.35"
+    },
+    {
+      "char": "식",
+      "count": 4125,
+      "percent": "0.35"
+    },
+    {
+      "char": "반",
+      "count": 4091,
+      "percent": "0.34"
+    },
+    {
+      "char": "분",
+      "count": 4084,
+      "percent": "0.34"
+    },
+    {
+      "char": "금",
+      "count": 3994,
+      "percent": "0.33"
+    },
+    {
+      "char": "문",
+      "count": 3981,
+      "percent": "0.33"
+    },
+    {
+      "char": "양",
+      "count": 3967,
+      "percent": "0.33"
+    },
+    {
+      "char": "드",
+      "count": 3916,
+      "percent": "0.33"
+    },
+    {
+      "char": "진",
+      "count": 3891,
+      "percent": "0.33"
+    },
+    {
+      "char": "바",
+      "count": 3868,
+      "percent": "0.32"
+    },
+    {
+      "char": "위",
+      "count": 3848,
+      "percent": "0.32"
+    },
+    {
+      "char": "발",
+      "count": 3831,
+      "percent": "0.32"
+    },
+    {
+      "char": "호",
+      "count": 3830,
+      "percent": "0.32"
+    },
+    {
+      "char": "질",
+      "count": 3729,
+      "percent": "0.31"
+    },
+    {
+      "char": "재",
+      "count": 3713,
+      "percent": "0.31"
+    },
+    {
+      "char": "그",
+      "count": 3710,
+      "percent": "0.31"
+    },
+    {
+      "char": "회",
+      "count": 3709,
+      "percent": "0.31"
+    },
+    {
+      "char": "생",
+      "count": 3622,
+      "percent": "0.30"
+    },
+    {
+      "char": "해",
+      "count": 3621,
+      "percent": "0.30"
+    },
+    {
+      "char": "파",
+      "count": 3553,
+      "percent": "0.30"
+    },
+    {
+      "char": "교",
+      "count": 3524,
+      "percent": "0.29"
+    },
+    {
+      "char": "간",
+      "count": 3487,
+      "percent": "0.29"
+    },
+    {
+      "char": "서",
+      "count": 3481,
+      "percent": "0.29"
+    },
+    {
+      "char": "음",
+      "count": 3476,
+      "percent": "0.29"
+    },
+    {
+      "char": "실",
+      "count": 3445,
+      "percent": "0.29"
+    },
+    {
+      "char": "법",
+      "count": 3406,
+      "percent": "0.29"
+    },
+    {
+      "char": "국",
+      "count": 3392,
+      "percent": "0.28"
+    },
+    {
+      "char": "용",
+      "count": 3329,
+      "percent": "0.28"
+    },
+    {
+      "char": "배",
+      "count": 3270,
+      "percent": "0.27"
+    },
+    {
+      "char": "안",
+      "count": 3256,
+      "percent": "0.27"
+    },
+    {
+      "char": "포",
+      "count": 3228,
+      "percent": "0.27"
+    },
+    {
+      "char": "천",
+      "count": 3191,
+      "percent": "0.27"
+    },
+    {
+      "char": "두",
+      "count": 3164,
+      "percent": "0.26"
+    },
+    {
+      "char": "차",
+      "count": 3155,
+      "percent": "0.26"
+    },
+    {
+      "char": "통",
+      "count": 3143,
+      "percent": "0.26"
+    },
+    {
+      "char": "체",
+      "count": 3041,
+      "percent": "0.25"
+    },
+    {
+      "char": "감",
+      "count": 3015,
+      "percent": "0.25"
+    },
+    {
+      "char": "당",
+      "count": 3014,
+      "percent": "0.25"
+    },
+    {
+      "char": "노",
+      "count": 3008,
+      "percent": "0.25"
+    },
+    {
+      "char": "종",
+      "count": 2999,
+      "percent": "0.25"
+    },
+    {
+      "char": "강",
+      "count": 2986,
+      "percent": "0.25"
+    },
+    {
+      "char": "작",
+      "count": 2977,
+      "percent": "0.25"
+    },
+    {
+      "char": "명",
+      "count": 2923,
+      "percent": "0.24"
+    },
+    {
+      "char": "석",
+      "count": 2892,
+      "percent": "0.24"
+    },
+    {
+      "char": "심",
+      "count": 2884,
+      "percent": "0.24"
+    },
+    {
+      "char": "각",
+      "count": 2882,
+      "percent": "0.24"
+    },
+    {
+      "char": "영",
+      "count": 2839,
+      "percent": "0.24"
+    },
+    {
+      "char": "타",
+      "count": 2792,
+      "percent": "0.23"
+    },
+    {
+      "char": "광",
+      "count": 2748,
+      "percent": "0.23"
+    },
+    {
+      "char": "형",
+      "count": 2739,
+      "percent": "0.23"
+    },
+    {
+      "char": "내",
+      "count": 2727,
+      "percent": "0.23"
+    },
+    {
+      "char": "합",
+      "count": 2726,
+      "percent": "0.23"
+    },
+    {
+      "char": "은",
+      "count": 2682,
+      "percent": "0.22"
+    },
+    {
+      "char": "삼",
+      "count": 2673,
+      "percent": "0.22"
+    },
+    {
+      "char": "속",
+      "count": 2668,
+      "percent": "0.22"
+    },
+    {
+      "char": "매",
+      "count": 2658,
+      "percent": "0.22"
+    },
+    {
+      "char": "행",
+      "count": 2645,
+      "percent": "0.22"
+    },
+    {
+      "char": "토",
+      "count": 2638,
+      "percent": "0.22"
+    },
+    {
+      "char": "복",
+      "count": 2623,
+      "percent": "0.22"
+    },
+    {
+      "char": "절",
+      "count": 2597,
+      "percent": "0.22"
+    },
+    {
+      "char": "초",
+      "count": 2587,
+      "percent": "0.22"
+    },
+    {
+      "char": "한",
+      "count": 2574,
+      "percent": "0.22"
+    },
+    {
+      "char": "근",
+      "count": 2569,
+      "percent": "0.22"
+    },
+    {
+      "char": "피",
+      "count": 2567,
+      "percent": "0.21"
+    },
+    {
+      "char": "프",
+      "count": 2549,
+      "percent": "0.21"
+    },
+    {
+      "char": "과",
+      "count": 2529,
+      "percent": "0.21"
+    },
+    {
+      "char": "크",
+      "count": 2500,
+      "percent": "0.21"
+    },
+    {
+      "char": "증",
+      "count": 2448,
+      "percent": "0.20"
+    },
+    {
+      "char": "역",
+      "count": 2435,
+      "percent": "0.20"
+    },
+    {
+      "char": "저",
+      "count": 2429,
+      "percent": "0.20"
+    },
+    {
+      "char": "직",
+      "count": 2399,
+      "percent": "0.20"
+    },
+    {
+      "char": "루",
+      "count": 2393,
+      "percent": "0.20"
+    },
+    {
+      "char": "에",
+      "count": 2365,
+      "percent": "0.20"
+    },
+    {
+      "char": "여",
+      "count": 2343,
+      "percent": "0.20"
+    },
+    {
+      "char": "청",
+      "count": 2327,
+      "percent": "0.19"
+    },
+    {
+      "char": "판",
+      "count": 2325,
+      "percent": "0.19"
+    },
+    {
+      "char": "설",
+      "count": 2315,
+      "percent": "0.19"
+    },
+    {
+      "char": "약",
+      "count": 2303,
+      "percent": "0.19"
+    },
+    {
+      "char": "니",
+      "count": 2270,
+      "percent": "0.19"
+    },
+    {
+      "char": "등",
+      "count": 2263,
+      "percent": "0.19"
+    },
+    {
+      "char": "름",
+      "count": 2239,
+      "percent": "0.19"
+    },
+    {
+      "char": "군",
+      "count": 2234,
+      "percent": "0.19"
+    },
+    {
+      "char": "박",
+      "count": 2233,
+      "percent": "0.19"
+    },
+    {
+      "char": "목",
+      "count": 2209,
+      "percent": "0.18"
+    },
+    {
+      "char": "만",
+      "count": 2205,
+      "percent": "0.18"
+    },
+    {
+      "char": "면",
+      "count": 2188,
+      "percent": "0.18"
+    },
+    {
+      "char": "염",
+      "count": 2156,
+      "percent": "0.18"
+    },
+    {
+      "char": "백",
+      "count": 2142,
+      "percent": "0.18"
+    },
+    {
+      "char": "들",
+      "count": 2120,
+      "percent": "0.18"
+    },
+    {
+      "char": "열",
+      "count": 2117,
+      "percent": "0.18"
+    },
+    {
+      "char": "추",
+      "count": 2113,
+      "percent": "0.18"
+    },
+    {
+      "char": "업",
+      "count": 2105,
+      "percent": "0.18"
+    },
+    {
+      "char": "민",
+      "count": 2103,
+      "percent": "0.18"
+    },
+    {
+      "char": "락",
+      "count": 2096,
+      "percent": "0.18"
+    },
+    {
+      "char": "운",
+      "count": 2086,
+      "percent": "0.17"
+    },
+    {
+      "char": "독",
+      "count": 2040,
+      "percent": "0.17"
+    },
+    {
+      "char": "외",
+      "count": 2038,
+      "percent": "0.17"
+    },
+    {
+      "char": "건",
+      "count": 2038,
+      "percent": "0.17"
+    },
+    {
+      "char": "결",
+      "count": 2036,
+      "percent": "0.17"
+    },
+    {
+      "char": "살",
+      "count": 2015,
+      "percent": "0.17"
+    },
+    {
+      "char": "임",
+      "count": 2012,
+      "percent": "0.17"
+    },
+    {
+      "char": "래",
+      "count": 2010,
+      "percent": "0.17"
+    },
+    {
+      "char": "후",
+      "count": 2000,
+      "percent": "0.17"
+    },
+    {
+      "char": "변",
+      "count": 1999,
+      "percent": "0.17"
+    },
+    {
+      "char": "입",
+      "count": 1993,
+      "percent": "0.17"
+    },
+    {
+      "char": "환",
+      "count": 1986,
+      "percent": "0.17"
+    },
+    {
+      "char": "예",
+      "count": 1973,
+      "percent": "0.17"
+    },
+    {
+      "char": "망",
+      "count": 1965,
+      "percent": "0.16"
+    },
+    {
+      "char": "랑",
+      "count": 1955,
+      "percent": "0.16"
+    },
+    {
+      "char": "출",
+      "count": 1947,
+      "percent": "0.16"
+    },
+    {
+      "char": "요",
+      "count": 1933,
+      "percent": "0.16"
+    },
+    {
+      "char": "카",
+      "count": 1932,
+      "percent": "0.16"
+    },
+    {
+      "char": "병",
+      "count": 1930,
+      "percent": "0.16"
+    },
+    {
+      "char": "권",
+      "count": 1929,
+      "percent": "0.16"
+    },
+    {
+      "char": "림",
+      "count": 1916,
+      "percent": "0.16"
+    },
+    {
+      "char": "색",
+      "count": 1910,
+      "percent": "0.16"
+    },
+    {
+      "char": "알",
+      "count": 1906,
+      "percent": "0.16"
+    },
+    {
+      "char": "디",
+      "count": 1863,
+      "percent": "0.16"
+    },
+    {
+      "char": "표",
+      "count": 1859,
+      "percent": "0.16"
+    },
+    {
+      "char": "평",
+      "count": 1848,
+      "percent": "0.15"
+    },
+    {
+      "char": "송",
+      "count": 1844,
+      "percent": "0.15"
+    },
+    {
+      "char": "태",
+      "count": 1823,
+      "percent": "0.15"
+    },
+    {
+      "char": "덕",
+      "count": 1810,
+      "percent": "0.15"
+    },
+    {
+      "char": "탄",
+      "count": 1807,
+      "percent": "0.15"
+    },
+    {
+      "char": "야",
+      "count": 1799,
+      "percent": "0.15"
+    },
+    {
+      "char": "러",
+      "count": 1793,
+      "percent": "0.15"
+    },
+    {
+      "char": "철",
+      "count": 1779,
+      "percent": "0.15"
+    },
+    {
+      "char": "막",
+      "count": 1775,
+      "percent": "0.15"
+    },
+    {
+      "char": "애",
+      "count": 1756,
+      "percent": "0.15"
+    },
+    {
+      "char": "돌",
+      "count": 1750,
+      "percent": "0.15"
+    },
+    {
+      "char": "집",
+      "count": 1747,
+      "percent": "0.15"
+    },
+    {
+      "char": "달",
+      "count": 1737,
+      "percent": "0.15"
+    },
+    {
+      "char": "격",
+      "count": 1735,
+      "percent": "0.15"
+    },
+    {
+      "char": "력",
+      "count": 1735,
+      "percent": "0.15"
+    },
+    {
+      "char": "급",
+      "count": 1733,
+      "percent": "0.15"
+    },
+    {
+      "char": "황",
+      "count": 1723,
+      "percent": "0.14"
+    },
+    {
+      "char": "벌",
+      "count": 1721,
+      "percent": "0.14"
+    },
+    {
+      "char": "말",
+      "count": 1707,
+      "percent": "0.14"
+    },
+    {
+      "char": "육",
+      "count": 1656,
+      "percent": "0.14"
+    },
+    {
+      "char": "창",
+      "count": 1656,
+      "percent": "0.14"
+    },
+    {
+      "char": "점",
+      "count": 1652,
+      "percent": "0.14"
+    },
+    {
+      "char": "항",
+      "count": 1647,
+      "percent": "0.14"
+    },
+    {
+      "char": "류",
+      "count": 1643,
+      "percent": "0.14"
+    },
+    {
+      "char": "새",
+      "count": 1634,
+      "percent": "0.14"
+    },
+    {
+      "char": "코",
+      "count": 1634,
+      "percent": "0.14"
+    },
+    {
+      "char": "귀",
+      "count": 1625,
+      "percent": "0.14"
+    },
+    {
+      "char": "투",
+      "count": 1603,
+      "percent": "0.13"
+    },
+    {
+      "char": "채",
+      "count": 1602,
+      "percent": "0.13"
+    },
+    {
+      "char": "축",
+      "count": 1598,
+      "percent": "0.13"
+    },
+    {
+      "char": "현",
+      "count": 1590,
+      "percent": "0.13"
+    },
+    {
+      "char": "극",
+      "count": 1546,
+      "percent": "0.13"
+    },
+    {
+      "char": "순",
+      "count": 1522,
+      "percent": "0.13"
+    },
+    {
+      "char": "글",
+      "count": 1513,
+      "percent": "0.13"
+    },
+    {
+      "char": "접",
+      "count": 1513,
+      "percent": "0.13"
+    },
+    {
+      "char": "갈",
+      "count": 1503,
+      "percent": "0.13"
+    },
+    {
+      "char": "량",
+      "count": 1501,
+      "percent": "0.13"
+    },
+    {
+      "char": "티",
+      "count": 1501,
+      "percent": "0.13"
+    },
+    {
+      "char": "허",
+      "count": 1494,
+      "percent": "0.13"
+    },
+    {
+      "char": "언",
+      "count": 1493,
+      "percent": "0.12"
+    },
+    {
+      "char": "악",
+      "count": 1491,
+      "percent": "0.12"
+    },
+    {
+      "char": "터",
+      "count": 1490,
+      "percent": "0.12"
+    },
+    {
+      "char": "검",
+      "count": 1479,
+      "percent": "0.12"
+    },
+    {
+      "char": "메",
+      "count": 1465,
+      "percent": "0.12"
+    },
+    {
+      "char": "봉",
+      "count": 1465,
+      "percent": "0.12"
+    },
+    {
+      "char": "버",
+      "count": 1441,
+      "percent": "0.12"
+    },
+    {
+      "char": "골",
+      "count": 1427,
+      "percent": "0.12"
+    },
+    {
+      "char": "풍",
+      "count": 1426,
+      "percent": "0.12"
+    },
+    {
+      "char": "침",
+      "count": 1394,
+      "percent": "0.12"
+    },
+    {
+      "char": "남",
+      "count": 1390,
+      "percent": "0.12"
+    },
+    {
+      "char": "승",
+      "count": 1384,
+      "percent": "0.12"
+    },
+    {
+      "char": "닥",
+      "count": 1367,
+      "percent": "0.11"
+    },
+    {
+      "char": "본",
+      "count": 1366,
+      "percent": "0.11"
+    },
+    {
+      "char": "편",
+      "count": 1364,
+      "percent": "0.11"
+    },
+    {
+      "char": "술",
+      "count": 1363,
+      "percent": "0.11"
+    },
+    {
+      "char": "압",
+      "count": 1355,
+      "percent": "0.11"
+    },
+    {
+      "char": "죽",
+      "count": 1349,
+      "percent": "0.11"
+    },
+    {
+      "char": "득",
+      "count": 1348,
+      "percent": "0.11"
+    },
+    {
+      "char": "왕",
+      "count": 1336,
+      "percent": "0.11"
+    },
+    {
+      "char": "밀",
+      "count": 1333,
+      "percent": "0.11"
+    },
+    {
+      "char": "렁",
+      "count": 1321,
+      "percent": "0.11"
+    },
+    {
+      "char": "누",
+      "count": 1310,
+      "percent": "0.11"
+    },
+    {
+      "char": "암",
+      "count": 1297,
+      "percent": "0.11"
+    },
+    {
+      "char": "손",
+      "count": 1296,
+      "percent": "0.11"
+    },
+    {
+      "char": "향",
+      "count": 1288,
+      "percent": "0.11"
+    },
+    {
+      "char": "담",
+      "count": 1283,
+      "percent": "0.11"
+    },
+    {
+      "char": "취",
+      "count": 1280,
+      "percent": "0.11"
+    },
+    {
+      "char": "농",
+      "count": 1278,
+      "percent": "0.11"
+    },
+    {
+      "char": "충",
+      "count": 1271,
+      "percent": "0.11"
+    },
+    {
+      "char": "온",
+      "count": 1263,
+      "percent": "0.11"
+    },
+    {
+      "char": "족",
+      "count": 1256,
+      "percent": "0.11"
+    },
+    {
+      "char": "곡",
+      "count": 1256,
+      "percent": "0.11"
+    },
+    {
+      "char": "난",
+      "count": 1251,
+      "percent": "0.10"
+    },
+    {
+      "char": "탈",
+      "count": 1229,
+      "percent": "0.10"
+    },
+    {
+      "char": "울",
+      "count": 1220,
+      "percent": "0.10"
+    },
+    {
+      "char": "베",
+      "count": 1214,
+      "percent": "0.10"
+    },
+    {
+      "char": "별",
+      "count": 1184,
+      "percent": "0.10"
+    },
+    {
+      "char": "테",
+      "count": 1177,
+      "percent": "0.10"
+    },
+    {
+      "char": "론",
+      "count": 1169,
+      "percent": "0.10"
+    },
+    {
+      "char": "록",
+      "count": 1155,
+      "percent": "0.10"
+    },
+    {
+      "char": "굴",
+      "count": 1152,
+      "percent": "0.10"
+    },
+    {
+      "char": "란",
+      "count": 1133,
+      "percent": "0.09"
+    },
+    {
+      "char": "참",
+      "count": 1131,
+      "percent": "0.09"
+    },
+    {
+      "char": "머",
+      "count": 1118,
+      "percent": "0.09"
+    },
+    {
+      "char": "데",
+      "count": 1117,
+      "percent": "0.09"
+    },
+    {
+      "char": "착",
+      "count": 1117,
+      "percent": "0.09"
+    },
+    {
+      "char": "준",
+      "count": 1111,
+      "percent": "0.09"
+    },
+    {
+      "char": "브",
+      "count": 1109,
+      "percent": "0.09"
+    },
+    {
+      "char": "립",
+      "count": 1109,
+      "percent": "0.09"
+    },
+    {
+      "char": "견",
+      "count": 1107,
+      "percent": "0.09"
+    },
+    {
+      "char": "령",
+      "count": 1105,
+      "percent": "0.09"
+    },
+    {
+      "char": "혼",
+      "count": 1105,
+      "percent": "0.09"
+    },
+    {
+      "char": "처",
+      "count": 1093,
+      "percent": "0.09"
+    },
+    {
+      "char": "응",
+      "count": 1081,
+      "percent": "0.09"
+    },
+    {
+      "char": "까",
+      "count": 1081,
+      "percent": "0.09"
+    },
+    {
+      "char": "궁",
+      "count": 1073,
+      "percent": "0.09"
+    },
+    {
+      "char": "옥",
+      "count": 1068,
+      "percent": "0.09"
+    },
+    {
+      "char": "월",
+      "count": 1067,
+      "percent": "0.09"
+    },
+    {
+      "char": "게",
+      "count": 1064,
+      "percent": "0.09"
+    },
+    {
+      "char": "좌",
+      "count": 1055,
+      "percent": "0.09"
+    },
+    {
+      "char": "총",
+      "count": 1046,
+      "percent": "0.09"
+    },
+    {
+      "char": "줄",
+      "count": 1036,
+      "percent": "0.09"
+    },
+    {
+      "char": "더",
+      "count": 1035,
+      "percent": "0.09"
+    },
+    {
+      "char": "팔",
+      "count": 1035,
+      "percent": "0.09"
+    },
+    {
+      "char": "번",
+      "count": 1025,
+      "percent": "0.09"
+    },
+    {
+      "char": "린",
+      "count": 1018,
+      "percent": "0.09"
+    },
+    {
+      "char": "폐",
+      "count": 1018,
+      "percent": "0.09"
+    },
+    {
+      "char": "네",
+      "count": 1010,
+      "percent": "0.08"
+    },
+    {
+      "char": "혈",
+      "count": 1004,
+      "percent": "0.08"
+    },
+    {
+      "char": "험",
+      "count": 1003,
+      "percent": "0.08"
+    },
+    {
+      "char": "둥",
+      "count": 997,
+      "percent": "0.08"
+    },
+    {
+      "char": "함",
+      "count": 996,
+      "percent": "0.08"
+    },
+    {
+      "char": "활",
+      "count": 995,
+      "percent": "0.08"
+    },
+    {
+      "char": "와",
+      "count": 983,
+      "percent": "0.08"
+    }
+  ],
+  "metadata": {
+    "totalWords": 421837,
+    "skippedWords": 0,
+    "totalChars": 1194618,
+    "uniqueChars": 2428,
+    "generatedAt": "2025-04-17T21:17:42.821705"
+  }
+}

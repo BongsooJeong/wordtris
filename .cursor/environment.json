@@ -1,0 +1,26 @@
+{
+  "shell": {
+    "command_separator": ";",
+    "preferred_command_format": "powershell",
+    "rules": [
+      {
+        "pattern": "&&",
+        "replacement": ";",
+        "description": "파워쉘에서는 명령 연결에 && 대신 ; 사용"
+      },
+      {
+        "pattern": "cd (.*?) && (.*)",
+        "replacement": "cd $1; $2",
+        "description": "디렉토리 이동 후 명령 실행 포맷 변환"
+      }
+    ]
+  },
+  "terminal": {
+    "default_shell": "powershell",
+    "use_semicolons": true
+  },
+  "execution": {
+    "always_check_shell_compatibility": true,
+    "auto_convert_commands": true
+  }
+} 

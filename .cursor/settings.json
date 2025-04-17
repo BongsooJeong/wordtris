@@ -1,0 +1,35 @@
+{
+  "terminal": {
+    "shell": {
+      "windows": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoExit", 
+        "-ExecutionPolicy", "Bypass", 
+        "-File", "${workspaceRoot}\\.cursor\\ps_profile.ps1"
+      ]
+    },
+    "profiles": {
+      "powershell": {
+        "path": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoExit", 
+          "-ExecutionPolicy", "Bypass", 
+          "-File", "${workspaceRoot}\\.cursor\\ps_profile.ps1"
+        ]
+      }
+    },
+    "defaultProfile": "powershell"
+  },
+  "assistant": {
+    "prompt": {
+      "shellFormat": {
+        "commandSeparator": ";",
+        "preferSemicolons": true
+      }
+    }
+  },
+  "editWithAI": {
+    "shellCommandSeparator": ";",
+    "convertShellCommands": true
+  }
+} 

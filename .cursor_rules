@@ -1,0 +1,20 @@
+# WordTris 프로젝트를 위한 Cursor 규칙
+
+# PowerShell 관련 규칙
+- 이 시스템은 Windows PowerShell을 사용합니다.
+- PowerShell에서는 명령어 구분을 위해 '&&' 대신 세미콜론(;)을 사용합니다.
+- 예: `cd C:\src\code\wordTris; flutter run`
+
+# Flutter 앱 실행 관련 규칙
+- Flutter 앱 실행 시 Chrome을 통해 실행해야 합니다.
+- `flutter run -d chrome` 명령어 실행
+- 디버깅은 Chrome 브라우저를 통해 진행합니다.
+
+# 프로젝트 구조 관련 규칙
+- 프로젝트 루트 디렉토리: C:\src\code\wordTris
+- 명령어는 항상 해당 디렉토리에서 실행해야 합니다.
+
+# 코드 오류 방지 규칙
+- 존재하지 않는 서비스나 메소드를 참조하지 않도록 주의합니다.
+- 기존 코드를 수정할 때는 항상 기존 구현 방식을 유지합니다.
+- 모든 블록 회전 관련 코드 수정 시 Block 클래스의 final 속성을 변경하지 않도록 주의합니다. 
