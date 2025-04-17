@@ -170,16 +170,75 @@ class Block {
 
   /// 블록 회전
   Block rotate() {
+    // 디버그 로그 추가
+    // print('ROTATE START - 블록 모양: $shape, ID: $id, 현재 회전 상태: $rotationState');
+    // print('ROTATE START - 현재 행렬: $matrix');
+    // print('ROTATE START - 문자열: $characters');
+
     // 1셀 블록과 폭탄 블록은 회전하지 않음
     if (shape == BlockShape.single || shape == BlockShape.bomb) {
       // print('1셀/폭탄 블록은 회전하지 않음: $shape');
       return this;
     }
     
-    // print('회전 시작 - 현재 블록 모양: $shape, ID: $id');
+    // 2x2 정사각형 블록 회전 특별 처리
+    if (shape == BlockShape.squareShape) {
+      // print('2x2 정사각형 블록 회전 처리 시작');
+      
+      // 정사각형 블록 회전을 위한 새 행렬 직접 생성
+      // 2x2 행렬의 경우 배열 순서가 [0,1] [2,3]으로 정의되어 있음
+      // 시계 방향 90도 회전: [2,0] [3,1]
+      // 이전 방식은 반시계방향으로 처리하는 문제가 있었음
+      List<List<String?>> newMatrix;
+      
+      switch (rotationState) {
+        case 0: // 0 -> 90도
+          newMatrix = [
+            [characters[2], characters[0]],
+            [characters[3], characters[1]]
+          ];
+          break;
+        case 1: // 90 -> 180도
+          newMatrix = [
+            [characters[3], characters[2]],
+            [characters[1], characters[0]]
+          ];
+          break;
+        case 2: // 180 -> 270도
+          newMatrix = [
+            [characters[1], characters[3]],
+            [characters[0], characters[2]]
+          ];
+          break;
+        case 3: // 270 -> 0도 (원래대로)
+          newMatrix = [
+            [characters[0], characters[1]],
+            [characters[2], characters[3]]
+          ];
+          break;
+        default:
+          newMatrix = matrix; // 예상치 못한 상황
+      }
+      
+      final newRotationState = (rotationState + 1) % 4;
+      // print('정사각형 블록 회전 행렬: $newMatrix');
+      
+      // 정사각형 블록은 모양 변경없이 회전 상태와 행렬만 변경
+      final rotatedBlock = copyWith(
+        rotationState: newRotationState,
+        matrix: newMatrix
+      );
+      
+      // print('ROTATE END - 정사각형 블록 회전 완료, 회전 상태: ${rotatedBlock.rotationState}');
+      // print('ROTATE END - 회전된 행렬: ${rotatedBlock.matrix}');
+      
+      return rotatedBlock;
+    }
     
-    // 행렬 자체를 회전시키는 방식으로 변경
+    // 일반 블록 회전 처리
     final rotatedMatrix = _rotateMatrixClockwise(matrix);
+    // print('ROTATED MATRIX: $rotatedMatrix');
+    
     final newRotationState = (rotationState + 1) % 4;
     
     // horizontal4, vertical4 특별 처리 (모양이 변경되어야 함)
@@ -221,7 +280,8 @@ class Block {
       matrix: rotatedMatrix
     );
     
-    // print('회전 완료 - 새 블록 모양: ${rotatedBlock.shape}, 회전 상태: ${rotatedBlock.rotationState}');
+    // print('ROTATE END - 회전된 블록 모양: ${rotatedBlock.shape}, 회전 상태: ${rotatedBlock.rotationState}');
+    // print('ROTATE END - 회전된 행렬: ${rotatedBlock.matrix}');
     
     return rotatedBlock;
   }
@@ -239,6 +299,17 @@ class Block {
     if (m == 0) return [];
     
     // print('회전 전 행렬: $mat (${n}x${m})');
+    
+    // 2x2 정사각형 행렬인 경우 특별 처리 (명시적으로 회전)
+    if (n == 2 && m == 2) {
+      // print('2x2 정사각형 행렬 특별 처리 적용');
+      final result = [
+        [mat[1][0], mat[0][0]],
+        [mat[1][1], mat[0][1]]
+      ];
+      // print('2x2 회전 결과: $result');
+      return result;
+    }
     
     // 1xm 행렬은 mx1 행렬로 변환 (가로->세로)
     if (n == 1) {
@@ -271,7 +342,7 @@ class Block {
       }
     }
     
-    // print('회전된 행렬: $rotated');
+    // print('일반 회전 결과: $rotated');
     return rotated;
   }
 

@@ -297,20 +297,20 @@ class GameProvider with ChangeNotifier {
         return;
       }
       
-      // print('----- 회전 전 -----');
-      // print('블록 ID: ${block.id}, 형태: ${block.shape}, 회전상태: ${block.rotationState}');
-      // print('현재 블록 문자: ${block.characters}');
+      // print('GameProvider: 블록 회전 시작 - ID: ${block.id}, 형태: ${block.shape}, 회전상태: ${block.rotationState}');
+      // print('GameProvider: 현재 블록 문자: ${block.characters}');
+      // print('GameProvider: 현재 행렬: ${block.matrix}');
       
       // 블록 회전 시도
       final rotatedBlock = block.rotate();
       
-      // print('----- 회전 후 -----');
-      // print('회전된 블록 ID: ${rotatedBlock.id}, 형태: ${rotatedBlock.shape}, 회전상태: ${rotatedBlock.rotationState}');
-      // print('회전된 블록 문자: ${rotatedBlock.characters}');
+      // print('GameProvider: 회전 후 블록 - ID: ${rotatedBlock.id}, 형태: ${rotatedBlock.shape}, 회전상태: ${rotatedBlock.rotationState}');
+      // print('GameProvider: 회전 후 행렬: ${rotatedBlock.matrix}');
       
       // 블록 목록에서 해당 ID의 블록 찾기
       final index = _availableBlocks.indexWhere((b) => b.id == block.id);
-      // print('블록 인덱스: $index, 전체 블록 수: ${_availableBlocks.length}');
+      
+      // print('GameProvider: 블록 인덱스: $index, 전체 블록 수: ${_availableBlocks.length}');
       
       if (index != -1) {
         // 회전된 블록으로 교체
@@ -318,13 +318,13 @@ class GameProvider with ChangeNotifier {
         
         // UI 갱신
         notifyListeners();
-        // print('블록 회전 완료: ${rotatedBlock.shape} (${rotatedBlock.rotationState})');
+        // print('GameProvider: 블록 회전 완료 및 UI 갱신 요청');
       } else {
-        // print('오류: 회전할 블록을 찾을 수 없습니다.');
+        // print('GameProvider: 오류: 회전할 블록을 찾을 수 없습니다. ID: ${block.id}');
       }
     } catch (e, stackTrace) {
-      print('블록 회전 중 예외 발생: $e');
-      print('스택 트레이스: $stackTrace');
+      // print('GameProvider: 블록 회전 중 예외 발생: $e');
+      // print('GameProvider: 스택 트레이스: $stackTrace');
     }
   }
 

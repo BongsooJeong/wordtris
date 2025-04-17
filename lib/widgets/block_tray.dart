@@ -251,44 +251,44 @@ class BlockTray extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        // 펄스 애니메이션 효과
-        if (opacity > 0.5)
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0.8, end: 1.2),
-            duration: const Duration(milliseconds: 800),
-            builder: (context, value, child) {
-              return Container(
-                width: cellSize * value,
-                height: cellSize * value,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.red.withOpacity((1.2 - value) * 0.5),
-                    width: 2,
-                  ),
+        // 반짝임 효과
+        Positioned.fill(
+          child: Opacity(
+            opacity: opacity * 0.3,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [Colors.white, Colors.transparent],
+                  stops: const [0.1, 1.0],
+                  center: Alignment.center,
+                  radius: 0.8,
                 ),
-              );
-            },
-            onEnd: () {
-              // 애니메이션은 자동으로 반복되게 설정
-            },
+              ),
+            ),
           ),
+        ),
       ],
     );
   }
 
-  /// 블록의 위치에 맞는 문자를 반환합니다
-  String _getCharacterForPosition(Block block, int positionIndex) {
-    // 현재 위치의 좌표점 가져오기
-    List<Point> points = block.getRelativePoints();
-    if (positionIndex >= points.length || positionIndex >= block.characters.length) {
-      return '';
+  /// 위치에 따른 문자 반환
+  String _getCharacterForPosition(Block block, int position) {
+    // 상대적 위치 목록에서 현재 위치 가져오기
+    List<Point> relativePoints = block.getRelativePoints();
+    if (position < relativePoints.length) {
+      Point point = relativePoints[position];
+      // 해당 위치의 문자 가져오기
+      String? character = block.getCharacterAt(point.x, point.y);
+      if (character != null) {
+        return character;
+      }
     }
     
-    Point currentPoint = points[positionIndex];
+    // 폴백: 기존 방식으로 처리 (문제가 있을 경우 대비)
+    if (position < block.characters.length) {
+      return block.characters[position];
+    }
     
-    // 행렬에서 해당 위치의 문자 가져오기
-    String? character = block.getCharacterAt(currentPoint.x, currentPoint.y);
-    return character ?? '';
+    return '';
   }
 }
