@@ -83,10 +83,16 @@ class GameGridBlockPlacement {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.offset);
 
-    // 그냥 위치 정보만 저장
+    // 위치를 한 칸 오른쪽으로 이동시킴
+    final Offset adjustedPosition = Offset(
+      localPosition.dx + totalCellSize, // X 좌표를 한 칸 오른쪽으로 이동
+      localPosition.dy,
+    );
+
+    // 조정된 위치 정보 저장
     _setState(() {
       draggedBlock = details.data;
-      draggedPosition = localPosition;
+      draggedPosition = adjustedPosition;
     });
   }
 
@@ -102,9 +108,15 @@ class GameGridBlockPlacement {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.offset);
 
+    // 위치를 한 칸 오른쪽으로 이동시킴
+    final Offset adjustedPosition = Offset(
+      localPosition.dx + totalCellSize, // X 좌표를 한 칸 오른쪽으로 이동
+      localPosition.dy,
+    );
+
     // 셀 크기를 기준으로 행과 열 인덱스 계산
-    final double adjustedX = localPosition.dx - gridPadding;
-    final double adjustedY = localPosition.dy - gridPadding;
+    final double adjustedX = adjustedPosition.dx - gridPadding;
+    final double adjustedY = adjustedPosition.dy - gridPadding;
     final int col = (adjustedX / totalCellSize).floor();
     final int row = (adjustedY / totalCellSize).floor();
 
@@ -267,6 +279,24 @@ class GameGridBlockPlacement {
     }
 
     return false;
+  }
+
+  /// 셀이 드래그 중인 블록의 일부인지 확인
+  bool isCellPartOfDraggedBlock(
+      int x, int y, Block block, double gridPadding, double totalCellSize) {
+    if (draggedBlock == null || draggedPosition == null) return false;
+
+    // 드래그 위치에서 블록의 기준 셀 위치 계산
+    final double adjustedX = draggedPosition!.dx - gridPadding;
+    final double adjustedY = draggedPosition!.dy - gridPadding;
+
+    // 셀 위치로 변환
+    final int baseCol = (adjustedX / totalCellSize).floor();
+    final int baseRow = (adjustedY / totalCellSize).floor();
+
+    // 현재 셀이 블록에 포함되는지 확인
+    List<Point> positions = calculateBlockPositions(block, baseRow, baseCol);
+    return positions.any((p) => p.x == x && p.y == y);
   }
 
   /// 특정 위치에 표시할 문자 가져오기

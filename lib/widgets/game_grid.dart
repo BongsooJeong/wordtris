@@ -260,22 +260,51 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
 
     // 드래그 중인 블록 처리 로직
     bool isValidPlacement = false;
+    bool isPartOfDraggedBlock = false;
+
     if (draggedBlock != null && draggedPosition != null) {
+      // 이 셀이 드래그 중인 블록의 일부인지 확인
+      isPartOfDraggedBlock = _blockPlacement.isCellPartOfDraggedBlock(
+          x, y, draggedBlock!, widget.gridPadding, totalCellSize);
+
+      // 배치 가능 여부 확인
       isValidPlacement = _blockPlacement.isValidPlacementForCell(
           x, y, draggedBlock!, widget.gridPadding, totalCellSize);
+    }
+
+    // 드래그 중인 블록 셀의 색상 및 테두리 설정
+    BoxDecoration decoration;
+
+    if (isPartOfDraggedBlock) {
+      // 이 셀이 드래그 중인 블록의 일부인 경우
+      if (isValidPlacement) {
+        // 배치 가능한 경우: 초록색 테두리와 투명한 초록색 배경
+        decoration = BoxDecoration(
+          color: draggedBlock!.color.withOpacity(0.4), // 블록 색상을 투명도 적용
+          borderRadius: BorderRadius.circular(4.0),
+          border: Border.all(color: Colors.green, width: 2.0),
+        );
+      } else {
+        // 배치 불가능한 경우: 빨간색 테두리와 투명한 빨간색 배경
+        decoration = BoxDecoration(
+          color: Colors.red.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(4.0),
+          border: Border.all(color: Colors.red, width: 2.0),
+        );
+      }
+    } else {
+      // 일반 셀
+      decoration = BoxDecoration(
+        color: cellColor,
+        borderRadius: BorderRadius.circular(4.0),
+      );
     }
 
     return Container(
       width: cellSize,
       height: cellSize,
       margin: EdgeInsets.all(cellMargin),
-      decoration: BoxDecoration(
-        color: cellColor,
-        borderRadius: BorderRadius.circular(4.0),
-        border: isValidPlacement
-            ? Border.all(color: Colors.green, width: 2.0)
-            : null,
-      ),
+      decoration: decoration,
       child: Center(
         child: cellText.isNotEmpty
             ? Text(
@@ -286,7 +315,21 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
                   color: Colors.white,
                 ),
               )
-            : null,
+            : isPartOfDraggedBlock && draggedBlock != null
+                ? Text(
+                    // 드래그 중인 블록의 문자 표시
+                    _blockPlacement.getCharacterForPosition(
+                            draggedBlock!, x, y) ??
+                        '',
+                    style: TextStyle(
+                      fontSize: cellSize * 0.6,
+                      fontWeight: FontWeight.bold,
+                      color: isValidPlacement
+                          ? Colors.white.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7),
+                    ),
+                  )
+                : null,
       ),
     );
   }
