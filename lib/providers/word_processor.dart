@@ -302,7 +302,19 @@ class WordProcessor {
 
     // 사용 가능한 글자 중 랜덤 선택
     List<String> charList = _availableCharacters.toList();
-    return charList[_random.nextInt(charList.length)];
+    int selectedIndex = _random.nextInt(charList.length);
+    String selectedChar = charList[selectedIndex];
+
+    // 선택된 글자를 목록에서 제거
+    _availableCharacters.remove(selectedChar);
+
+    // 글자 수가 너무 적어지면 새로운 단어 세트 선택
+    if (_availableCharacters.length < 5) {
+      print('사용 가능한 글자가 5개 미만으로 줄어 새로운 단어 세트를 선택합니다');
+      _selectNewWordBatch();
+    }
+
+    return selectedChar;
   }
 
   /// 빈도 기반 랜덤 글자 선택 (이전 방식)
