@@ -164,7 +164,7 @@ class GameProvider with ChangeNotifier {
 
   /// 초기 블록 생성
   void _generateInitialBlocks() {
-    _availableBlocks = _blockManager.generateBlocks(3);
+    _availableBlocks = _blockManager.generateBlocks(4);
     notifyListeners();
   }
 

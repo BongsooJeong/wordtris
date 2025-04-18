@@ -83,21 +83,9 @@ class GameGridBlockPlacement {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.offset);
 
-    // 마우스 위치를 그리드 셀 중앙으로 조정
-    final double adjustedX = localPosition.dx - gridPadding;
-    final double adjustedY = localPosition.dy - gridPadding;
-    final int col = (adjustedX / totalCellSize).floor();
-    final int row = (adjustedY / totalCellSize).floor();
-
-    // 조정된 위치 계산 (각 셀의 중앙에 맞추도록)
-    final double centeredX =
-        gridPadding + (col * totalCellSize) + (totalCellSize / 2);
-    final double centeredY =
-        gridPadding + (row * totalCellSize) + (totalCellSize / 2);
-
+    // 그냥 위치 정보만 저장
     _setState(() {
       draggedBlock = details.data;
-      // 계산된 중앙 위치를 사용 (그리드 셀의 중앙에 맞춤)
       draggedPosition = localPosition;
     });
   }
@@ -117,8 +105,8 @@ class GameGridBlockPlacement {
     // 셀 크기를 기준으로 행과 열 인덱스 계산
     final double adjustedX = localPosition.dx - gridPadding;
     final double adjustedY = localPosition.dy - gridPadding;
-    final col = (adjustedX / totalCellSize).floor();
-    final row = (adjustedY / totalCellSize).floor();
+    final int col = (adjustedX / totalCellSize).floor();
+    final int row = (adjustedY / totalCellSize).floor();
 
     // 게임 프로바이더 가져오기
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
@@ -128,7 +116,7 @@ class GameGridBlockPlacement {
 
     // 유효한 위치인지 확인하고 블록 배치
     if (row >= 0 && row < rows && col >= 0 && col < columns) {
-      // 블록의 위치 계산 (현재 위치 기준으로 블록의 셀 배치)
+      // 블록의 위치 계산
       List<Point> positions = calculateBlockPositions(details.data, row, col);
 
       // 블록 배치 시도
@@ -147,6 +135,9 @@ class GameGridBlockPlacement {
         // 배치할 수 없는 경우 시각적 피드백 (진동 등)
         HapticFeedback.mediumImpact();
       }
+    } else {
+      // 그리드 밖에 놓은 경우 피드백
+      HapticFeedback.mediumImpact();
     }
 
     // 드래그 상태 초기화
@@ -195,7 +186,7 @@ class GameGridBlockPlacement {
     List<Point> relativePoints = block.getRelativePoints();
 
     // 블록의 경계 계산
-    int minX = 999, minY = 999, maxX = 0, maxY = 0;
+    int minX = 999, minY = 999, maxX = -1, maxY = -1;
 
     for (var point in relativePoints) {
       if (point.x < minX) minX = point.x;
@@ -204,22 +195,18 @@ class GameGridBlockPlacement {
       if (point.y > maxY) maxY = point.y;
     }
 
-    // 블록의 실제 폭과 높이 (인덱스라서 +1 필요)
+    // 블록의 실제 폭과 높이
     int width = maxX - minX + 1;
     int height = maxY - minY + 1;
 
-    // 중심점 계산 - 정확한 중앙을 구함
-    double centerOffsetX = width / 2.0 - 0.5;
-    double centerOffsetY = height / 2.0 - 0.5;
+    // 중앙 배치를 위한 오프셋 계산
+    int offsetX = width ~/ 2;
+    int offsetY = height ~/ 2;
 
-    // 조정된 기준점 계산
-    int adjustedCol = baseCol - (width % 2 == 0 ? width ~/ 2 - 1 : width ~/ 2);
-    int adjustedRow =
-        baseRow - (height % 2 == 0 ? height ~/ 2 - 1 : height ~/ 2);
-
+    // 모든 블록 셀의 위치 계산 (블록의 중앙이 기준)
     for (var point in relativePoints) {
-      int row = adjustedRow + (point.y - minY);
-      int col = adjustedCol + (point.x - minX);
+      int row = baseRow + (point.y - minY) - offsetY;
+      int col = baseCol + (point.x - minX) - offsetX;
       positions.add(Point(col, row));
     }
 
@@ -234,8 +221,24 @@ class GameGridBlockPlacement {
     // 드래그 위치에서 블록의 기준 셀 위치 계산
     final double adjustedX = draggedPosition!.dx - gridPadding;
     final double adjustedY = draggedPosition!.dy - gridPadding;
-    final baseCol = (adjustedX / totalCellSize).floor();
-    final baseRow = (adjustedY / totalCellSize).floor();
+
+    // 그리드 내부로 위치 계산 (열과 행)
+    final gameProvider =
+        Provider.of<GameProvider>(_getContext(), listen: false);
+    final int gridRows = gameProvider.grid.rows;
+    final int gridColumns = gameProvider.grid.columns;
+
+    // 셀 위치로 변환
+    final int baseCol = (adjustedX / totalCellSize).floor();
+    final int baseRow = (adjustedY / totalCellSize).floor();
+
+    // 그리드 범위를 벗어나면 false 반환
+    if (baseCol < 0 ||
+        baseCol >= gridColumns ||
+        baseRow < 0 ||
+        baseRow >= gridRows) {
+      return false;
+    }
 
     // 현재 셀이 블록에 포함되는지 확인
     List<Point> positions = calculateBlockPositions(block, baseRow, baseCol);
@@ -243,9 +246,6 @@ class GameGridBlockPlacement {
 
     // 포함된다면 배치 가능 여부 확인
     if (isPartOfDraggedBlock) {
-      final gameProvider =
-          Provider.of<GameProvider>(_getContext(), listen: false);
-
       // 모든 위치가 그리드 범위 내에 있고 비어있는지 확인
       bool isValid = true;
       for (var point in positions) {

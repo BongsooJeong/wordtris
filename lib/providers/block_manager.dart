@@ -3,6 +3,40 @@ import 'dart:math';
 import '../models/block.dart';
 import 'word_processor.dart';
 
+/// WordTris 게임의 블록 관리를 담당하는 클래스 API 문서
+///
+/// [BlockManager] 클래스
+/// 블록 생성, 관리 및 변형을 담당하는 클래스
+///
+/// 주요 기능:
+/// - 다양한 모양과 크기의 블록 생성
+/// - 빈도 기반 한글 문자를 포함한 블록 생성
+/// - 특수 블록(폭탄 블록 등) 생성
+/// - 블록 개수 관리
+///
+/// 블록 생성 메서드:
+/// - generateNewBlock(): Block
+///   빈도 기반으로 새로운 단일 블록 생성
+///
+/// - generateConsonantBlock(): Block
+///   자음 기반의 단일 블록 생성
+///
+/// - generateVowelBlock(): Block
+///   모음 기반의 단일 블록 생성
+///
+/// - generateBlocks(int count): List<Block>
+///   지정된 수만큼의 랜덤 블록 생성
+///
+/// - createRandomBlock(): Block
+///   다양한 모양과 크기의 랜덤 블록 생성
+///
+/// - generateBombBlock(): Block
+///   폭탄 블록 생성
+///
+/// 유틸리티 메서드:
+/// - isBlockCountExceeded(List<Block> blocks): bool
+///   블록 수가 최대 제한을 초과하는지 확인
+
 class BlockManager {
   final WordProcessor _wordProcessor;
   final Random _random = Random();

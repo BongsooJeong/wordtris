@@ -4,6 +4,48 @@ import 'block.dart';
 import 'grid.dart';
 import '../utils/point.dart';
 
+/// WordTris 게임 상태 관리 API 문서
+///
+/// [GameStatus] 열거형
+/// - ready: 게임 준비 상태
+/// - playing: 게임 진행 중
+/// - paused: 게임 일시 정지
+/// - gameOver: 게임 종료
+///
+/// [GameState] 클래스 API
+/// - constructor: GameState({grid, activeBlocks, score, level, status, completedWords})
+///   게임 상태 객체 생성
+///
+/// 주요 메서드:
+/// - initialize(): GameState
+///   새 게임을 시작하기 위한 초기 상태 생성
+///
+/// - generateNewBlocks(): GameState
+///   새로운 블록을 생성하여 활성 블록 리스트에 추가 (최대 5개)
+///
+/// - placeBlock(Block block, List<Point> points): GameState
+///   블록을 게임 그리드의 지정된 위치에 배치
+///
+/// - processWords(Set<String> validWords): GameState
+///   완성된 단어를 처리하고 점수 계산
+///
+/// - endGame(): GameState
+///   게임을 종료 상태로 변경
+///
+/// 속성:
+/// - grid: 게임 보드 그리드
+/// - activeBlocks: 현재 사용 가능한 블록 목록
+/// - score: 현재 게임 점수
+/// - level: 현재 게임 레벨 (1-10)
+/// - status: 현재 게임 상태
+/// - completedWords: 완성한 단어 목록
+///
+/// 내부 메서드:
+/// - _generateInitialBlocks(): List<Block>
+///   초기 블록 세트 생성
+/// - _getShapeForSize(int size): BlockShape
+///   블록 크기에 맞는 모양 선택
+
 /// 게임 상태 열거형
 enum GameStatus {
   ready, // 게임 준비

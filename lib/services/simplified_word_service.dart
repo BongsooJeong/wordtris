@@ -1,3 +1,35 @@
+/// WordTris 게임의 단어 처리를 담당하는 서비스 API 문서
+///
+/// [WordService] 클래스
+/// 한글 단어의 유효성 검사, 단어 목록 관리, 통계 기능을 제공하는 싱글톤 클래스
+///
+/// 주요 기능:
+/// - 단어 데이터베이스 초기화 및 관리
+/// - 단어 유효성 검사
+/// - 단어 목록 제공
+/// - 단어 통계 정보 제공
+///
+/// 초기화 및 데이터 로드:
+/// - initialize(): Future<void>
+///   단어 데이터베이스 초기화 및 로드
+///
+/// - _loadWordsFromAsset(): Future<bool>
+///   에셋에서 단어 파일을 로드하여 메모리에 캐시
+///
+/// 단어 처리 메서드:
+/// - isValidWord(String word): Future<bool>
+///   주어진 단어가 유효한지 확인
+///
+/// - getWords({int limit = 100}): Future<List<String>>
+///   제한된 수의 단어 목록 반환
+///
+/// 통계 관련 메서드:
+/// - getStats(): Future<Map<String, dynamic>>
+///   전체 단어 수와 길이별 통계 정보 반환
+///
+/// - _calculateWordStats(): Map<int, int>
+///   단어 길이별 통계 계산
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';

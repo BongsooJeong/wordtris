@@ -10,6 +10,38 @@ import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+/// WordTris 게임의 메인 화면을 구성하는 위젯 API 문서
+///
+/// [GameScreen] 클래스
+/// 게임의 주요 화면 구성과 상태 관리를 담당하는 StatefulWidget
+///
+/// 주요 기능:
+/// - 게임 화면 UI 구성
+/// - 게임 상태 관리
+/// - 단어 검색 및 제안 기능
+/// - 폭탄 생성 및 표시
+///
+/// 상태 관리:
+/// - initState(): void
+///   게임 초기화 및 상태 설정
+///
+/// - dispose(): void
+///   리소스 정리 및 타이머 취소
+///
+/// 검색 관련 메서드:
+/// - _onSearchChanged(String value): void
+///   검색어 변경 시 디바운싱 처리
+///
+/// - _getWordSuggestions(String pattern): Future<void>
+///   입력된 패턴에 맞는 단어 제안 가져오기
+///
+/// UI 구성 메서드:
+/// - build(BuildContext context): Widget
+///   전체 게임 화면 구성
+///
+/// - _buildBombIndicator(GameProvider gameProvider): Widget
+///   폭탄 생성 상태 표시 위젯 구성
+
 /// 게임 화면 위젯
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -82,14 +114,14 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<GameProvider>(
-        builder: (context, gameProvider, child) {
-          if (gameProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      builder: (context, gameProvider, child) {
+        if (gameProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          if (gameProvider.errorMessage.isNotEmpty) {
-            return Center(child: Text(gameProvider.errorMessage));
-          }
+        if (gameProvider.errorMessage.isNotEmpty) {
+          return Center(child: Text(gameProvider.errorMessage));
+        }
 
         // 게임 화면 구성
         return Scaffold(
@@ -101,7 +133,8 @@ class _GameScreenState extends State<GameScreen> {
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () {
-                  Provider.of<GameProvider>(context, listen: false).restartGame();
+                  Provider.of<GameProvider>(context, listen: false)
+                      .restartGame();
                 },
               ),
             ],
@@ -109,41 +142,41 @@ class _GameScreenState extends State<GameScreen> {
           body: Stack(
             children: [
               Column(
-                  children: [
-                    // 점수 디스플레이
-                    ScoreDisplay(
-                      score: gameProvider.score,
-                      level: gameProvider.level,
-                    ),
-                    
-                    // 폭탄 인디케이터 추가
-                    _buildBombIndicator(gameProvider),
-                    
-                    // 게임 그리드
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GameGrid(
-                          cellSize: 32.0,
-                          gridPadding: 4.0,
-                        ),
+                children: [
+                  // 점수 디스플레이
+                  ScoreDisplay(
+                    score: gameProvider.score,
+                    level: gameProvider.level,
+                  ),
+
+                  // 폭탄 인디케이터 추가
+                  _buildBombIndicator(gameProvider),
+
+                  // 게임 그리드
+                  const Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: GameGrid(
+                        cellSize: 32.0,
+                        gridPadding: 4.0,
                       ),
                     ),
-                    
+                  ),
+
                   // 블록 트레이를 위한 공간 확보
-                  SizedBox(height: 150),
-                      ],
-                    ),
-              
+                  const SizedBox(height: 150),
+                ],
+              ),
+
               // 블록 트레이 (화면 하단에 고정)
-              BlockTray(
+              const BlockTray(
                 cellSize: 40.0,
                 spacing: 8.0,
-                        ),
-                      ],
-                    ),
-          );
-        },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -173,7 +206,8 @@ class _GameScreenState extends State<GameScreen> {
           // 현재 클리어 턴 수
           Row(
             children: [
-              const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
+              const Icon(Icons.check_circle_outline,
+                  color: Colors.green, size: 20),
               const SizedBox(width: 4),
               Text(
                 '클리어 턴: $clearedWords',
@@ -184,31 +218,30 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ],
           ),
-          
+
           // 폭탄 생성 정보
           Row(
             children: [
-              Icon(Icons.fireplace, 
-                color: remainingTurns == 0 ? Colors.red : Colors.grey, 
-                size: 20
-              ),
+              Icon(Icons.fireplace,
+                  color: remainingTurns == 0 ? Colors.red : Colors.grey,
+                  size: 20),
               const SizedBox(width: 4),
               remainingTurns == 0
-                ? const Text(
-                    '폭탄 생성됨!',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                  ? const Text(
+                      '폭탄 생성됨!',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    )
+                  : Text(
+                      '폭탄까지 $remainingTurns턴',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  )
-                : Text(
-                    '폭탄까지 $remainingTurns턴',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
             ],
           ),
         ],

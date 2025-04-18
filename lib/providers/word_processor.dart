@@ -6,6 +6,45 @@ import '../models/grid.dart';
 import '../services/word_service.dart';
 import '../utils/point.dart';
 
+/// WordTris 게임의 한글 단어 처리를 담당하는 클래스 API 문서
+///
+/// [WordProcessor] 클래스
+/// 한글 문자 생성, 단어 검증, 점수 계산 등을 담당하는 클래스
+///
+/// 주요 기능:
+/// - 빈도 기반 한글 문자 생성
+/// - 자음/모음 기반 문자 생성
+/// - 단어 검증 및 점수 계산
+/// - 사전 검색 기능
+///
+/// 초기화 메서드:
+/// - initialize(): Future<void>
+///   한글 처리를 위한 초기 설정 수행
+///
+/// 문자 생성 메서드:
+/// - getFrequencyBasedChar(): String
+///   빈도 기반으로 한글 문자 생성
+///
+/// - getRandomConsonantChar(): String
+///   자음 기반의 랜덤 문자 생성
+///
+/// - getRandomVowelChar(): String
+///   모음 기반의 랜덤 문자 생성
+///
+/// 단어 처리 메서드:
+/// - findWords(Grid grid): Future<List<Word>>
+///   그리드에서 유효한 단어 찾기
+///
+/// - getWordSuggestions(String pattern): Future<List<String>>
+///   패턴에 맞는 단어 제안 가져오기
+///
+/// - calculateWordPoints(Word word, int level): int
+///   단어의 점수 계산
+///
+/// 사전 기능:
+/// - openDictionary(String word): Future<bool>
+///   국립국어원 사전에서 단어 검색
+
 /// 한글 단어 처리를 담당하는 클래스
 class WordProcessor {
   final WordService _wordService = WordService();

@@ -1,3 +1,46 @@
+/// WordTris 게임의 단어 처리 및 검증을 담당하는 서비스 API 문서
+///
+/// [WordService] 클래스
+/// SQLite 데이터베이스와 파일 기반 초성 인덱스를 사용하여 한글 단어를 관리하는 싱글톤 클래스
+///
+/// 주요 기능:
+/// - 단어 데이터베이스 초기화 및 관리
+/// - 초성별 단어 인덱싱 및 로딩
+/// - 단어 유효성 검사
+/// - 단어 검색 및 제안
+/// - 웹/모바일 환경 대응
+///
+/// 초기화 및 데이터 로드:
+/// - initialize(): Future<void>
+///   서비스 초기화 및 필수 데이터 로드
+///
+/// - _initDatabase(): Future<void>
+///   SQLite 데이터베이스 초기화
+///
+/// - _loadInitialWords(Database db): Future<void>
+///   초기 단어 데이터 로드
+///
+/// 단어 처리:
+/// - isValidWordAsync(String word): Future<bool>
+///   단어의 유효성 비동기 검사
+///
+/// - getWordAsync(String pattern): Future<List<String>>
+///   패턴에 맞는 단어 검색
+///
+/// 초성 관리:
+/// - loadConsonantData(String consonant): Future<void>
+///   특정 초성의 단어 데이터 로드
+///
+/// - preloadCommonConsonants(): Future<void>
+///   자주 사용되는 초성 데이터 미리 로드
+///
+/// 캐시 관리:
+/// - clearCache(): void
+///   단어 캐시 초기화
+///
+/// - _loadWordIndex(): Future<bool>
+///   초성 인덱스 파일 로드
+
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
@@ -309,19 +352,19 @@ class WordService {
 
     try {
       print('초성 인덱스 로드 시도');
-      final String indexData = await rootBundle
-          .loadString('assets/data/korean_words_index.json');
-      
+      final String indexData =
+          await rootBundle.loadString('assets/data/korean_words_index.json');
+
       // JSON 파일은 초성별 단어 수를 저장하고 있음
       final Map<String, dynamic> rawData = json.decode(indexData);
-      
+
       // 초성 인덱스 맵 생성 - 파일 경로 형식으로 변환
       _consonantIndex = {};
       rawData.forEach((consonant, count) {
         // 파일 이름 패턴 지정
         _consonantIndex[consonant] = 'korean_words_$consonant.json';
       });
-      
+
       _indexLoaded = true;
       print('초성 인덱스 로드 성공: ${_consonantIndex.length}개 항목');
       return true;
@@ -342,7 +385,7 @@ class WordService {
     try {
       String filePath;
       if (_indexLoaded && _consonantIndex.containsKey(consonant)) {
-        filePath = 'assets/data/' + _consonantIndex[consonant]!;
+        filePath = 'assets/data/${_consonantIndex[consonant]!}';
       } else {
         print('초성 $consonant에 대한 인덱스 정보 없음');
         return false;
@@ -351,13 +394,13 @@ class WordService {
       print('$filePath 로드 시도');
       final String data = await rootBundle.loadString(filePath);
       final List<dynamic> words = json.decode(data);
-      
+
       // 세트 초기화
       final Set<String> wordSet = {};
       for (final word in words) {
         wordSet.add(word.toString());
       }
-      
+
       // 맵에 추가
       _consonantWordMap[consonant] = wordSet;
       print('$consonant 초성 단어 ${wordSet.length}개 로드 완료');

@@ -1,3 +1,63 @@
+/// WordTris 게임의 블록 트레이 위젯 API 문서
+///
+/// [BlockTray] 클래스
+/// 게임에서 사용 가능한 블록들을 표시하고 관리하는 StatelessWidget
+///
+/// 주요 기능:
+/// - 사용 가능한 블록 표시 (기본 4개)
+/// - 블록 회전 처리
+/// - 드래그 앤 드롭 기능
+/// - 블록 레이아웃 관리
+/// - 블록들의 가운데 정렬
+///
+/// 생성자 매개변수:
+/// - cellSize: double
+///   블록 셀의 크기 (기본값: 40.0)
+///
+/// - spacing: double
+///   블록 간의 간격 (기본값: 16.0)
+///
+/// 이벤트 처리:
+/// - _handleTap(BuildContext context, Block block): void
+///   블록 회전 이벤트 처리
+///
+/// UI 구성:
+/// - build(BuildContext context): Widget
+///   전체 트레이 UI 구성
+///
+/// - buildBlockWidget(Block block, double opacity): Widget
+///   개별 블록 위젯 생성 및 2차원 레이아웃 적용
+///
+/// 레이아웃 구조:
+/// ```
+/// Positioned (화면 하단에 고정)
+/// └─ Container (트레이 메인 컨테이너)
+///    └─ Column
+///       ├─ Container (드래그 핸들)
+///       ├─ Text (트레이 제목)
+///       └─ Expanded
+///          └─ Center (X축 가운데 정렬)
+///             └─ Row (가운데 정렬)
+///                └─ SizedBox (고정 높이)
+///                   └─ ListView.builder (가로 스크롤)
+///                      └─ Draggable<Block>
+///                         ├─ Material (드래그 중 표시)
+///                         │  └─ BlockWidget
+///                         └─ GestureDetector (탭 처리)
+///                            └─ BlockWidget
+///
+/// BlockWidget 구조:
+/// Container (블록 컨테이너)
+/// └─ Column
+///    ├─ SizedBox (여백)
+///    └─ Expanded
+///       └─ LayoutBuilder
+///          └─ Stack
+///             └─ Positioned[] (블록 셀들)
+///                └─ Container (개별 셀)
+///                   └─ Text/BombWidget (문자 또는 폭탄)
+/// ```
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/block.dart';
@@ -77,35 +137,59 @@ class BlockTray extends StatelessWidget {
             const SizedBox(height: 8),
             // 블록 목록
             Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: blocks.length,
-                itemBuilder: (context, index) {
-                  final block = blocks[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Draggable<Block>(
-                      data: block,
-                      onDragStarted: () {
-                        // 드래그 시작 시 처리
-                      },
-                      feedback: Material(
-                        color: Colors.transparent,
-                        child: buildBlockWidget(block, 0.7),
-                      ),
-                      childWhenDragging: Opacity(
-                        opacity: 0.3,
-                        child: buildBlockWidget(block, 0.3),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          _handleTap(context, block);
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: cellSize * 4,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: blocks.length,
+                        itemBuilder: (context, index) {
+                          final block = blocks[index];
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Draggable<Block>(
+                              data: block,
+                              onDragStarted: () {
+                                // 드래그 시작 시 처리
+                              },
+                              // 드래그 중일 때 보여줄 위젯
+                              feedback: Material(
+                                color: Colors.transparent,
+                                elevation: 4.0,
+                                child: buildBlockWidget(block, 0.7),
+                              ),
+                              // 드래그 앵커 전략 - 블록의 중앙점이 마우스 포인터에 위치하도록 설정
+                              dragAnchorStrategy:
+                                  (draggable, context, position) {
+                                // 블록 위젯의 중앙점을 계산
+                                final RenderBox renderBox =
+                                    context.findRenderObject() as RenderBox;
+                                final size = renderBox.size;
+                                return Offset(size.width / 2, size.height / 2);
+                              },
+                              childWhenDragging: Opacity(
+                                opacity: 0.3,
+                                child: buildBlockWidget(block, 0.3),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _handleTap(context, block);
+                                },
+                                child: buildBlockWidget(block, 1.0),
+                              ),
+                            ),
+                          );
                         },
-                        child: buildBlockWidget(block, 1.0),
                       ),
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
             ),
           ],
@@ -136,8 +220,12 @@ class BlockTray extends StatelessWidget {
     bool isBombBlock = block.isBomb;
 
     return Container(
-      width: gridWidth <= 2 ? cellSize * 3.5 : (gridWidth <= 3 ? cellSize * 4.5 : cellSize * 5.5),
-      height: gridHeight <= 2 ? cellSize * 3.5 : (gridHeight <= 3 ? cellSize * 4.5 : cellSize * 5.5),
+      width: gridWidth <= 2
+          ? cellSize * 3.5
+          : (gridWidth <= 3 ? cellSize * 4.5 : cellSize * 5.5),
+      height: gridHeight <= 2
+          ? cellSize * 3.5
+          : (gridHeight <= 3 ? cellSize * 4.5 : cellSize * 5.5),
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.1),
@@ -160,27 +248,30 @@ class BlockTray extends StatelessWidget {
                   // 사용 가능한 공간 계산
                   final availableWidth = constraints.maxWidth;
                   final availableHeight = constraints.maxHeight;
-                  
+
                   // 셀 사이의 간격
-                  final cellPadding = 2.0;
-                  
+                  const cellPadding = 2.0;
+
                   // 셀 크기 - 정사각형으로 유지
                   // 작은 grid일수록 더 큰 셀로, 큰 grid일수록 조금 작은 셀로 조정
-                  final maxCellSize = gridWidth <= 2 ? 60.0 : 
-                                     (gridWidth == 3 ? 50.0 : 45.0);
-                  
+                  final maxCellSize =
+                      gridWidth <= 2 ? 60.0 : (gridWidth == 3 ? 50.0 : 45.0);
+
                   double cellSize = Math.min(
-                    (availableWidth - (gridWidth - 1) * cellPadding) / gridWidth,
-                    (availableHeight - (gridHeight - 1) * cellPadding) / gridHeight
-                  );
-                  
+                      (availableWidth - (gridWidth - 1) * cellPadding) /
+                          gridWidth,
+                      (availableHeight - (gridHeight - 1) * cellPadding) /
+                          gridHeight);
+
                   // 최대 크기 제한
                   cellSize = Math.min(cellSize, maxCellSize);
-                  
+
                   // 그리드 전체 크기 계산
-                  final gridRealWidth = (cellSize + cellPadding) * gridWidth - cellPadding;
-                  final gridRealHeight = (cellSize + cellPadding) * gridHeight - cellPadding;
-                  
+                  final gridRealWidth =
+                      (cellSize + cellPadding) * gridWidth - cellPadding;
+                  final gridRealHeight =
+                      (cellSize + cellPadding) * gridHeight - cellPadding;
+
                   return Center(
                     child: SizedBox(
                       width: gridRealWidth,
@@ -189,8 +280,10 @@ class BlockTray extends StatelessWidget {
                         children: [
                           for (int i = 0; i < relativePoints.length; i++)
                             Positioned(
-                              left: relativePoints[i].x * (cellSize + cellPadding),
-                              top: relativePoints[i].y * (cellSize + cellPadding),
+                              left: relativePoints[i].x *
+                                  (cellSize + cellPadding),
+                              top: relativePoints[i].y *
+                                  (cellSize + cellPadding),
                               child: Container(
                                 width: cellSize,
                                 height: cellSize,
@@ -213,9 +306,11 @@ class BlockTray extends StatelessWidget {
                                           child: Padding(
                                             padding: const EdgeInsets.all(2.0),
                                             child: Text(
-                                              _getCharacterForPosition(block, i),
+                                              _getCharacterForPosition(
+                                                  block, i),
                                               style: TextStyle(
-                                                fontSize: Math.min(cellSize * 0.6, 20),
+                                                fontSize: Math.min(
+                                                    cellSize * 0.6, 20),
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white,
                                               ),
@@ -256,10 +351,10 @@ class BlockTray extends StatelessWidget {
           child: Opacity(
             opacity: opacity * 0.3,
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: RadialGradient(
                   colors: [Colors.white, Colors.transparent],
-                  stops: const [0.1, 1.0],
+                  stops: [0.1, 1.0],
                   center: Alignment.center,
                   radius: 0.8,
                 ),
@@ -283,12 +378,12 @@ class BlockTray extends StatelessWidget {
         return character;
       }
     }
-    
+
     // 폴백: 기존 방식으로 처리 (문제가 있을 경우 대비)
     if (position < block.characters.length) {
       return block.characters[position];
     }
-    
+
     return '';
   }
 }

@@ -6,6 +6,46 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+/// WordTris 게임의 단어 데이터베이스 관리 서비스 API 문서
+///
+/// [WordDatabaseService] 클래스
+/// SQLite 데이터베이스를 사용하여 한글 단어를 관리하고 캐싱하는 싱글톤 클래스
+///
+/// 주요 기능:
+/// - SQLite 데이터베이스 초기화 및 관리
+/// - 자주 사용되는 단어 메모리 캐싱
+/// - 단어 유효성 검사
+/// - 단어 추가 및 검색
+/// - 웹 환경 대응 (임시 단어 목록 사용)
+///
+/// 데이터베이스 관리:
+/// - database: Future<Database?>
+///   데이터베이스 인스턴스 반환
+///
+/// - _initDatabase(): Future<Database>
+///   데이터베이스 초기화 및 생성
+///
+/// - _createTables(Database db): Future<void>
+///   필요한 테이블과 인덱스 생성
+///
+/// 캐시 관리:
+/// - initializeCache(): Future<void>
+///   자주 사용되는 단어를 메모리에 캐싱
+///
+/// 단어 처리:
+/// - isValidWord(String word): Future<bool>
+///   단어의 유효성 검사 (캐시 및 데이터베이스)
+///
+/// - addWord(String word): Future<bool>
+///   새로운 단어 추가
+///
+/// - searchWords(String pattern): Future<List<String>>
+///   패턴에 맞는 단어 검색
+///
+/// 통계:
+/// - getWordStats(): Future<Map<String, dynamic>>
+///   단어 통계 정보 반환
+
 /// 한글 단어 데이터베이스를 관리하는 서비스 클래스
 class WordDatabaseService {
   static final WordDatabaseService _instance = WordDatabaseService._internal();
