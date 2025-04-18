@@ -106,6 +106,18 @@ class GameProvider with ChangeNotifier {
   int get wordClearCount => _wordClearCount;
   bool get bombGenerated => _bombGenerated;
 
+  /// 현재 추천 단어 목록 가져오기
+  List<String> get suggestedWordSet => _wordProcessor.selectedWords;
+
+  /// 단어 사용 횟수 가져오기
+  Map<String, int> get wordUsageCounts => _wordProcessor.wordUsageCount;
+
+  /// 새 단어 세트 선택
+  Future<void> selectNewWordSet() async {
+    await _wordProcessor.selectNewWordSet();
+    notifyListeners();
+  }
+
   // 생성자에서 초기화
   GameProvider() {
     _blockManager = BlockManager(_wordProcessor);
@@ -328,5 +340,10 @@ class GameProvider with ChangeNotifier {
   set availableBlocks(List<Block> blocks) {
     _availableBlocks = blocks;
     notifyListeners();
+  }
+
+  /// 단어 사전 검색
+  Future<bool> openDictionary(String word) async {
+    return await _wordProcessor.openDictionary(word);
   }
 }

@@ -89,8 +89,17 @@ class WordService {
         await loadConsonantData('ㄱ');
         await loadConsonantData('ㄴ');
         await loadConsonantData('ㄷ');
-        await loadConsonantData('ㅇ'); // '아우'와 같은 단어를 위해 추가
-        await loadConsonantData('ㅂ'); // '바다'와 같은 단어를 위해 추가
+        await loadConsonantData('ㄹ');
+        await loadConsonantData('ㅁ');
+        await loadConsonantData('ㅂ');
+        await loadConsonantData('ㅅ');
+        await loadConsonantData('ㅇ');
+        await loadConsonantData('ㅈ');
+        await loadConsonantData('ㅊ');
+        await loadConsonantData('ㅋ');
+        await loadConsonantData('ㅌ');
+        await loadConsonantData('ㅍ');
+        await loadConsonantData('ㅎ');
 
         _isInitialized = true;
         return;
@@ -722,11 +731,29 @@ class WordService {
   /// 유효한 단어 세트 반환
   Set<String> getValidWords() {
     if (!_isInitialized) {
-      print('WordService가 초기화되지 않음');
-      return {};
+      print('WordService가 초기화되지 않음, 기본 단어 목록 반환');
+      return Set.from(_getFallbackWords());
     }
 
-    return _validWords;
+    // 이미 유효한 단어가 있으면 그대로 반환
+    if (_validWords.isNotEmpty) {
+      return _validWords;
+    }
+
+    // 초성별 데이터에서 단어 수집
+    Set<String> allWords = {};
+
+    for (var consonantSet in _consonantWordMap.values) {
+      allWords.addAll(consonantSet);
+    }
+
+    // 수집된 단어가 있으면 반환
+    if (allWords.isNotEmpty) {
+      return allWords;
+    }
+
+    // 없으면 기본 단어 목록 반환
+    return Set.from(_getFallbackWords());
   }
 
   /// 데이터베이스에 저장된 총 단어 수 반환

@@ -6,6 +6,7 @@ import '../providers/game_provider.dart';
 import '../widgets/game_grid.dart';
 import '../widgets/block_tray.dart';
 import '../widgets/score_display.dart';
+import '../widgets/word_suggestions.dart';
 import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -139,39 +140,61 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ],
           ),
-          body: Stack(
+          body: Row(
             children: [
-              Column(
-                children: [
-                  // 점수 디스플레이
-                  ScoreDisplay(
-                    score: gameProvider.score,
-                    level: gameProvider.level,
-                  ),
+              // 메인 게임 영역
+              Expanded(
+                flex: 3,
+                child: Stack(
+                  children: [
+                    Column(
+                      children: [
+                        // 점수 디스플레이
+                        ScoreDisplay(
+                          score: gameProvider.score,
+                          level: gameProvider.level,
+                        ),
 
-                  // 폭탄 인디케이터 추가
-                  _buildBombIndicator(gameProvider),
+                        // 폭탄 인디케이터 추가
+                        _buildBombIndicator(gameProvider),
 
-                  // 게임 그리드
-                  const Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: GameGrid(
-                        cellSize: 32.0,
-                        gridPadding: 4.0,
-                      ),
+                        // 게임 그리드
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: GameGrid(
+                              cellSize: 32.0,
+                              gridPadding: 4.0,
+                            ),
+                          ),
+                        ),
+
+                        // 블록 트레이를 위한 공간 확보
+                        const SizedBox(height: 150),
+                      ],
                     ),
-                  ),
 
-                  // 블록 트레이를 위한 공간 확보
-                  const SizedBox(height: 150),
-                ],
+                    // 블록 트레이 (화면 하단에 고정)
+                    const BlockTray(
+                      cellSize: 40.0,
+                      spacing: 8.0,
+                    ),
+                  ],
+                ),
               ),
 
-              // 블록 트레이 (화면 하단에 고정)
-              const BlockTray(
-                cellSize: 40.0,
-                spacing: 8.0,
+              // 추천 단어 영역
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: WordSuggestions(
+                    words: gameProvider.suggestedWordSet,
+                    wordUsageCount: gameProvider.wordUsageCounts,
+                    onRefresh: () => gameProvider.selectNewWordSet(),
+                    onDictionaryLookup: gameProvider.openDictionary,
+                  ),
+                ),
               ),
             ],
           ),

@@ -48,12 +48,29 @@ import '../utils/point.dart';
 /// 한글 단어 처리를 담당하는 클래스
 class WordProcessor {
   final WordService _wordService = WordService();
+  final Random _random = Random();
 
   // 빈도 기반 한글 글자 데이터
   List<String> _top100Chars = [];
   List<String> _top101_200Chars = [];
   List<String> _top201_300Chars = [];
   bool _frequencyDataLoaded = false;
+
+  // 현재 게임에 사용 중인 선택된 단어 목록
+  List<String> _selectedWords = [];
+
+  // 현재 사용 가능한 글자 목록
+  final Set<String> _availableCharacters = {};
+
+  // 각 단어 사용 횟수 카운트
+  final Map<String, int> _wordUsageCount = {};
+
+  // 단어 선택 시 최소/최대 길이
+  static const int _minWordLength = 2;
+  static const int _maxWordLength = 5;
+
+  // 한 번에 선택할 단어 수
+  static const int _wordsPerBatch = 10;
 
   // 자주 사용되는 한글 글자 목록 (약 150개)
   static const List<String> _commonKoreanChars = [
@@ -145,6 +162,9 @@ class WordProcessor {
     if (!_frequencyDataLoaded) {
       await _loadFrequencyData();
     }
+
+    // 초기 단어 세트 선택
+    await _selectNewWordBatch();
   }
 
   /// 빈도 데이터 파일 로드
@@ -195,62 +215,112 @@ class WordProcessor {
     _frequencyDataLoaded = true;
   }
 
-  /// 빈도 기반 랜덤 글자 선택
+  /// 새 단어 배치 선택
+  Future<void> _selectNewWordBatch() async {
+    print('새로운 단어 배치 선택 중...');
+
+    // 기존 사용 중인 단어들 사용 횟수 초기화
+    _wordUsageCount.clear();
+
+    // 서비스에서 단어 목록 가져오기
+    List<String> allWords = _wordService.getValidWords().toList();
+
+    if (allWords.isEmpty) {
+      print('사용 가능한 단어가 없습니다. 서비스가 제대로 초기화되었는지 확인하세요.');
+      // 서비스가 초기화되지 않았거나 단어가 없는 경우, 강제로 초기화 시도
+      await _wordService.initialize();
+      allWords = _wordService.getValidWords().toList();
+    }
+
+    // 단어 필터링 (길이에 따라)
+    List<String> filteredWords = allWords
+        .where((word) =>
+            word.length >= _minWordLength && word.length <= _maxWordLength)
+        .toList();
+
+    if (filteredWords.isEmpty) {
+      print('필터링된 단어가 없습니다. 모든 단어 사용');
+      filteredWords = allWords;
+    }
+
+    // 필터링된 단어 중 무작위로 선택
+    filteredWords.shuffle(_random);
+    _selectedWords = filteredWords.take(_wordsPerBatch).toList();
+
+    // 선택된 단어가 없는 경우(예외 상황)에도 게임이 작동하게 기본 단어 추가
+    if (_selectedWords.isEmpty) {
+      _selectedWords = [
+        '사과',
+        '바나나',
+        '학교',
+        '공부',
+        '친구',
+        '가족',
+        '행복',
+        '사랑',
+        '여행',
+        '음식'
+      ];
+    }
+
+    // 선택된 단어에서 고유 글자 추출
+    _updateAvailableCharacters();
+
+    print('선택된 단어 배치: $_selectedWords');
+    print('사용 가능한 글자 목록: $_availableCharacters');
+  }
+
+  /// 사용 가능한 글자 목록 업데이트
+  void _updateAvailableCharacters() {
+    _availableCharacters.clear();
+
+    for (String word in _selectedWords) {
+      for (int i = 0; i < word.length; i++) {
+        _availableCharacters.add(word[i]);
+      }
+    }
+
+    // 글자 수가 너무 적으면 기본 글자 추가
+    if (_availableCharacters.length < 10) {
+      for (int i = 0; i < 10 && i < _commonKoreanChars.length; i++) {
+        _availableCharacters.add(_commonKoreanChars[i]);
+      }
+    }
+  }
+
+  /// 현재 선택된 단어 세트에서 글자 가져오기
+  String getCharFromWordSet() {
+    // 사용 가능한 글자가 없으면 새로운 단어 세트 선택
+    if (_availableCharacters.isEmpty) {
+      _selectNewWordBatch();
+
+      // 그래도 없으면 기본 글자 반환
+      if (_availableCharacters.isEmpty) {
+        return _commonKoreanChars[_random.nextInt(_commonKoreanChars.length)];
+      }
+    }
+
+    // 사용 가능한 글자 중 랜덤 선택
+    List<String> charList = _availableCharacters.toList();
+    return charList[_random.nextInt(charList.length)];
+  }
+
+  /// 빈도 기반 랜덤 글자 선택 (이전 방식)
   String getFrequencyBasedChar() {
-    if (!_frequencyDataLoaded) {
-      _setupDefaultFrequencyData();
-    }
-
-    final random = Random();
-    final roll = random.nextDouble();
-
-    if (roll < 0.4) {
-      // 40% 확률로 상위 100개 중 선택
-      return _top100Chars[random.nextInt(_top100Chars.length)];
-    } else if (roll < 0.7) {
-      // 30% 확률로 상위 101-200개 중 선택
-      return _top101_200Chars.isEmpty
-          ? _top100Chars[random.nextInt(_top100Chars.length)]
-          : _top101_200Chars[random.nextInt(_top101_200Chars.length)];
-    } else if (roll < 0.9) {
-      // 20% 확률로 상위 201-300개 중 선택
-      return _top201_300Chars.isEmpty
-          ? _top100Chars[random.nextInt(_top100Chars.length)]
-          : _top201_300Chars[random.nextInt(_top201_300Chars.length)];
-    } else {
-      // 10% 확률로 기존 한글 글자에서 선택
-      return _commonKoreanChars[random.nextInt(_commonKoreanChars.length)];
-    }
+    // 현재 선택된 단어 세트에서 글자 가져오기
+    return getCharFromWordSet();
   }
 
   /// 랜덤 자음 기반 문자 생성
   String getRandomConsonantChar() {
-    final random = Random();
-    final consonant = _consonants[random.nextInt(_consonants.length)];
-    final vowel = _vowels[random.nextInt(_vowels.length)];
-
-    if (_charMapping.containsKey(consonant) &&
-        _charMapping[consonant]!.containsKey(vowel)) {
-      return _charMapping[consonant]![vowel]!;
-    }
-
-    const defaultChars = ['가', '나', '다', '라', '마', '바', '사', '아', '자', '차'];
-    return defaultChars[random.nextInt(defaultChars.length)];
+    // 현재 선택된 단어 세트에서 글자 가져오기
+    return getCharFromWordSet();
   }
 
   /// 랜덤 모음 기반 문자 생성
   String getRandomVowelChar() {
-    final random = Random();
-    final vowel = _vowels[random.nextInt(_vowels.length)];
-    final consonant = _consonants[random.nextInt(_consonants.length)];
-
-    if (_charMapping.containsKey(consonant) &&
-        _charMapping[consonant]!.containsKey(vowel)) {
-      return _charMapping[consonant]![vowel]!;
-    }
-
-    const defaultChars = ['아', '야', '어', '여', '오', '요', '우', '유', '으', '이'];
-    return defaultChars[random.nextInt(defaultChars.length)];
+    // 현재 선택된 단어 세트에서 글자 가져오기
+    return getCharFromWordSet();
   }
 
   /// 그리드에서 단어 찾기
@@ -271,7 +341,7 @@ class WordProcessor {
           word += grid.cells[y][x].character!;
           cells.add(Point(x, y));
 
-          if (word.length >= 3) {
+          if (word.length >= 2) {
             bool isValid = await _wordService.isValidWordAsync(word);
             if (isValid) {
               wordCandidates.add(Word(text: word, cells: List.from(cells)));
@@ -295,10 +365,21 @@ class WordProcessor {
           word += grid.cells[y][x].character!;
           cells.add(Point(x, y));
 
-          if (word.length >= 3) {
+          if (word.length >= 2) {
             bool isValid = await _wordService.isValidWordAsync(word);
             if (isValid) {
               wordCandidates.add(Word(text: word, cells: List.from(cells)));
+
+              // 찾은 단어가 현재 선택된 단어 세트에 있으면 사용 카운트 증가
+              if (_selectedWords.contains(word)) {
+                _wordUsageCount[word] = (_wordUsageCount[word] ?? 0) + 1;
+
+                // 모든 선택된 단어가 한 번 이상 사용되었는지 확인
+                if (_isAllWordsUsed()) {
+                  // 새 단어 세트 선택
+                  _selectNewWordBatch();
+                }
+              }
             }
           }
         }
@@ -306,6 +387,20 @@ class WordProcessor {
     }
 
     return wordCandidates;
+  }
+
+  /// 모든 단어가 사용되었는지 확인
+  bool _isAllWordsUsed() {
+    int usedWordsCount = 0;
+
+    for (String word in _selectedWords) {
+      if (_wordUsageCount.containsKey(word) && _wordUsageCount[word]! > 0) {
+        usedWordsCount++;
+      }
+    }
+
+    // 70% 이상의 단어가 사용되었는지 확인
+    return usedWordsCount >= (_selectedWords.length * 0.7).round();
   }
 
   /// 단어 점수 계산
@@ -338,5 +433,16 @@ class WordProcessor {
       print('URL 열기 오류: $e');
       return false;
     }
+  }
+
+  /// 현재 선택된 단어 목록 반환
+  List<String> get selectedWords => List.unmodifiable(_selectedWords);
+
+  /// 단어 사용 횟수 반환
+  Map<String, int> get wordUsageCount => Map.unmodifiable(_wordUsageCount);
+
+  /// 새 단어 세트 수동 선택
+  Future<void> selectNewWordSet() async {
+    await _selectNewWordBatch();
   }
 }
