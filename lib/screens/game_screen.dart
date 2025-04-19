@@ -63,11 +63,15 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    // 게임 초기화
-    Future.microtask(() {
-      final gameProvider = Provider.of<GameProvider>(context, listen: false);
-      gameProvider.initialize();
-    });
+    // 게임 초기화는 앱 시작 시 한 번만 실행
+    print('🎮 GameScreen.initState() - 게임 초기화 시작');
+
+    // 초기화가 이미 진행 중일 수 있으므로 microtask 사용하지 않음
+    final gameProvider = Provider.of<GameProvider>(context, listen: false);
+
+    // initState에서는 GameProvider.initialize()를 직접 호출하지 않음
+    // GameProvider 생성자에서 이미 _initializeGame()이 호출됨
+    print('📱 GameScreen 초기화 완료 - GameProvider는 자동 초기화됨');
   }
 
   @override
@@ -191,7 +195,12 @@ class _GameScreenState extends State<GameScreen> {
                   child: WordSuggestions(
                     words: gameProvider.suggestedWordSet,
                     wordUsageCount: gameProvider.wordUsageCounts,
-                    onRefresh: () => gameProvider.selectNewWordSet(),
+                    onRefresh: (bool replaceAll) {
+                      // 사용자가 명시적으로 요청할 때만 새 단어 세트를 가져옴
+                      print(
+                          '🔄 WordSuggestions.onRefresh - 새 단어 세트 요청 (사용자 요청), replaceAll: $replaceAll');
+                      gameProvider.selectNewWordSet(replaceAll: replaceAll);
+                    },
                     onDictionaryLookup: gameProvider.openDictionary,
                   ),
                 ),

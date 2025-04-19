@@ -117,15 +117,15 @@ class BlockManager {
     int blockSize;
     final sizeRoll = random.nextDouble();
 
-    // 1칸 블록: 15%, 2칸 블록: 30%, 3칸 블록: 35%, 4칸 블록: 20%로 비율 조정
-    if (sizeRoll < 0.15) {
-      blockSize = 1; // 15%
-    } else if (sizeRoll < 0.45) {
-      blockSize = 2; // 30%
+    // 1칸 블록: 40%, 2칸 블록: 40%, 3칸 블록: 10%, 4칸 블록: 10%로 비율 조정
+    if (sizeRoll < 0.40) {
+      blockSize = 1; // 40%
     } else if (sizeRoll < 0.80) {
-      blockSize = 3; // 35%
+      blockSize = 2; // 40%
+    } else if (sizeRoll < 0.90) {
+      blockSize = 3; // 10%
     } else {
-      blockSize = 4; // 20%
+      blockSize = 4; // 10%
     }
 
     // 블록 모양 선택

@@ -441,21 +441,31 @@ class Block {
     } else if (size == 2) {
       return random.nextBool() ? BlockShape.horizontal2 : BlockShape.vertical2;
     } else if (size == 3) {
-      final shapes = [
-        BlockShape.horizontal3,
-        BlockShape.vertical3,
-        BlockShape.lShape,
-        BlockShape.reverseLShape,
-        BlockShape.corner,
-      ];
-      return shapes[random.nextInt(shapes.length)];
+      // 더 간단한 형태의 블록이 더 자주 나오도록 확률 조정
+      final roll = random.nextDouble();
+      if (roll < 0.4) {
+        return BlockShape.horizontal3; // 40% 확률
+      } else if (roll < 0.8) {
+        return BlockShape.vertical3; // 40% 확률
+      } else {
+        // 나머지 20%는 복잡한 형태
+        final shapes = [
+          BlockShape.lShape,
+          BlockShape.reverseLShape,
+          BlockShape.corner,
+        ];
+        return shapes[random.nextInt(shapes.length)];
+      }
     } else if (size == 4) {
-      final shapes = [
-        BlockShape.squareShape,
-        BlockShape.horizontal4,
-        BlockShape.vertical4,
-      ];
-      return shapes[random.nextInt(shapes.length)];
+      // 더 간단한 형태의 블록이 더 자주 나오도록 확률 조정
+      final roll = random.nextDouble();
+      if (roll < 0.4) {
+        return BlockShape.horizontal4; // 40% 확률
+      } else if (roll < 0.8) {
+        return BlockShape.vertical4; // 40% 확률
+      } else {
+        return BlockShape.squareShape; // 20% 확률
+      }
     }
 
     // 기본값 (사이즈가 지원되지 않을 경우)

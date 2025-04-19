@@ -1,0 +1,5 @@
+[33mcommit c2677c1091eb4faf832f2bbb1ebe5fb43ceea7c7[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/difficulty-adjustment-phase1[m[33m, [m[1;32mdifficulty-adjustment-phase1[m[33m)[m
+Author: bongsoo Jeong <bsjeong@gmail.com>
+Date:   Sat Apr 19 07:57:34 2025 +0900
+
+    난이도 조정 1차: 패턴 검색 최소 3글자로 변경, 추천 단어 위젯 추가, 단어 사전 검색 기능 개선

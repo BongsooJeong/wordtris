@@ -108,15 +108,43 @@ class GameProvider with ChangeNotifier {
   bool get bombGenerated => _bombGenerated;
 
   /// 현재 추천 단어 목록 가져오기
-  List<String> get suggestedWordSet => _wordProcessor.selectedWords;
+  List<String> get suggestedWordSet {
+    final words = _wordProcessor.selectedWords;
+    // print('📋 GameProvider.suggestedWordSet 접근: ${words.length}개 단어');
+    return words;
+  }
 
   /// 단어 사용 횟수 가져오기
-  Map<String, int> get wordUsageCounts => _wordProcessor.wordUsageCount;
+  Map<String, int> get wordUsageCounts {
+    final counts = _wordProcessor.wordUsageCount;
+    // print('📋 GameProvider.wordUsageCounts 접근: ${counts.length}개 항목');
+    return counts;
+  }
 
   /// 새 단어 세트 선택
-  Future<void> selectNewWordSet() async {
-    await _wordProcessor.selectNewWordSet();
-    notifyListeners();
+  Future<void> selectNewWordSet({bool replaceAll = false}) async {
+    print(
+        '🎮 GameProvider.selectNewWordSet(replaceAll: $replaceAll) 호출 - 호출 스택: ${StackTrace.current}');
+    print('📝 WordProcessor에 새 단어 세트 선택 요청');
+    print('📋 선택 전 단어 수: ${_wordProcessor.selectedWords.length}');
+    print('📋 선택 전 단어 목록: ${_wordProcessor.selectedWords}');
+
+    try {
+      await _wordProcessor.selectNewWordSet(replaceAll: replaceAll);
+
+      print('✅ GameProvider에서 새 단어 세트 선택 완료');
+      print('📋 선택 후 단어 수: ${_wordProcessor.selectedWords.length}');
+      print('📋 선택 후 단어 목록: ${_wordProcessor.selectedWords}');
+
+      // 상태 변경을 위젯에 알림
+      print('📢 GameProvider.notifyListeners() 호출 - selectNewWordSet');
+      notifyListeners();
+      print('📢 GameProvider.notifyListeners() 완료 - selectNewWordSet');
+    } catch (e) {
+      print('❌ 단어 세트 선택 중 오류 발생: $e');
+      // 오류가 발생해도 UI 갱신
+      notifyListeners();
+    }
   }
 
   // 생성자에서 초기화
@@ -127,18 +155,43 @@ class GameProvider with ChangeNotifier {
       wordService: wordService,
       characterProvider: characterProvider,
     );
+    // WordProcessor의 변경을 감지하는 리스너 추가
+    _wordProcessor.addListener(_onWordProcessorChanged);
     _blockManager = BlockManager(_wordProcessor);
     _initializeGame();
   }
 
+  /// WordProcessor 변경 시 호출되는 콜백
+  void _onWordProcessorChanged() {
+    print('📣 WordProcessor 변경 감지됨, GameProvider 상태 업데이트 중...');
+    print('📋 GameProvider 단어 세트 수: ${_wordProcessor.selectedWords.length}');
+
+    // 여기서 단어 세트와 관련된 상태 업데이트
+    print('📢 GameProvider.notifyListeners() 호출 - _onWordProcessorChanged');
+    // 명시적으로 상태 변경을 알림
+    notifyListeners();
+    print('📢 GameProvider.notifyListeners() 완료 - _onWordProcessorChanged');
+  }
+
+  @override
+  void dispose() {
+    // 리스너 제거
+    _wordProcessor.removeListener(_onWordProcessorChanged);
+    super.dispose();
+  }
+
   /// 게임 초기화
   Future<void> _initializeGame() async {
+    print('🎮 GameProvider._initializeGame() 시작');
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
 
     try {
+      // WordProcessor 초기화 - 이 과정에서 이미 CharacterProvider에서 단어 세트가 선택됨
+      print('📝 WordProcessor 초기화 시작 (via GameProvider)');
       await _wordProcessor.initialize();
+      print('✅ WordProcessor 초기화 완료 (via GameProvider)');
 
       // 게임 그리드 생성 (10x10)
       _grid = Grid(rows: 10, columns: 10);
@@ -153,14 +206,16 @@ class GameProvider with ChangeNotifier {
       _availableBlocks.clear();
 
       // 초기 블록 생성
+      print('🧩 초기 블록 생성');
       _generateInitialBlocks();
 
       _isLoading = false;
       notifyListeners();
+      print('✅ GameProvider 초기화 완료');
     } catch (e) {
       _isLoading = false;
       _errorMessage = '게임 초기화 오류: $e';
-      print(_errorMessage);
+      print('❌ 게임 초기화 오류: $e');
       notifyListeners();
     }
   }

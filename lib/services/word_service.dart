@@ -466,31 +466,30 @@ class WordService {
   @override
   bool isValidWord(String word) {
     if (!_isInitialized) {
-      print('WordService가 초기화되지 않음');
+      // print('WordService가 초기화되지 않음');
       return false;
     }
 
-    print('단어 확인: "$word"');
+    // print('단어 확인: "$word"');
 
     // 이미 캐시에 있는지 확인
     if (_wordCache.containsKey(word)) {
-      print('캐시에서 확인: ${_wordCache[word]}');
+      // print('캐시에서 확인: ${_wordCache[word]}');
       return _wordCache[word]!;
     }
 
     // 단어의 초성 확인
     final String consonant = getConsonantFromWord(word);
-    print('초성: "$consonant"');
+    // print('초성: "$consonant"');
 
     // 초성별 데이터가 로드되어 있는지 확인
     if (!_consonantWordMap.containsKey(consonant) ||
         _consonantWordMap[consonant]!.isEmpty) {
-      print('초성 "$consonant"의 단어 데이터가 로드되지 않음. 로드 필요.');
+      // print('초성 "$consonant"의 단어 데이터가 로드되지 않음. 로드 필요.');
       // 비동기 로드 시도 (다음 검증을 위해)
       loadConsonantData(consonant);
     } else {
-      print(
-          '초성 "$consonant"의 단어 데이터 로드됨 (${_consonantWordMap[consonant]!.length}개 단어)');
+      // print('초성 "$consonant"의 단어 데이터 로드됨 (${_consonantWordMap[consonant]!.length}개 단어)');
     }
 
     // 초성별 데이터가 로드되어 있으면 활용
@@ -498,14 +497,14 @@ class WordService {
         _consonantWordMap[consonant]!.isNotEmpty) {
       final bool isValid = _consonantWordMap[consonant]!.contains(word);
       _wordCache[word] = isValid;
-      print('초성 데이터에서 확인: $isValid');
+      // print('초성 데이터에서 확인: $isValid');
       return isValid;
     }
 
     // 기존 로직: 전체 단어 목록에서 확인
     bool isValid = _validWords.contains(word);
     _wordCache[word] = isValid;
-    print('전체 단어 목록에서 확인: $isValid (전체 단어 수: ${_validWords.length})');
+    // print('전체 단어 목록에서 확인: $isValid (전체 단어 수: ${_validWords.length})');
 
     return isValid;
   }
@@ -519,27 +518,26 @@ class WordService {
     // 너무 짧은 단어는 무효
     if (word.length < 2) return false;
 
-    print('단어 비동기 확인: "$word"');
+    // print('단어 비동기 확인: "$word"');
 
     // 캐시 확인
     if (_wordCache.containsKey(word)) {
-      print('캐시에서 비동기 확인: ${_wordCache[word]}');
+      // print('캐시에서 비동기 확인: ${_wordCache[word]}');
       return _wordCache[word]!;
     }
 
     // 단어의 초성 확인
     final String consonant = getConsonantFromWord(word);
-    print('비동기 초성: "$consonant"');
+    // print('비동기 초성: "$consonant"');
 
     // 해당 초성의 단어 목록 로드 (아직 로드되지 않은 경우)
     if (!_consonantWordMap.containsKey(consonant) ||
         _consonantWordMap[consonant]!.isEmpty) {
-      print('비동기: 초성 "$consonant"의 단어 데이터 로드 시작...');
+      // print('비동기: 초성 "$consonant"의 단어 데이터 로드 시작...');
       bool loaded = await loadConsonantData(consonant);
-      print('비동기: 초성 "$consonant"의 단어 데이터 로드 ${loaded ? "성공" : "실패"}');
+      // print('비동기: 초성 "$consonant"의 단어 데이터 로드 ${loaded ? "성공" : "실패"}');
     } else {
-      print(
-          '비동기: 초성 "$consonant"의 단어 데이터 이미 로드됨 (${_consonantWordMap[consonant]!.length}개 단어)');
+      // print('비동기: 초성 "$consonant"의 단어 데이터 이미 로드됨 (${_consonantWordMap[consonant]!.length}개 단어)');
     }
 
     // 초성에 해당하는 단어 데이터가 있으면 확인
@@ -547,7 +545,7 @@ class WordService {
         _consonantWordMap[consonant]!.isNotEmpty) {
       final bool isValid = _consonantWordMap[consonant]!.contains(word);
       _wordCache[word] = isValid;
-      print('비동기: 초성 데이터에서 확인: $isValid');
+      // print('비동기: 초성 데이터에서 확인: $isValid');
       return isValid;
     }
 
@@ -556,7 +554,7 @@ class WordService {
       if (_database == null) {
         final isValid = _checkWordInDatabase(word);
         _wordCache[word] = isValid;
-        print('비동기: 내장 데이터에서 확인: $isValid');
+        // print('비동기: 내장 데이터에서 확인: $isValid');
         return isValid;
       }
 
@@ -569,7 +567,7 @@ class WordService {
 
       final bool isValid = result.isNotEmpty;
       _wordCache[word] = isValid;
-      print('비동기: 데이터베이스에서 확인: $isValid');
+      // print('비동기: 데이터베이스에서 확인: $isValid');
       return isValid;
     } catch (e) {
       print('단어 비동기 조회 오류: $e');
