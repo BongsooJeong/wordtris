@@ -90,6 +90,10 @@ class GameProvider with ChangeNotifier {
   // 사용된 글자를 추적하는 세트 추가
   final Set<String> _usedCharacters = {};
 
+  // 가장 최근에 완성한 단어를 저장하는 변수 추가
+  String _lastCompletedWord = '';
+  int _lastWordPoints = 0;
+
   late final WordProcessor _wordProcessor;
   late final BlockManager _blockManager;
 
@@ -109,6 +113,10 @@ class GameProvider with ChangeNotifier {
   bool get isLoadingSuggestions => _isLoadingSuggestions;
   int get wordClearCount => _wordClearCount;
   bool get bombGenerated => _bombGenerated;
+
+  // 가장 최근에 완성한 단어 getter 추가
+  String get lastCompletedWord => _lastCompletedWord;
+  int get lastWordPoints => _lastWordPoints;
 
   // 사용된 글자 목록 getter 추가
   Set<String> get usedCharacters => Set.unmodifiable(_usedCharacters);
@@ -193,6 +201,8 @@ class GameProvider with ChangeNotifier {
       _bombGenerated = false;
       _availableBlocks.clear();
       _usedCharacters.clear(); // 사용된 글자 목록 초기화
+      _lastCompletedWord = ''; // 최근 완성 단어 초기화
+      _lastWordPoints = 0; // 최근 단어 점수 초기화
 
       // 초기 블록 생성
       print('🧩 초기 블록 생성');
@@ -217,6 +227,8 @@ class GameProvider with ChangeNotifier {
   /// 게임 재시작
   void restartGame() {
     _usedCharacters.clear(); // 사용된 글자 목록 초기화
+    _lastCompletedWord = ''; // 최근 완성 단어 초기화
+    _lastWordPoints = 0; // 최근 단어 점수 초기화
     _initializeGame();
   }
 
@@ -316,8 +328,23 @@ class GameProvider with ChangeNotifier {
 
     // 단어 제거 및 점수 계산
     int totalPoints = 0;
+    _lastCompletedWord = ''; // 단어 목록 초기화
+
     for (Word word in words) {
-      totalPoints += _wordProcessor.calculateWordPoints(word, _level);
+      int wordPoints = _wordProcessor.calculateWordPoints(word, _level);
+      totalPoints += wordPoints;
+
+      // 가장 긴 단어를 최근 완성 단어로 저장
+      if (word.text.length > _lastCompletedWord.length) {
+        _lastCompletedWord = word.text;
+        _lastWordPoints = wordPoints;
+      }
+    }
+
+    // 단어가 여러 개면 첫 번째 단어 저장 (이미 저장되지 않은 경우)
+    if (_lastCompletedWord.isEmpty && words.isNotEmpty) {
+      _lastCompletedWord = words[0].text;
+      _lastWordPoints = _wordProcessor.calculateWordPoints(words[0], _level);
     }
 
     // 점수 추가

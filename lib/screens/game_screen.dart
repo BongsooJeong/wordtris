@@ -157,6 +157,8 @@ class _GameScreenState extends State<GameScreen> {
                         ScoreDisplay(
                           score: gameProvider.score,
                           level: gameProvider.level,
+                          lastWord: gameProvider.lastCompletedWord,
+                          lastWordPoints: gameProvider.lastWordPoints,
                         ),
 
                         // 폭탄 인디케이터 추가
@@ -167,7 +169,7 @@ class _GameScreenState extends State<GameScreen> {
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: GameGrid(
-                              cellSize: 32.0,
+                              cellSize: 48.0,
                               gridPadding: 4.0,
                             ),
                           ),
