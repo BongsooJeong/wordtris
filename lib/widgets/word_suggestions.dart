@@ -23,6 +23,27 @@ class WordSuggestions extends StatefulWidget {
 }
 
 class _WordSuggestionsState extends State<WordSuggestions> {
+  // 단어가 완전히 사용되었는지 확인하는 헬퍼 메서드
+  bool _isWordFullyUsed(String word) {
+    if (widget.usedCharacters == null) return false;
+
+    // 단어의 모든 글자가 사용되었는지 확인
+    for (int i = 0; i < word.length; i++) {
+      if (!widget.usedCharacters!.contains(word[i])) {
+        return false; // 한 글자라도 사용되지 않았다면 false 반환
+      }
+    }
+    return true; // 모든 글자가 사용되었다면 true 반환
+  }
+
+  // 표시할 단어 목록을 필터링하는 메서드
+  List<String> _getFilteredWords() {
+    if (widget.words == null) return [];
+
+    // 모든 글자가 사용된 단어를 필터링하여 제외
+    return widget.words!.where((word) => !_isWordFullyUsed(word)).toList();
+  }
+
   // 네이버 사전 URL 생성
   String getNaverDictionaryWebUrl(String word) {
     return 'https://dict.naver.com/search.dict?dicQuery=$word';
@@ -79,6 +100,9 @@ class _WordSuggestionsState extends State<WordSuggestions> {
 
   @override
   Widget build(BuildContext context) {
+    // 표시할 필터링된 단어 목록 가져오기
+    final filteredWords = _getFilteredWords();
+
     return Container(
       width: 170, // 고정 너비를 180에서 170으로 줄임
       decoration: BoxDecoration(
@@ -127,10 +151,10 @@ class _WordSuggestionsState extends State<WordSuggestions> {
           const SizedBox(height: 4),
           const Divider(),
           Expanded(
-            child: widget.words == null || widget.words!.isEmpty
+            child: filteredWords.isEmpty
                 ? const Center(
                     child: Text(
-                      '추천 단어가 없습니다',
+                      '표시할 단어가 없습니다',
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
@@ -139,11 +163,11 @@ class _WordSuggestionsState extends State<WordSuggestions> {
                   )
                 : ListView.builder(
                     key: ValueKey(
-                        'word_list_${widget.words.hashCode}'), // 고유 키로 변경하여 목록 변경 시 강제 재구성
+                        'word_list_${filteredWords.hashCode}'), // 고유 키로 변경하여 목록 변경 시 강제 재구성
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    itemCount: widget.words!.length,
+                    itemCount: filteredWords.length,
                     itemBuilder: (context, index) {
-                      final word = widget.words![index];
+                      final word = filteredWords[index];
 
                       return ListTile(
                         key: ValueKey('word_tile_$word'), // 개별 타일에도 키 추가
