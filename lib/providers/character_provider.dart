@@ -137,15 +137,20 @@ class CharacterProvider with ChangeNotifier {
     _availableCharacters.addAll(chars);
   }
 
-  /// 글자 목록 채우기 (단어 세트는 그대로 유지)
-  void _refillCharacters() {
-    _availableCharacters.clear();
+  /// 글자 목록 채우기 (새 단어를 추가하고 글자 목록 재생성)
+  Future<void> _refillCharacters() async {
+    print('🔄 글자 목록 재충전 시작 - 새 단어 추가 포함');
 
-    // 매니저를 통해 글자 목록 생성
+    // 새 단어 세트 추가
+    await _addNewWords();
+
+    // 새 단어가 추가된 후 다시 글자 목록 생성
+    _availableCharacters.clear();
     final chars = _manager.generateAvailableCharacters(_selectedWords);
     _availableCharacters.addAll(chars);
 
-    print('🔄 글자 목록 재충전 완료. 현재 ${_availableCharacters.length}개 글자 가능');
+    print(
+        '🔄 글자 목록 재충전 완료. 새 단어 추가 후 현재 ${_availableCharacters.length}개 글자 가능');
   }
 
   /// 단어 사용 횟수 증가시키기
@@ -203,7 +208,12 @@ class CharacterProvider with ChangeNotifier {
     // 사용 가능한 글자가 없으면 새로운 단어 세트 선택
     if (_availableCharacters.isEmpty) {
       print('🔄 사용 가능한 글자가 없어서 글자 목록 재생성');
-      _refillCharacters();
+      // 비동기 호출이지만 동기 API용으로 별도 처리
+      _refillCharactersSync();
+      // 비상용 기본값 제공
+      if (_availableCharacters.isEmpty) {
+        return '가';
+      }
     }
 
     // 글자 선택
@@ -218,10 +228,82 @@ class CharacterProvider with ChangeNotifier {
     // 글자 수가 너무 적어지면 글자 목록 재생성 (단어 세트는 그대로 유지)
     if (_availableCharacters.length < 5) {
       print('🔄 사용 가능한 글자가 5개 미만으로 줄어 글자 목록을 재생성합니다');
-      _refillCharacters();
+      // 비동기 호출이지만 동기 API용으로 별도 처리
+      _refillCharactersSync();
     }
 
     return selectedChar;
+  }
+
+  /// 동기 API를 위한 글자 목록 재충전 래퍼
+  void _refillCharactersSync() {
+    // 비동기 호출을 별도 분리해서 백그라운드에서 처리
+    Future.microtask(() async {
+      await _refillCharacters();
+      notifyListeners();
+    });
+
+    // 동기적으로 즉시 새 단어 추가 시도
+    try {
+      // 단어 서비스에서 바로 가져올 수 있는 단어 있는지 확인
+      final validWords = _manager.wordService.getValidWords().toList();
+      if (validWords.isNotEmpty) {
+        // 랜덤으로 5개 단어 선택
+        validWords.shuffle();
+        final List<String> newWords = [];
+
+        // 기존 단어와 중복되지 않는 단어 최대 5개 추가
+        for (String word in validWords) {
+          if (word.length >= 2 &&
+              word.length <= 5 &&
+              !_selectedWords.contains(word)) {
+            newWords.add(word);
+            if (newWords.length >= 5) break;
+          }
+        }
+
+        // 새 단어 추가
+        for (String word in newWords) {
+          _selectedWords.add(word);
+          _wordUsageCount[word] = 0;
+        }
+
+        if (newWords.isNotEmpty) {
+          print('🆕 [SYNC] 새 단어 ${newWords.length}개 즉시 추가: $newWords');
+        }
+      }
+    } catch (e) {
+      print('⚠️ [SYNC] 단어 즉시 추가 중 오류: $e');
+    }
+
+    // 기존 단어에서 바로 사용 가능한 글자들 추출
+    _availableCharacters.clear();
+    if (_selectedWords.isNotEmpty) {
+      final chars = _manager.generateAvailableCharacters(_selectedWords);
+      _availableCharacters.addAll(chars);
+      print('🔡 [SYNC] 글자 ${_availableCharacters.length}개 생성됨');
+    }
+
+    // 글자가 부족하면 기본 글자 추가
+    if (_availableCharacters.isEmpty) {
+      _availableCharacters.addAll([
+        '가',
+        '나',
+        '다',
+        '라',
+        '마',
+        '바',
+        '사',
+        '아',
+        '자',
+        '차',
+        '카',
+        '타',
+        '파',
+        '하'
+      ]);
+      print('⚠️ [SYNC] 글자가 없어 기본 글자 추가');
+    }
   }
 
   /// 선택된 글자가 포함된 단어들의 사용 추적 업데이트
@@ -268,17 +350,17 @@ class CharacterProvider with ChangeNotifier {
     return _manager.isRareCharacter(char);
   }
 
-  /// 빈도 기반 랜덤 글자 선택
+  /// 빈도 기반 문자 선택
   String getFrequencyBasedChar() {
     return getRandomCharacter();
   }
 
-  /// 랜덤 자음 기반 문자 생성
+  /// 랜덤 자음 선택
   String getRandomConsonantChar() {
     return getRandomCharacter();
   }
 
-  /// 랜덤 모음 기반 문자 생성
+  /// 랜덤 모음 선택
   String getRandomVowelChar() {
     return getRandomCharacter();
   }
