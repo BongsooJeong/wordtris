@@ -10,6 +10,7 @@ import '../utils/point.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'word_processor.dart';
 import 'block_manager.dart';
+import 'character_provider.dart';
 
 /// WordTris 게임 상태 관리 Provider API 문서
 ///
@@ -86,7 +87,7 @@ class GameProvider with ChangeNotifier {
   int _wordClearCount = 0; // 단어 제거 횟수 카운터
   bool _bombGenerated = false;
 
-  final WordProcessor _wordProcessor = WordProcessor();
+  late final WordProcessor _wordProcessor;
   late final BlockManager _blockManager;
 
   // Getters
@@ -120,6 +121,12 @@ class GameProvider with ChangeNotifier {
 
   // 생성자에서 초기화
   GameProvider() {
+    final wordService = WordService();
+    final characterProvider = CharacterProvider(wordService);
+    _wordProcessor = WordProcessor(
+      wordService: wordService,
+      characterProvider: characterProvider,
+    );
     _blockManager = BlockManager(_wordProcessor);
     _initializeGame();
   }
