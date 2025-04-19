@@ -129,25 +129,12 @@ class GameProvider with ChangeNotifier {
 
   /// 새 단어 세트 선택
   Future<void> selectNewWordSet({bool replaceAll = false}) async {
-    print(
-        '🎮 GameProvider.selectNewWordSet(replaceAll: $replaceAll) 호출 - 호출 스택: ${StackTrace.current}');
-    print('📝 WordProcessor에 새 단어 세트 선택 요청');
-    print('📋 선택 전 단어 수: ${_wordProcessor.selectedWords.length}');
-    print('📋 선택 전 단어 목록: ${_wordProcessor.selectedWords}');
-
     try {
       await _wordProcessor.selectNewWordSet(replaceAll: replaceAll);
 
-      print('✅ GameProvider에서 새 단어 세트 선택 완료');
-      print('📋 선택 후 단어 수: ${_wordProcessor.selectedWords.length}');
-      print('📋 선택 후 단어 목록: ${_wordProcessor.selectedWords}');
-
       // 상태 변경을 위젯에 알림
-      print('📢 GameProvider.notifyListeners() 호출 - selectNewWordSet');
       notifyListeners();
-      print('📢 GameProvider.notifyListeners() 완료 - selectNewWordSet');
     } catch (e) {
-      print('❌ 단어 세트 선택 중 오류 발생: $e');
       // 오류가 발생해도 UI 갱신
       notifyListeners();
     }
@@ -169,14 +156,9 @@ class GameProvider with ChangeNotifier {
 
   /// WordProcessor 변경 시 호출되는 콜백
   void _onWordProcessorChanged() {
-    print('📣 WordProcessor 변경 감지됨, GameProvider 상태 업데이트 중...');
-    print('📋 GameProvider 단어 세트 수: ${_wordProcessor.selectedWords.length}');
-
     // 여기서 단어 세트와 관련된 상태 업데이트
-    print('📢 GameProvider.notifyListeners() 호출 - _onWordProcessorChanged');
     // 명시적으로 상태 변경을 알림
     notifyListeners();
-    print('📢 GameProvider.notifyListeners() 완료 - _onWordProcessorChanged');
   }
 
   @override
