@@ -7,6 +7,7 @@ class WordSuggestions extends StatefulWidget {
   final Map<String, int>? wordUsageCount;
   final void Function(bool replaceAll)? onRefresh;
   final Function(String)? onDictionaryLookup; // 사전 검색 콜백 함수 추가
+  final Set<String>? usedCharacters; // 사용된 글자 목록 추가
 
   const WordSuggestions({
     super.key,
@@ -14,6 +15,7 @@ class WordSuggestions extends StatefulWidget {
     required this.wordUsageCount,
     this.onRefresh,
     this.onDictionaryLookup,
+    this.usedCharacters, // 새 파라미터 추가
   });
 
   @override
@@ -77,11 +79,6 @@ class _WordSuggestionsState extends State<WordSuggestions> {
 
   @override
   Widget build(BuildContext context) {
-    // print('📱 WordSuggestions.build() 호출');
-    // print('📋 단어 목록 수: ${widget.words?.length ?? 0}개');
-    // print('📋 단어 사용 횟수 항목: ${widget.wordUsageCount?.length ?? 0}개');
-    // print('📋 단어 목록: ${widget.words}');
-
     return Container(
       width: 170, // 고정 너비를 180에서 170으로 줄임
       decoration: BoxDecoration(
@@ -147,9 +144,6 @@ class _WordSuggestionsState extends State<WordSuggestions> {
                     itemCount: widget.words!.length,
                     itemBuilder: (context, index) {
                       final word = widget.words![index];
-                      final isUsed =
-                          widget.wordUsageCount?.containsKey(word) == true &&
-                              widget.wordUsageCount![word]! > 0;
 
                       return ListTile(
                         key: ValueKey('word_tile_$word'), // 개별 타일에도 키 추가
@@ -157,21 +151,40 @@ class _WordSuggestionsState extends State<WordSuggestions> {
                         visualDensity: VisualDensity.compact,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 0),
-                        leading: Icon(
-                          isUsed ? Icons.check_circle : Icons.circle_outlined,
-                          size: 16,
-                          color: isUsed ? Colors.green : Colors.grey,
-                        ),
-                        title: Text(
-                          word,
-                          style: TextStyle(
-                            fontWeight:
-                                isUsed ? FontWeight.normal : FontWeight.bold,
-                            fontSize: 14,
-                            color:
-                                isUsed ? Colors.green.shade800 : Colors.black87,
-                            decoration:
-                                isUsed ? TextDecoration.lineThrough : null,
+                        title: RichText(
+                          text: TextSpan(
+                            children: [
+                              for (int i = 0; i < word.length; i++)
+                                TextSpan(
+                                  text: word[i],
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: widget.usedCharacters
+                                                ?.contains(word[i]) ==
+                                            true
+                                        ? FontWeight.normal
+                                        : FontWeight.bold,
+                                    color: widget.usedCharacters
+                                                ?.contains(word[i]) ==
+                                            true
+                                        ? Colors.red.shade300 // 사용된 글자는 빨간색으로
+                                        : Colors.black, // 미사용 글자는 검정색으로
+                                    decoration: widget.usedCharacters
+                                                ?.contains(word[i]) ==
+                                            true
+                                        ? TextDecoration
+                                            .lineThrough // 사용된 글자는 취소선 추가
+                                        : null,
+                                    decorationColor: Colors.red.shade700,
+                                    decorationThickness: 2.0,
+                                    backgroundColor: widget.usedCharacters
+                                                ?.contains(word[i]) ==
+                                            true
+                                        ? Colors.yellow.shade100 // 배경색 추가하여 강조
+                                        : null,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         trailing: IconButton(

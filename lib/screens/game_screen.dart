@@ -195,6 +195,7 @@ class _GameScreenState extends State<GameScreen> {
                   child: WordSuggestions(
                     words: gameProvider.suggestedWordSet,
                     wordUsageCount: gameProvider.wordUsageCounts,
+                    usedCharacters: gameProvider.usedCharacters,
                     onRefresh: (bool replaceAll) {
                       // 사용자가 명시적으로 요청할 때만 새 단어 세트를 가져옴
                       print(

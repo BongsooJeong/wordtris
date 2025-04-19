@@ -87,6 +87,9 @@ class GameProvider with ChangeNotifier {
   int _wordClearCount = 0; // 단어 제거 횟수 카운터
   bool _bombGenerated = false;
 
+  // 사용된 글자를 추적하는 세트 추가
+  final Set<String> _usedCharacters = {};
+
   late final WordProcessor _wordProcessor;
   late final BlockManager _blockManager;
 
@@ -106,6 +109,9 @@ class GameProvider with ChangeNotifier {
   bool get isLoadingSuggestions => _isLoadingSuggestions;
   int get wordClearCount => _wordClearCount;
   bool get bombGenerated => _bombGenerated;
+
+  // 사용된 글자 목록 getter 추가
+  Set<String> get usedCharacters => Set.unmodifiable(_usedCharacters);
 
   /// 현재 추천 단어 목록 가져오기
   List<String> get suggestedWordSet {
@@ -204,6 +210,7 @@ class GameProvider with ChangeNotifier {
       _wordClearCount = 0;
       _bombGenerated = false;
       _availableBlocks.clear();
+      _usedCharacters.clear(); // 사용된 글자 목록 초기화
 
       // 초기 블록 생성
       print('🧩 초기 블록 생성');
@@ -227,6 +234,7 @@ class GameProvider with ChangeNotifier {
 
   /// 게임 재시작
   void restartGame() {
+    _usedCharacters.clear(); // 사용된 글자 목록 초기화
     _initializeGame();
   }
 
@@ -283,24 +291,26 @@ class GameProvider with ChangeNotifier {
     return true;
   }
 
-  /// 블록 배치
+  /// 블록을 그리드에 배치
   Future<bool> placeBlock(Block block, List<Point> positions) async {
     // 배치 가능 여부 확인
-    if (!_canPlaceBlock(positions)) {
+    if (!_grid.isValidPlacement(positions)) {
       return false;
-    }
-
-    // 폭탄 블록 처리
-    if (block.isBomb) {
-      _grid = _grid.explodeBomb(positions[0]);
-      _availableBlocks.removeWhere((b) => b.id == block.id);
-      notifyListeners();
-      return true;
     }
 
     // 블록 배치
     _grid = _grid.placeBlock(block, positions);
+
+    // 활성 블록에서 제거
     _availableBlocks.removeWhere((b) => b.id == block.id);
+
+    // 배치된 블록의 모든 글자를 사용된 글자 목록에 추가
+    for (String character in block.characters) {
+      _usedCharacters.add(character);
+    }
+
+    // print('🧩 블록 배치 - 사용된 글자 추가: ${block.characters}');
+    // print('📊 현재 사용된 글자: $_usedCharacters');
 
     // 새 블록 생성 (최대 5개까지)
     if (_availableBlocks.length < 5) {
