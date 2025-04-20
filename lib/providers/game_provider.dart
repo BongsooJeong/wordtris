@@ -319,6 +319,12 @@ class GameProvider with ChangeNotifier {
     // print('🧩 블록 배치 - 사용된 글자 추가: ${block.characters}');
     // print('📊 현재 사용된 글자: $_usedCharacters');
 
+    // 폭탄 블록인 경우 폭발 효과 적용
+    if (block.isBomb && positions.isNotEmpty) {
+      // 폭발의 중심점은 첫 번째 위치 (폭탄은 1칸이므로)
+      _grid = _grid.explodeBomb(positions[0]);
+    }
+
     // 새 블록 생성 (최대 5개까지)
     if (_availableBlocks.length < 5) {
       _generateNewBlock();
@@ -439,5 +445,11 @@ class GameProvider with ChangeNotifier {
   /// 단어 사전 검색
   Future<bool> openDictionary(String word) async {
     return await _wordProcessor.openDictionary(word);
+  }
+
+  /// 폭탄 블록 폭발 효과 적용
+  void explodeBomb(Point center) {
+    _grid = _grid.explodeBomb(center);
+    notifyListeners();
   }
 }

@@ -391,6 +391,13 @@ class WordService {
       return true;
     }
 
+    // '기타' 초성에 대한 특별 처리
+    if (consonant == '기타') {
+      print('기타 초성은 빈 세트로 초기화합니다.');
+      _consonantWordMap[consonant] = <String>{};
+      return true;
+    }
+
     try {
       String filePath;
       if (_indexLoaded && _consonantIndex.containsKey(consonant)) {

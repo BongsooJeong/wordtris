@@ -37,6 +37,8 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../models/grid.dart';
 import '../utils/point.dart';
+import 'package:provider/provider.dart';
+import '../providers/game_provider.dart';
 
 /// 게임 그리드의 애니메이션을 관리하는 클래스
 class GameGridAnimations {
