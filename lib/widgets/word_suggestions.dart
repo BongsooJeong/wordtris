@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 class WordSuggestions extends StatefulWidget {
   final List<String>? words;
   final Map<String, int>? wordUsageCount;
-  final void Function(bool replaceAll)? onRefresh;
   final Function(String)? onDictionaryLookup; // 사전 검색 콜백 함수 추가
   final Set<String>? usedCharacters; // 사용된 글자 목록 추가
 
@@ -13,16 +12,18 @@ class WordSuggestions extends StatefulWidget {
     super.key,
     required this.words,
     required this.wordUsageCount,
-    this.onRefresh,
     this.onDictionaryLookup,
     this.usedCharacters, // 새 파라미터 추가
   });
 
   @override
-  State<WordSuggestions> createState() => _WordSuggestionsState();
+  State<WordSuggestions> createState() => WordSuggestionsState();
 }
 
-class _WordSuggestionsState extends State<WordSuggestions> {
+class WordSuggestionsState extends State<WordSuggestions> {
+  // 현재 하이라이트할 글자 목록
+  Set<String> _highlightedCharacters = {};
+
   // 단어가 완전히 사용되었는지 확인하는 헬퍼 메서드
   bool _isWordFullyUsed(String word) {
     if (widget.usedCharacters == null) return false;
@@ -49,52 +50,33 @@ class _WordSuggestionsState extends State<WordSuggestions> {
     return 'https://dict.naver.com/search.dict?dicQuery=$word';
   }
 
-  void _showRefreshMenu(BuildContext context, Offset position) {
-    print('📱 WordSuggestions 새로고침 메뉴 표시');
-    final Future<String?> resultFuture = showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        position.dx + 1,
-        position.dy + 1,
-      ),
-      items: const [
-        PopupMenuItem<String>(
-          value: 'add',
-          child: Row(
-            children: [
-              Icon(Icons.add, size: 16),
-              SizedBox(width: 8),
-              Text('새 단어 추가'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'replace',
-          child: Row(
-            children: [
-              Icon(Icons.refresh, size: 16),
-              SizedBox(width: 8),
-              Text('단어 전체 교체'),
-            ],
-          ),
-        ),
-      ],
-    );
+  // 단어에 하이라이트할 글자가 포함되어 있는지 확인
+  bool _wordContainsHighlightedChar(String word) {
+    if (_highlightedCharacters.isEmpty) return false;
 
-    resultFuture.then((result) {
-      // 컨텍스트 메뉴 항목을 표시합니다.
-      if (result != null && widget.onRefresh != null) {
-        print('📱 선택된 메뉴: $result');
-        if (result == 'add') {
-          print('📱 새 단어 추가 요청');
-          widget.onRefresh!(false); // false는 단어 추가
-        } else if (result == 'replace') {
-          print('📱 단어 전체 교체 요청');
-          widget.onRefresh!(true); // true는 전체 단어 교체
-        }
+    for (var char in _highlightedCharacters) {
+      if (word.contains(char)) {
+        return true;
       }
+    }
+    return false;
+  }
+
+  // 외부에서 호출할 하이라이트 설정 메서드
+  void setHighlightedCharacters(Set<String> characters) {
+    if (!mounted) return;
+
+    setState(() {
+      _highlightedCharacters = Set.from(characters);
+    });
+  }
+
+  // 하이라이트 제거 메서드
+  void clearHighlights() {
+    if (!mounted) return;
+
+    setState(() {
+      _highlightedCharacters.clear();
     });
   }
 
@@ -121,32 +103,13 @@ class _WordSuggestionsState extends State<WordSuggestions> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                '추천 단어',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo,
-                ),
-              ),
-              if (widget.onRefresh != null)
-                IconButton(
-                  icon: const Icon(Icons.refresh, size: 18),
-                  tooltip: '단어 갱신',
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
-                    // 현재 버튼의 위치를 기준으로 메뉴 표시
-                    final RenderBox button =
-                        context.findRenderObject() as RenderBox;
-                    final Offset position = button.localToGlobal(Offset.zero);
-                    _showRefreshMenu(context, position);
-                  },
-                ),
-            ],
+          const Text(
+            '추천 단어',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.indigo,
+            ),
           ),
           const SizedBox(height: 4),
           const Divider(),
@@ -168,13 +131,22 @@ class _WordSuggestionsState extends State<WordSuggestions> {
                     itemCount: filteredWords.length,
                     itemBuilder: (context, index) {
                       final word = filteredWords[index];
+                      final isHighlighted = _wordContainsHighlightedChar(word);
 
                       return ListTile(
                         key: ValueKey('word_tile_$word'), // 개별 타일에도 키 추가
                         dense: true,
                         visualDensity: VisualDensity.compact,
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 0),
+                            horizontal: 8, vertical: 2),
+                        tileColor: isHighlighted ? Colors.blue.shade50 : null,
+                        shape: isHighlighted
+                            ? RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                side: BorderSide(
+                                    color: Colors.blue.shade300, width: 1.5),
+                              )
+                            : null,
                         title: RichText(
                           text: TextSpan(
                             children: [
@@ -188,11 +160,15 @@ class _WordSuggestionsState extends State<WordSuggestions> {
                                             true
                                         ? FontWeight.normal
                                         : FontWeight.bold,
-                                    color: widget.usedCharacters
-                                                ?.contains(word[i]) ==
-                                            true
-                                        ? Colors.red.shade300 // 사용된 글자는 빨간색으로
-                                        : Colors.black, // 미사용 글자는 검정색으로
+                                    color: isHighlighted
+                                        ? Colors.blue
+                                            .shade700 // 하이라이트된 단어는 모든 글자가 파란색
+                                        : (widget.usedCharacters
+                                                    ?.contains(word[i]) ==
+                                                true
+                                            ? Colors
+                                                .red.shade300 // 사용된 글자는 빨간색으로
+                                            : Colors.black), // 미사용 글자는 검정색으로
                                     decoration: widget.usedCharacters
                                                 ?.contains(word[i]) ==
                                             true
@@ -204,7 +180,8 @@ class _WordSuggestionsState extends State<WordSuggestions> {
                                     backgroundColor: widget.usedCharacters
                                                 ?.contains(word[i]) ==
                                             true
-                                        ? Colors.yellow.shade100 // 배경색 추가하여 강조
+                                        ? Colors
+                                            .yellow.shade100 // 사용된 글자만 배경색 추가
                                         : null,
                                   ),
                                 ),

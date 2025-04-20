@@ -113,6 +113,9 @@ class WordProcessor with ChangeNotifier {
   final List<String> _foundWords = [];
   Map<String, int> _wordUsageCount = {};
 
+  // 재귀 호출 방지 플래그
+  bool _isSelectingWordSet = false;
+
   /// 서비스를 주입받는 생성자
   WordProcessor({
     required WordService wordService,
@@ -280,7 +283,7 @@ class WordProcessor with ChangeNotifier {
           word += grid.cells[y][x].character!;
           cells.add(Point(x, y));
 
-          if (word.length >= 2) {
+          if (word.length >= 3) {
             await _checkAndAddWord(word, cells, wordCandidates);
           }
         }
@@ -302,7 +305,7 @@ class WordProcessor with ChangeNotifier {
           word += grid.cells[y][x].character!;
           cells.add(Point(x, y));
 
-          if (word.length >= 2) {
+          if (word.length >= 3) {
             await _checkAndAddWord(word, cells, wordCandidates);
           }
         }
@@ -414,23 +417,27 @@ class WordProcessor with ChangeNotifier {
     }
   }
 
-  /// CharacterProvider에게 새 단어 세트 선택을 요청
+  /// 새 단어 세트 선택 요청
   Future<void> selectNewWordSet({bool replaceAll = false}) async {
-    print(
-        '🔄 WordProcessor.selectNewWordSet(replaceAll: $replaceAll) 호출 - 호출 스택: ${StackTrace.current}');
-    print(
-        '📋 WordProcessor - 선택 전 단어 수: ${_characterProvider.selectedWords.length}');
-    print('📋 WordProcessor - 선택 전 단어 목록: ${_characterProvider.selectedWords}');
+    // 이미 단어 세트 선택 중이면 중복 호출 방지
+    if (_isSelectingWordSet) {
+      print('⚠️ WordProcessor - 이미 단어 세트 선택 중입니다. 중복 호출 무시.');
+      return;
+    }
+
+    _isSelectingWordSet = true;
 
     try {
+      print('🔄 WordProcessor.selectNewWordSet(replaceAll: $replaceAll) 호출');
+      print(
+          '📋 WordProcessor - 선택 전 단어 수: ${_characterProvider.selectedWords.length}');
+
       // CharacterProvider에 단어 세트 선택 요청
       await _characterProvider.selectNewWordSet(replaceAll: replaceAll);
 
       print('📋 CharacterProvider에서 단어 세트 선택 완료');
       print(
           '📋 WordProcessor - 선택 후 단어 수: ${_characterProvider.selectedWords.length}');
-      print(
-          '📋 WordProcessor - 선택 후 단어 목록: ${_characterProvider.selectedWords}');
 
       // 상태 동기화
       syncWithCharacterProvider();
@@ -444,6 +451,8 @@ class WordProcessor with ChangeNotifier {
       // 오류가 발생해도 상태를 동기화하고 UI에 알림
       syncWithCharacterProvider();
       notifyListeners();
+    } finally {
+      _isSelectingWordSet = false;
     }
   }
 

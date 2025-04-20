@@ -516,7 +516,7 @@ class WordService {
     }
 
     // 너무 짧은 단어는 무효
-    if (word.length < 2) return false;
+    if (word.length < 3) return false;
 
     // print('단어 비동기 확인: "$word"');
 

@@ -60,6 +60,10 @@ class _GameScreenState extends State<GameScreen> {
   Timer? _debounceTimer;
   final TextEditingController _searchController = TextEditingController();
 
+  // WordSuggestions 위젯의 GlobalKey 추가
+  final GlobalKey<WordSuggestionsState> _wordSuggestionsKey =
+      GlobalKey<WordSuggestionsState>();
+
   @override
   void initState() {
     super.initState();
@@ -181,9 +185,10 @@ class _GameScreenState extends State<GameScreen> {
                     ),
 
                     // 블록 트레이 (화면 하단에 고정)
-                    const BlockTray(
+                    BlockTray(
                       cellSize: 40.0,
                       spacing: 8.0,
+                      wordSuggestionsKey: _wordSuggestionsKey,
                     ),
                   ],
                 ),
@@ -195,15 +200,10 @@ class _GameScreenState extends State<GameScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: WordSuggestions(
+                    key: _wordSuggestionsKey,
                     words: gameProvider.suggestedWordSet,
                     wordUsageCount: gameProvider.wordUsageCounts,
                     usedCharacters: gameProvider.usedCharacters,
-                    onRefresh: (bool replaceAll) {
-                      // 사용자가 명시적으로 요청할 때만 새 단어 세트를 가져옴
-                      print(
-                          '🔄 WordSuggestions.onRefresh - 새 단어 세트 요청 (사용자 요청), replaceAll: $replaceAll');
-                      gameProvider.selectNewWordSet(replaceAll: replaceAll);
-                    },
                     onDictionaryLookup: gameProvider.openDictionary,
                   ),
                 ),
@@ -217,67 +217,63 @@ class _GameScreenState extends State<GameScreen> {
 
   // 폭탄 인디케이터 위젯
   Widget _buildBombIndicator(GameProvider gameProvider) {
-    // 폭탄 생성까지 남은 턴 수 계산 (5의 배수마다 생성)
+    // 폭탄 생성까지 남은 턴 수 계산 (3의 배수마다 생성)
     int clearedWords = gameProvider.wordClearCount;
-    int remainingTurns = 5 - (clearedWords % 5);
-    if (remainingTurns == 5 && clearedWords > 0 && gameProvider.bombGenerated) {
-      remainingTurns = 0;
-    }
+    int remainingTurns = 3 - (clearedWords % 3);
+    bool bombActive = remainingTurns == 0 || gameProvider.bombGenerated;
+
+    // 상태 텍스트 및 색상 설정
+    String statusText = bombActive ? '💣 폭탄이 준비되었습니다!' : '단어 3개 완성 후 폭탄이 나타납니다';
+
+    Color borderColor = bombActive ? Colors.red : Colors.orange.shade300;
+    Color bgColor = bombActive ? Colors.red.shade50 : Colors.white;
+    Color textColor = bombActive ? Colors.red.shade700 : Colors.black87;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
       margin: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 12.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: bgColor,
         borderRadius: BorderRadius.circular(8.0),
         border: Border.all(
-          color: remainingTurns == 0 ? Colors.red : Colors.orange.shade300,
+          color: borderColor,
           width: 1.5,
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // 현재 클리어 턴 수
-          Row(
-            children: [
-              const Icon(Icons.check_circle_outline,
-                  color: Colors.green, size: 20),
-              const SizedBox(width: 4),
-              Text(
-                '클리어 턴: $clearedWords',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          Icon(
+            bombActive ? Icons.warning_amber : Icons.info_outline,
+            color: bombActive ? Colors.red : Colors.orange.shade700,
+            size: 20,
           ),
-
-          // 폭탄 생성 정보
-          Row(
-            children: [
-              Icon(Icons.fireplace,
-                  color: remainingTurns == 0 ? Colors.red : Colors.grey,
-                  size: 20),
-              const SizedBox(width: 4),
-              remainingTurns == 0
-                  ? const Text(
-                      '폭탄 생성됨!',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    )
-                  : Text(
-                      '폭탄까지 $remainingTurns턴',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-            ],
+          const SizedBox(width: 8),
+          Text(
+            statusText,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+            margin: const EdgeInsets.only(left: 8.0),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(4.0),
+              border: Border.all(color: Colors.blue.shade300, width: 1.0),
+            ),
+            child: Text(
+              '총 완성 단어: $clearedWords',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade800,
+              ),
+            ),
           ),
         ],
       ),

@@ -121,6 +121,9 @@ class GameProvider with ChangeNotifier {
   // 사용된 글자 목록 getter 추가
   Set<String> get usedCharacters => Set.unmodifiable(_usedCharacters);
 
+  // 단어 세트 선택 중 플래그
+  bool _isSelectingWordSet = false;
+
   /// 현재 추천 단어 목록 가져오기
   List<String> get suggestedWordSet {
     final words = _wordProcessor.selectedWords;
@@ -137,6 +140,14 @@ class GameProvider with ChangeNotifier {
 
   /// 새 단어 세트 선택
   Future<void> selectNewWordSet({bool replaceAll = false}) async {
+    // 이미 진행 중이면 무시
+    if (_isSelectingWordSet) {
+      print('⚠️ GameProvider - 이미 단어 세트 선택 중입니다. 중복 호출 무시.');
+      return;
+    }
+
+    _isSelectingWordSet = true;
+
     try {
       await _wordProcessor.selectNewWordSet(replaceAll: replaceAll);
 
@@ -145,6 +156,8 @@ class GameProvider with ChangeNotifier {
     } catch (e) {
       // 오류가 발생해도 UI 갱신
       notifyListeners();
+    } finally {
+      _isSelectingWordSet = false;
     }
   }
 
@@ -248,8 +261,8 @@ class GameProvider with ChangeNotifier {
   void _generateNewBlock() {
     if (_blockManager.isBlockCountExceeded(_availableBlocks)) return;
 
-    // 5번마다 폭탄 블록 생성 (5, 10, 15, 20, ...)
-    if (_wordClearCount > 0 && _wordClearCount % 5 == 0 && !_bombGenerated) {
+    // 3번마다 폭탄 블록 생성 (3, 6, 9, 12, ...)
+    if (_wordClearCount > 0 && _wordClearCount % 3 == 0 && !_bombGenerated) {
       _bombGenerated = true;
       _availableBlocks.add(_blockManager.generateBombBlock());
     } else {

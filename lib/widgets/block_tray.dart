@@ -17,6 +17,9 @@
 /// - spacing: double
 ///   블록 간의 간격 (기본값: 16.0)
 ///
+/// - wordSuggestionsKey: GlobalKey<WordSuggestionsState>?
+///   단어 제안 위젯의 키 (기본값: null)
+///
 /// 이벤트 처리:
 /// - _handleTap(BuildContext context, Block block): void
 ///   블록 회전 이벤트 처리
@@ -64,17 +67,32 @@ import '../models/block.dart';
 import '../providers/game_provider.dart';
 import '../utils/point.dart';
 import 'dart:math' as Math;
+import '../widgets/word_suggestions.dart';
 
 /// 게임에서 사용 가능한 블록들을 표시하는 트레이 위젯
 class BlockTray extends StatelessWidget {
   final double cellSize;
   final double spacing;
+  final GlobalKey<WordSuggestionsState>? wordSuggestionsKey;
 
   const BlockTray({
     super.key,
     this.cellSize = 40.0,
     this.spacing = 16.0,
+    this.wordSuggestionsKey,
   });
+
+  /// 블록 문자를 하이라이트
+  void _highlightBlockCharacters(Block block, {bool clear = false}) {
+    if (wordSuggestionsKey?.currentState == null) return;
+
+    if (clear) {
+      wordSuggestionsKey!.currentState!.clearHighlights();
+    } else {
+      final characters = Set<String>.from(block.characters);
+      wordSuggestionsKey!.currentState!.setHighlightedCharacters(characters);
+    }
+  }
 
   /// 블록의 회전 처리
   void _handleTap(BuildContext context, Block block) {
@@ -157,6 +175,15 @@ class BlockTray extends StatelessWidget {
                               data: block,
                               onDragStarted: () {
                                 // 드래그 시작 시 처리
+                                _highlightBlockCharacters(block);
+                              },
+                              onDragEnd: (details) {
+                                // 드래그 종료 시 처리
+                                _highlightBlockCharacters(block, clear: true);
+                              },
+                              onDraggableCanceled: (velocity, offset) {
+                                // 드래그 취소 시 처리
+                                _highlightBlockCharacters(block, clear: true);
                               },
                               // 드래그 중일 때 보여줄 위젯
                               feedback: Material(
@@ -177,11 +204,21 @@ class BlockTray extends StatelessWidget {
                                 opacity: 0.3,
                                 child: buildBlockWidget(block, 0.3),
                               ),
-                              child: GestureDetector(
-                                onTap: () {
-                                  _handleTap(context, block);
+                              child: MouseRegion(
+                                onEnter: (_) {
+                                  // 마우스가 블록에 들어왔을 때
+                                  _highlightBlockCharacters(block);
                                 },
-                                child: buildBlockWidget(block, 1.0),
+                                onExit: (_) {
+                                  // 마우스가 블록에서 나갔을 때
+                                  _highlightBlockCharacters(block, clear: true);
+                                },
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _handleTap(context, block);
+                                  },
+                                  child: buildBlockWidget(block, 1.0),
+                                ),
                               ),
                             ),
                           );

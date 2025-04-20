@@ -234,7 +234,7 @@ class Grid {
           wordCells.add(Point(x, y));
         } else if (currentWord.isNotEmpty) {
           // 단어가 끝나면 확인
-          if (currentWord.length >= 2 && validWords.contains(currentWord)) {
+          if (currentWord.length >= 3 && validWords.contains(currentWord)) {
             found.add(Word(
               text: currentWord,
               cells: List.from(wordCells),
@@ -249,7 +249,7 @@ class Grid {
       }
 
       // 줄 끝에서 단어 확인
-      if (currentWord.length >= 2 && validWords.contains(currentWord)) {
+      if (currentWord.length >= 3 && validWords.contains(currentWord)) {
         found.add(Word(
           text: currentWord,
           cells: List.from(wordCells),
@@ -271,7 +271,7 @@ class Grid {
           wordCells.add(Point(x, y));
         } else if (currentWord.isNotEmpty) {
           // 단어가 끝나면 확인
-          if (currentWord.length >= 2 && validWords.contains(currentWord)) {
+          if (currentWord.length >= 3 && validWords.contains(currentWord)) {
             found.add(Word(
               text: currentWord,
               cells: List.from(wordCells),
@@ -286,7 +286,7 @@ class Grid {
       }
 
       // 열 끝에서 단어 확인
-      if (currentWord.length >= 2 && validWords.contains(currentWord)) {
+      if (currentWord.length >= 3 && validWords.contains(currentWord)) {
         found.add(Word(
           text: currentWord,
           cells: List.from(wordCells),

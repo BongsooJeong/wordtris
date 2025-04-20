@@ -26,6 +26,9 @@ class CharacterProvider with ChangeNotifier {
   // 한 번에 표시할 최대 단어 수
   static const int _maxDisplayedWords = 20;
 
+  // 재귀 호출 방지 플래그
+  bool _isSelectingWordSet = false;
+
   CharacterProvider(WordService wordService)
       : _manager = CharacterManager(wordService);
 
@@ -48,46 +51,58 @@ class CharacterProvider with ChangeNotifier {
 
   /// 새 단어 배치 선택
   Future<void> selectNewWordSet({bool replaceAll = false}) async {
-    print('📦 [DEBUG] 새로운 단어 배치 선택 시작 - 호출 스택: ${StackTrace.current}');
-    print('🔍 [DEBUG] 모드: ${replaceAll ? "전체 교체" : "추가"}');
-
-    if (replaceAll) {
-      // 기존 상태 초기화
-      _selectedWords.clear();
-      _wordUsageCount.clear();
-
-      // 초기 단어 세트 가져오기
-      final initialWords = await _manager.getInitialWordSet();
-
-      // 단어 목록 설정 및 사용 횟수 초기화
-      for (String word in initialWords) {
-        _selectedWords.add(word);
-        _wordUsageCount[word] = 0;
-      }
-
-      print(
-          '🆕 [DEBUG] 초기화 - 새 단어 ${_selectedWords.length}개 선택됨: $_selectedWords');
-    } else {
-      // 기존 단어 유지하면서 새 단어 추가
-      await _addNewWords();
+    // 이미 단어 세트 선택 중이면 중복 호출 방지
+    if (_isSelectingWordSet) {
+      print('⚠️ [DEBUG] 이미 단어 세트 선택 중입니다. 중복 호출 무시.');
+      return;
     }
 
-    // 선택된 단어가 없는 경우 기본 단어 추가
-    if (_selectedWords.isEmpty) {
-      print('⚠️ [DEBUG] 선택된 단어가 없습니다. 기본 단어 목록 사용');
-      final defaultWords = _manager.getDefaultWords();
+    _isSelectingWordSet = true;
 
-      for (String word in defaultWords) {
-        _selectedWords.add(word);
-        _wordUsageCount[word] = 0;
+    try {
+      print('📦 [DEBUG] 새로운 단어 배치 선택 시작');
+      print('🔍 [DEBUG] 모드: ${replaceAll ? "전체 교체" : "추가"}');
+
+      if (replaceAll) {
+        // 기존 상태 초기화
+        _selectedWords.clear();
+        _wordUsageCount.clear();
+
+        // 초기 단어 세트 가져오기
+        final initialWords = await _manager.getInitialWordSet();
+
+        // 단어 목록 설정 및 사용 횟수 초기화
+        for (String word in initialWords) {
+          _selectedWords.add(word);
+          _wordUsageCount[word] = 0;
+        }
+
+        print(
+            '🆕 [DEBUG] 초기화 - 새 단어 ${_selectedWords.length}개 선택됨: $_selectedWords');
+      } else {
+        // 기존 단어 유지하면서 새 단어 추가
+        await _addNewWords();
       }
+
+      // 선택된 단어가 없는 경우 기본 단어 추가
+      if (_selectedWords.isEmpty) {
+        print('⚠️ [DEBUG] 선택된 단어가 없습니다. 기본 단어 목록 사용');
+        final defaultWords = _manager.getDefaultWords();
+
+        for (String word in defaultWords) {
+          _selectedWords.add(word);
+          _wordUsageCount[word] = 0;
+        }
+      }
+
+      // 사용 가능한 글자 목록 업데이트
+      _updateAvailableCharacters();
+
+      print('✅ [DEBUG] 선택된 단어 배치 (${_selectedWords.length}개): $_selectedWords');
+      notifyListeners();
+    } finally {
+      _isSelectingWordSet = false;
     }
-
-    // 사용 가능한 글자 목록 업데이트
-    _updateAvailableCharacters();
-
-    print('✅ [DEBUG] 선택된 단어 배치 (${_selectedWords.length}개): $_selectedWords');
-    notifyListeners();
   }
 
   /// 새 단어를 추가합니다 (기존 단어는 유지)

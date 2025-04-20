@@ -102,50 +102,39 @@ class CharacterManager {
   /// 빈도 데이터 파일 로드
   Future<void> _loadFrequencyData() async {
     print('📊 빈도 데이터 로드 시작');
-
-    bool anyFileLoadFailed = false;
-
     try {
-      // Top 100 글자 로드 시도
-      try {
-        final top100Text =
-            await rootBundle.loadString('assets/data/korean_chars_top100.txt');
-        _top100Chars = top100Text
-            .split('\n')
-            .where((line) => line.trim().isNotEmpty)
-            .toList();
-        print('📊 Top 100 글자 로드 완료: ${_top100Chars.length}개');
-      } catch (e) {
-        print('⚠️ Top 100 글자 로드 실패: $e - 기본 데이터 사용');
-        _top100Chars = _commonKoreanChars.take(100).toList();
-        anyFileLoadFailed = true;
-      }
+      // Top 100 글자 로드
+      final top100Text =
+          await rootBundle.loadString('assets/data/korean_chars_top100.txt');
+      _top100Chars = top100Text
+          .split('\n')
+          .where((line) => line.trim().isNotEmpty)
+          .toList();
 
-      // 나머지 빈도 데이터는 기본 데이터 사용
-      _top101_200Chars = _commonKoreanChars.length > 100
-          ? _commonKoreanChars.sublist(100, min(200, _commonKoreanChars.length))
-          : [];
-      print('📊 Top 101-200 글자: ${_top101_200Chars.length}개 (기본 데이터)');
+      // Top 101-200 글자 로드
+      final top200Text = await rootBundle
+          .loadString('assets/data/korean_chars_top101_200.txt');
+      _top101_200Chars = top200Text
+          .split('\n')
+          .where((line) => line.trim().isNotEmpty)
+          .toList();
 
-      _top201_300Chars = _commonKoreanChars.length > 200
-          ? _commonKoreanChars.sublist(200, min(300, _commonKoreanChars.length))
-          : [];
-      print('📊 Top 201-300 글자: ${_top201_300Chars.length}개 (기본 데이터)');
-
-      _frequencyDataLoaded = true;
-
-      if (anyFileLoadFailed) {
-        print('⚠️ 일부 빈도 데이터 파일이 누락되어 기본 데이터로 대체되었습니다.');
-      }
+      // Top 201-300 글자 로드
+      final top300Text = await rootBundle
+          .loadString('assets/data/korean_chars_top201_300.txt');
+      _top201_300Chars = top300Text
+          .split('\n')
+          .where((line) => line.trim().isNotEmpty)
+          .toList();
 
       print(
-          '📊 빈도 데이터 준비 완료: Top 100 (${_top100Chars.length}개), Top 101-200 (${_top101_200Chars.length}개), Top 201-300 (${_top201_300Chars.length}개)');
+          '빈도 데이터 로드 완료: Top 100 (${_top100Chars.length}개), Top 101-200 (${_top101_200Chars.length}개), Top 201-300 (${_top201_300Chars.length}개)');
+      _frequencyDataLoaded = true;
     } catch (e) {
-      print('❌ 빈도 데이터 로드 과정에서 예상치 못한 오류 발생: $e');
+      print('빈도 데이터 로드 실패: $e');
       _setupDefaultFrequencyData();
     }
-
-    print('📊 빈도 데이터 로드 과정 완료');
+    print('📊 빈도 데이터 로드 완료');
   }
 
   /// 기본 빈도 데이터 설정
