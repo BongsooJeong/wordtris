@@ -68,7 +68,6 @@ import 'character_provider.dart';
 
 /// 게임 상태를 관리하는 Provider 클래스
 class GameProvider with ChangeNotifier {
-  final Set<String> _validWords = {};
   final WordService _wordService = WordService();
   bool _isLoading = true;
   String _errorMessage = '';
@@ -78,12 +77,7 @@ class GameProvider with ChangeNotifier {
   bool _isGameOver = false;
   bool _isGamePaused = false;
   int _level = 1;
-  final bool _isInitialized = false;
-  final Random _random = Random();
   final List<Word> _formedWords = [];
-  final String _currentPattern = '';
-  final List<String> _suggestedWords = [];
-  final bool _isLoadingSuggestions = false;
   int _wordClearCount = 0; // 단어 제거 횟수 카운터
   bool _bombGenerated = false;
 
@@ -103,14 +97,10 @@ class GameProvider with ChangeNotifier {
   bool get isGameOver => _isGameOver;
   bool get isGamePaused => _isGamePaused;
   int get level => _level;
-  bool get isInitialized => _isInitialized;
   Grid get grid => _grid;
   List<Block> get availableBlocks => _availableBlocks;
   int get score => _score;
   List<Word> get formedWords => _formedWords;
-  String get currentPattern => _currentPattern;
-  List<String> get suggestedWords => _suggestedWords;
-  bool get isLoadingSuggestions => _isLoadingSuggestions;
   int get wordClearCount => _wordClearCount;
   bool get bombGenerated => _bombGenerated;
 
@@ -127,14 +117,12 @@ class GameProvider with ChangeNotifier {
   /// 현재 추천 단어 목록 가져오기
   List<String> get suggestedWordSet {
     final words = _wordProcessor.selectedWords;
-    // print('📋 GameProvider.suggestedWordSet 접근: ${words.length}개 단어');
     return words;
   }
 
   /// 단어 사용 횟수 가져오기
   Map<String, int> get wordUsageCounts {
     final counts = _wordProcessor.wordUsageCount;
-    // print('📋 GameProvider.wordUsageCounts 접근: ${counts.length}개 항목');
     return counts;
   }
 
@@ -232,11 +220,6 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  /// 게임 초기화
-  Future<void> initialize() async {
-    await _initializeGame();
-  }
-
   /// 게임 재시작
   void restartGame() {
     _usedCharacters.clear(); // 사용된 글자 목록 초기화
@@ -316,9 +299,6 @@ class GameProvider with ChangeNotifier {
       _usedCharacters.add(character);
     }
 
-    // print('🧩 블록 배치 - 사용된 글자 추가: ${block.characters}');
-    // print('📊 현재 사용된 글자: $_usedCharacters');
-
     // 폭탄 블록인 경우 폭발 효과 적용
     if (block.isBomb && positions.isNotEmpty) {
       // 폭발의 중심점은 첫 번째 위치 (폭탄은 1칸이므로)
@@ -391,15 +371,6 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  /// 로딩 상태 설정
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    if (loading) {
-      _errorMessage = '';
-    }
-    notifyListeners();
-  }
-
   /// 오류 메시지 설정
   void _setError(String message) {
     _errorMessage = message;
@@ -416,19 +387,6 @@ class GameProvider with ChangeNotifier {
 
     return await _wordProcessor.getWordSuggestions(pattern);
   }
-
-  // 블록 최대 개수
-  static const int _maxAvailableBlocks = 5;
-
-  // 색상 팔레트
-  static const List<Color> _blockColors = [
-    Color(0xFFFFC107), // 노랑
-    Color(0xFF4CAF50), // 초록
-    Color(0xFF2196F3), // 파랑
-    Color(0xFFE91E63), // 분홍
-    Color(0xFF9C27B0), // 보라
-    Color(0xFFFF5722), // 주황
-  ];
 
   // 애니메이션 상태 초기화
   void resetAnimationState() {

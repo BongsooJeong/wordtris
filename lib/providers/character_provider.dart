@@ -14,8 +14,11 @@ import '../services/word_service.dart';
 class CharacterProvider with ChangeNotifier {
   final CharacterManager _manager;
 
-  // 현재 게임에 사용 중인 선택된 단어 목록
+  // 현재 게임에 사용 중인 선택된 단어 목록 (글자 생성용)
   final List<String> _selectedWords = [];
+
+  // 화면에 표시하는 추천 단어 목록 (UI 표시용)
+  final List<String> _displayedWords = [];
 
   // 현재 사용 가능한 글자 목록
   final Set<String> _availableCharacters = {};
@@ -66,6 +69,7 @@ class CharacterProvider with ChangeNotifier {
       if (replaceAll) {
         // 기존 상태 초기화
         _selectedWords.clear();
+        _displayedWords.clear();
         _wordUsageCount.clear();
 
         // 초기 단어 세트 가져오기
@@ -74,6 +78,7 @@ class CharacterProvider with ChangeNotifier {
         // 단어 목록 설정 및 사용 횟수 초기화
         for (String word in initialWords) {
           _selectedWords.add(word);
+          _displayedWords.add(word);
           _wordUsageCount[word] = 0;
         }
 
@@ -91,6 +96,7 @@ class CharacterProvider with ChangeNotifier {
 
         for (String word in defaultWords) {
           _selectedWords.add(word);
+          _displayedWords.add(word);
           _wordUsageCount[word] = 0;
         }
       }
@@ -120,21 +126,23 @@ class CharacterProvider with ChangeNotifier {
     // 새 단어 추가 및 사용 횟수 초기화
     for (String word in newWords) {
       _selectedWords.add(word);
+      if (!_displayedWords.contains(word)) {
+        _displayedWords.add(word);
+      }
       _wordUsageCount[word] = 0;
     }
     print('➕ [DEBUG] 단어 배치에 새 단어 ${newWords.length}개 추가: $newWords');
 
-    // 단어 개수가 최대 표시 개수를 초과하면 오래된 단어부터 제거
+    // 표시되는 단어 개수가 최대 표시 개수를 초과하면 오래된 단어부터 제거
     final List<String> removedWords = [];
-    while (_selectedWords.length > _maxDisplayedWords) {
-      final String removed = _selectedWords.removeAt(0);
+    while (_displayedWords.length > _maxDisplayedWords) {
+      final String removed = _displayedWords.removeAt(0);
       removedWords.add(removed);
-      _wordUsageCount.remove(removed);
     }
 
     if (removedWords.isNotEmpty) {
       print(
-          '🗑️ [DEBUG] 최대 표시 개수 초과로 ${removedWords.length}개 단어 제거됨: $removedWords');
+          '🗑️ [DEBUG] 최대 표시 개수 초과로 표시 목록에서 ${removedWords.length}개 단어 제거됨: $removedWords');
     }
 
     // 선택된 단어에서 고유 글자 추출 업데이트
@@ -142,7 +150,7 @@ class CharacterProvider with ChangeNotifier {
 
     // 단어 추가 후 남은 글자 수 로그 추가
     print(
-        '✅ [DEBUG] 새 단어 배치 추가 완료. 현재 단어 ${_selectedWords.length}개, 사용 가능한 글자 ${_availableCharacters.length}개');
+        '✅ [DEBUG] 새 단어 배치 추가 완료. 현재 단어 ${_selectedWords.length}개, 표시 중인 단어 ${_displayedWords.length}개, 사용 가능한 글자 ${_availableCharacters.length}개');
   }
 
   /// 사용 가능한 글자 목록 업데이트
@@ -158,13 +166,38 @@ class CharacterProvider with ChangeNotifier {
   Future<void> _refillCharacters() async {
     print('📦 [DEBUG] 사용 가능한 글자가 없어 새 단어 세트 추가');
 
-    // 기존 단어를 모두 제거하고 새로운 단어만 사용
+    // 기존 글자 생성용 단어 목록만 제거하고, 화면 표시용 단어 목록은 유지
+    List<String> displayedWordsCopy = List.from(_displayedWords);
+    print('🔄 [DEBUG] 화면 표시용 단어 목록 백업: $displayedWordsCopy');
+
+    // 글자 생성용 단어 목록 초기화
     _selectedWords.clear();
-    _wordUsageCount.clear();
-    print('🗑️ [DEBUG] 모든 글자를 소진한 기존 단어들을 제거합니다');
+    print('🗑️ [DEBUG] 모든 글자를 소진한 글자 생성용 단어 목록 제거');
 
     // 새 단어 추가
     await _addNewWords();
+
+    // 새로 추가된 단어 목록 가져오기
+    List<String> newAddedWords = _selectedWords
+        .where((word) => !displayedWordsCopy.contains(word))
+        .toList();
+    print('🆕 [DEBUG] 새로 추가된 단어 (${newAddedWords.length}개): $newAddedWords');
+
+    // 표시 목록 업데이트: 기존 단어 + 새 단어 (최대 표시 개수 유지)
+    _displayedWords.clear();
+    _displayedWords.addAll(displayedWordsCopy); // 기존 표시되던 단어 복원
+
+    // 새 단어들을 표시 목록에 추가
+    for (String word in newAddedWords) {
+      _displayedWords.add(word);
+      // 최대 표시 개수를 초과하면 가장 오래된 단어 제거
+      if (_displayedWords.length > _maxDisplayedWords) {
+        _displayedWords.removeAt(0);
+      }
+    }
+
+    print(
+        '📋 [DEBUG] 업데이트된 화면 표시 단어 목록 (${_displayedWords.length}개): $_displayedWords');
 
     // 여전히 글자가 없으면 기존 단어에서 추출
     if (_availableCharacters.isEmpty) {
@@ -175,14 +208,17 @@ class CharacterProvider with ChangeNotifier {
     }
 
     print(
-        '🔄 [DEBUG] 글자 목록 재충전 완료. 현재 단어 ${_selectedWords.length}개, 사용 가능한 글자 ${_availableCharacters.length}개');
+        '🔄 [DEBUG] 글자 목록 재충전 완료. 글자 생성용 단어 ${_selectedWords.length}개, 화면 표시용 단어 ${_displayedWords.length}개, 사용 가능한 글자 ${_availableCharacters.length}개');
+
+    // 단어 목록이 변경되었으므로 알림
+    notifyListeners();
   }
 
   /// 단어 사용 횟수 증가시키기
   void incrementWordUsageCount(String word) {
     print('incrementWordUsageCount 호출: $word');
 
-    if (_selectedWords.contains(word)) {
+    if (_displayedWords.contains(word)) {
       _wordUsageCount[word] = (_wordUsageCount[word] ?? 0) + 1;
       notifyListeners();
     }
@@ -190,7 +226,7 @@ class CharacterProvider with ChangeNotifier {
 
   /// 단어 사용 정보 업데이트
   void updateWordUsage(String word) {
-    if (!_selectedWords.contains(word)) {
+    if (!_displayedWords.contains(word)) {
       return;
     }
 
@@ -199,8 +235,8 @@ class CharacterProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// 현재 선택된 단어 목록 반환
-  List<String> get selectedWords => List.unmodifiable(_selectedWords);
+  /// 현재 선택된 단어 목록 반환 (화면에 표시용)
+  List<String> get selectedWords => List.unmodifiable(_displayedWords);
 
   /// 단어 사용 횟수 반환
   Map<String, int> get wordUsageCount => Map.unmodifiable(_wordUsageCount);
@@ -213,7 +249,10 @@ class CharacterProvider with ChangeNotifier {
     // 사용 가능한 글자가 없으면 새로운 단어 세트 추가
     if (_availableCharacters.isEmpty) {
       print('🔄 사용 가능한 글자가 없어서 새 단어 세트를 추가합니다');
-      print('📊 [DEBUG] 현재 단어 목록 (${_selectedWords.length}개): $_selectedWords');
+      print(
+          '📊 [DEBUG] 현재 글자 생성용 단어 목록 (${_selectedWords.length}개): $_selectedWords');
+      print(
+          '📊 [DEBUG] 현재 화면 표시용 단어 목록 (${_displayedWords.length}개): $_displayedWords');
 
       // 이전 단어들은 모두 글자를 소진했으므로 새 단어 세트로 교체
       await _refillCharacters();
