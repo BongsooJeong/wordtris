@@ -352,6 +352,9 @@ class GameProvider with ChangeNotifier {
     // 단어 제거 카운트 증가
     _wordClearCount++;
 
+    // 폭탄 생성 플래그 리셋 - 매 단어 클리어마다 초기화하여 3의 배수 확인이 제대로 동작하도록 함
+    _bombGenerated = false;
+
     // 레벨 업 체크 (100점마다)
     _level = (_score ~/ 100) + 1;
     if (_level > 10) _level = 10;

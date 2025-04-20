@@ -166,7 +166,11 @@ class _GameScreenState extends State<GameScreen> {
                         ),
 
                         // 폭탄 인디케이터 추가
-                        _buildBombIndicator(gameProvider),
+                        Consumer<GameProvider>(
+                          builder: (context, gameProvider, child) {
+                            return _buildBombIndicator(gameProvider);
+                          },
+                        ),
 
                         // 게임 그리드
                         const Expanded(
