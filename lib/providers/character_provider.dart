@@ -140,7 +140,9 @@ class CharacterProvider with ChangeNotifier {
     // 선택된 단어에서 고유 글자 추출 업데이트
     _updateAvailableCharacters();
 
-    print('✅ [DEBUG] 새 단어 배치 추가 완료. 현재 단어 ${_selectedWords.length}개');
+    // 단어 추가 후 남은 글자 수 로그 추가
+    print(
+        '✅ [DEBUG] 새 단어 배치 추가 완료. 현재 단어 ${_selectedWords.length}개, 사용 가능한 글자 ${_availableCharacters.length}개');
   }
 
   /// 사용 가능한 글자 목록 업데이트
@@ -156,6 +158,11 @@ class CharacterProvider with ChangeNotifier {
   Future<void> _refillCharacters() async {
     print('📦 [DEBUG] 사용 가능한 글자가 없어 새 단어 세트 추가');
 
+    // 기존 단어를 모두 제거하고 새로운 단어만 사용
+    _selectedWords.clear();
+    _wordUsageCount.clear();
+    print('🗑️ [DEBUG] 모든 글자를 소진한 기존 단어들을 제거합니다');
+
     // 새 단어 추가
     await _addNewWords();
 
@@ -167,7 +174,8 @@ class CharacterProvider with ChangeNotifier {
       _availableCharacters.addAll(chars);
     }
 
-    print('🔄 글자 목록 재충전 완료. 현재 ${_availableCharacters.length}개 글자 가능');
+    print(
+        '🔄 [DEBUG] 글자 목록 재충전 완료. 현재 단어 ${_selectedWords.length}개, 사용 가능한 글자 ${_availableCharacters.length}개');
   }
 
   /// 단어 사용 횟수 증가시키기
@@ -205,6 +213,9 @@ class CharacterProvider with ChangeNotifier {
     // 사용 가능한 글자가 없으면 새로운 단어 세트 추가
     if (_availableCharacters.isEmpty) {
       print('🔄 사용 가능한 글자가 없어서 새 단어 세트를 추가합니다');
+      print('📊 [DEBUG] 현재 단어 목록 (${_selectedWords.length}개): $_selectedWords');
+
+      // 이전 단어들은 모두 글자를 소진했으므로 새 단어 세트로 교체
       await _refillCharacters();
     }
 
@@ -219,6 +230,10 @@ class CharacterProvider with ChangeNotifier {
 
     // 선택된 글자를 목록에서 제거
     _availableCharacters.remove(selectedChar);
+
+    // 매번 남은 글자 수를 로그에 출력
+    print(
+        '📊 [DEBUG] 글자 "$selectedChar" 사용 후 남은 글자 수: ${_availableCharacters.length}개');
 
     // 선택된 글자가 포함된 단어 사용 횟수 업데이트
     _updateCharacterUsageInWords(selectedChar);
