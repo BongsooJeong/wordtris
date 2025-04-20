@@ -201,11 +201,17 @@ class CharacterProvider with ChangeNotifier {
   Set<String> get availableCharacters => Set.unmodifiable(_availableCharacters);
 
   /// 랜덤 문자 생성 (블록, 그리드 채우기용)
-  String getRandomCharacter() {
+  Future<String> getRandomCharacter() async {
     // 사용 가능한 글자가 없으면 새로운 단어 세트 추가
     if (_availableCharacters.isEmpty) {
       print('🔄 사용 가능한 글자가 없어서 새 단어 세트를 추가합니다');
-      _refillCharacters();
+      await _refillCharacters();
+    }
+
+    // 글자가 여전히 없으면 기본 글자 하나 반환
+    if (_availableCharacters.isEmpty) {
+      print('⚠️ [ERROR] 글자 목록이 여전히 비어 있습니다. 기본 글자 반환');
+      return '가';
     }
 
     // 글자 선택
@@ -256,17 +262,17 @@ class CharacterProvider with ChangeNotifier {
   }
 
   /// 빈도 기반 랜덤 글자 선택
-  String getFrequencyBasedChar() {
-    return getRandomCharacter();
+  Future<String> getFrequencyBasedChar() async {
+    return await getRandomCharacter();
   }
 
   /// 랜덤 자음 기반 문자 생성
-  String getRandomConsonantChar() {
-    return getRandomCharacter();
+  Future<String> getRandomConsonantChar() async {
+    return await getRandomCharacter();
   }
 
   /// 랜덤 모음 기반 문자 생성
-  String getRandomVowelChar() {
-    return getRandomCharacter();
+  Future<String> getRandomVowelChar() async {
+    return await getRandomCharacter();
   }
 }

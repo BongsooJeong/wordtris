@@ -177,20 +177,29 @@ class WordProcessor with ChangeNotifier {
   List<String> get selectedWords => _characterProvider.selectedWords;
 
   // Grid 초기화 메서드
-  void initializeGrid(int rows, int cols) {
+  Future<void> initializeGrid(int rows, int cols) async {
+    // 빈 그리드 먼저 생성
     _grid = List.generate(
       rows,
       (_) => List.generate(
         cols,
-        (_) => _characterProvider.getRandomCharacter(),
+        (_) => '', // 빈 문자열로 초기화
       ),
     );
+
+    // 그리드의 각 셀을 비동기적으로 채우기
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        _grid[i][j] = await _characterProvider.getRandomCharacter();
+      }
+    }
+
     notifyListeners();
   }
 
   // Grid의 특정 위치 문자 업데이트
-  void updateGridCharacter(int row, int col) {
-    _grid[row][col] = _characterProvider.getRandomCharacter();
+  Future<void> updateGridCharacter(int row, int col) async {
+    _grid[row][col] = await _characterProvider.getRandomCharacter();
     notifyListeners();
   }
 
@@ -224,7 +233,7 @@ class WordProcessor with ChangeNotifier {
   }
 
   // 선택한 단어 제출
-  bool submitWord() {
+  Future<bool> submitWord() async {
     print('🔤 단어 제출 시도: "$_currentWord", 길이: ${_currentWord.length}');
 
     if (_currentWord.length < 2) {
@@ -251,7 +260,7 @@ class WordProcessor with ChangeNotifier {
       // 선택된 위치의 문자 교체
       print('🔄 선택된 위치의 문자 교체 (${_selectedPositions.length}개)');
       for (var position in _selectedPositions) {
-        updateGridCharacter(position.row, position.col);
+        await updateGridCharacter(position.row, position.col);
       }
 
       resetSelection();
@@ -480,17 +489,17 @@ class WordProcessor with ChangeNotifier {
   }
 
   /// 빈도 기반 문자 가져오기
-  String getFrequencyBasedChar() {
-    return _characterProvider.getRandomCharacter();
+  Future<String> getFrequencyBasedChar() async {
+    return await _characterProvider.getFrequencyBasedChar();
   }
 
   /// 자음 기반 랜덤 문자 가져오기
-  String getRandomConsonantChar() {
-    return _characterProvider.getRandomCharacter();
+  Future<String> getRandomConsonantChar() async {
+    return await _characterProvider.getRandomConsonantChar();
   }
 
   /// 모음 기반 랜덤 문자 가져오기
-  String getRandomVowelChar() {
-    return _characterProvider.getRandomCharacter();
+  Future<String> getRandomVowelChar() async {
+    return await _characterProvider.getRandomVowelChar();
   }
 }

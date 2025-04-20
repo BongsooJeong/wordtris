@@ -57,8 +57,8 @@ class BlockManager {
   BlockManager(this._wordProcessor);
 
   /// 새로운 블록 생성
-  Block generateNewBlock() {
-    final character = _wordProcessor.getFrequencyBasedChar();
+  Future<Block> generateNewBlock() async {
+    final character = await _wordProcessor.getFrequencyBasedChar();
     final color = blockColors[_random.nextInt(blockColors.length)];
     final blockId =
         DateTime.now().millisecondsSinceEpoch + _random.nextInt(1000);
@@ -72,8 +72,8 @@ class BlockManager {
   }
 
   /// 자음 기반 블록 생성
-  Block generateConsonantBlock() {
-    final character = _wordProcessor.getRandomConsonantChar();
+  Future<Block> generateConsonantBlock() async {
+    final character = await _wordProcessor.getRandomConsonantChar();
     final color = blockColors[_random.nextInt(blockColors.length)];
     final blockId =
         DateTime.now().millisecondsSinceEpoch + _random.nextInt(1000);
@@ -87,8 +87,8 @@ class BlockManager {
   }
 
   /// 모음 기반 블록 생성
-  Block generateVowelBlock() {
-    final character = _wordProcessor.getRandomVowelChar();
+  Future<Block> generateVowelBlock() async {
+    final character = await _wordProcessor.getRandomVowelChar();
     final color = blockColors[_random.nextInt(blockColors.length)];
     final blockId =
         DateTime.now().millisecondsSinceEpoch + _random.nextInt(1000);
@@ -102,15 +102,16 @@ class BlockManager {
   }
 
   /// 여러 개의 새로운 블록 생성
-  List<Block> generateBlocks(int count) {
-    return List.generate(
-      count,
-      (index) => createRandomBlock(),
-    );
+  Future<List<Block>> generateBlocks(int count) async {
+    List<Block> blocks = [];
+    for (int i = 0; i < count; i++) {
+      blocks.add(await createRandomBlock());
+    }
+    return blocks;
   }
 
   /// 랜덤 블록 생성 (크기와 모양 포함)
-  Block createRandomBlock() {
+  Future<Block> createRandomBlock() async {
     final random = Random();
 
     // 블록 크기 확률 조정
@@ -165,10 +166,10 @@ class BlockManager {
     }
 
     // 문자 생성
-    List<String> characters = List.generate(
-      requiredChars,
-      (_) => _wordProcessor.getFrequencyBasedChar(),
-    );
+    List<String> characters = [];
+    for (int i = 0; i < requiredChars; i++) {
+      characters.add(await _wordProcessor.getFrequencyBasedChar());
+    }
 
     // 블록 ID 생성
     int blockId = DateTime.now().millisecondsSinceEpoch + random.nextInt(1000);
@@ -187,7 +188,7 @@ class BlockManager {
   }
 
   /// 폭탄 블록 생성
-  Block generateBombBlock() {
+  Future<Block> generateBombBlock() async {
     final blockId =
         DateTime.now().millisecondsSinceEpoch + _random.nextInt(1000);
     return Block(

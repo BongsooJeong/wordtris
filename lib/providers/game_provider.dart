@@ -219,7 +219,7 @@ class GameProvider with ChangeNotifier {
 
       // 초기 블록 생성
       print('🧩 초기 블록 생성');
-      _generateInitialBlocks();
+      await _generateInitialBlocks();
 
       _isLoading = false;
       notifyListeners();
@@ -252,21 +252,21 @@ class GameProvider with ChangeNotifier {
   }
 
   /// 초기 블록 생성
-  void _generateInitialBlocks() {
-    _availableBlocks = _blockManager.generateBlocks(4);
+  Future<void> _generateInitialBlocks() async {
+    _availableBlocks = await _blockManager.generateBlocks(4);
     notifyListeners();
   }
 
   /// 새로운 블록 생성
-  void _generateNewBlock() {
+  Future<void> _generateNewBlock() async {
     if (_blockManager.isBlockCountExceeded(_availableBlocks)) return;
 
     // 3번마다 폭탄 블록 생성 (3, 6, 9, 12, ...)
     if (_wordClearCount > 0 && _wordClearCount % 3 == 0 && !_bombGenerated) {
       _bombGenerated = true;
-      _availableBlocks.add(_blockManager.generateBombBlock());
+      _availableBlocks.add(await _blockManager.generateBombBlock());
     } else {
-      _availableBlocks.add(_blockManager.createRandomBlock());
+      _availableBlocks.add(await _blockManager.createRandomBlock());
     }
     notifyListeners();
   }
