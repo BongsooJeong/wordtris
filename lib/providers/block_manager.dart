@@ -105,7 +105,12 @@ class BlockManager {
   Future<List<Block>> generateBlocks(int count) async {
     List<Block> blocks = [];
     for (int i = 0; i < count; i++) {
-      blocks.add(await createRandomBlock());
+      // 3번째 블록은 와일드카드 블록으로 생성
+      if (i == 2) {
+        blocks.add(await generateWildcardBlock());
+      } else {
+        blocks.add(await createRandomBlock());
+      }
     }
     return blocks;
   }
@@ -114,19 +119,18 @@ class BlockManager {
   Future<Block> createRandomBlock() async {
     final random = Random();
 
-    // 블록 크기 확률 조정
+    // 블록 크기 확률 조정 - 각각 25%로 균등하게 조정
     int blockSize;
     final sizeRoll = random.nextDouble();
 
-    // 1칸 블록: 40%, 2칸 블록: 40%, 3칸 블록: 10%, 4칸 블록: 10%로 비율 조정
-    if (sizeRoll < 0.40) {
-      blockSize = 1; // 40%
-    } else if (sizeRoll < 0.80) {
-      blockSize = 2; // 40%
-    } else if (sizeRoll < 0.90) {
-      blockSize = 3; // 10%
+    if (sizeRoll < 0.25) {
+      blockSize = 1; // 25%
+    } else if (sizeRoll < 0.50) {
+      blockSize = 2; // 25%
+    } else if (sizeRoll < 0.75) {
+      blockSize = 3; // 25%
     } else {
-      blockSize = 4; // 10%
+      blockSize = 4; // 25%
     }
 
     // 블록 모양 선택
@@ -197,6 +201,19 @@ class BlockManager {
       characters: ['💣'],
       color: Colors.red,
       isBomb: true,
+    );
+  }
+
+  /// 와일드카드 블록 생성
+  Future<Block> generateWildcardBlock() async {
+    final blockId =
+        DateTime.now().millisecondsSinceEpoch + _random.nextInt(1000);
+    return Block(
+      id: blockId,
+      shape: BlockShape.single,
+      characters: [Block.wildcardChar],
+      color: Colors.purple,
+      isWildcard: true,
     );
   }
 }

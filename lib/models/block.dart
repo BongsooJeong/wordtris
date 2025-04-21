@@ -37,6 +37,7 @@ import 'dart:math';
 /// - isPlaced: 블록이 보드에 배치되었는지 여부
 /// - rotationState: 현재 회전 상태 (0-3)
 /// - isBomb: 폭탄 블록 여부
+/// - isWildcard: 와일드카드 여부
 /// - matrix: 블록의 2차원 배열 표현
 /// - size: 블록의 크기 (문자 개수)
 
@@ -77,6 +78,10 @@ class Block {
   bool isPlaced = false;
   int rotationState = 0; // 0, 1, 2, 3 (0, 90, 180, 270도)
   bool isBomb = false; // 폭탄 여부
+  bool isWildcard = false; // 와일드카드 여부
+
+  // 와일드카드 문자 상수
+  static const String wildcardChar = '?';
 
   // 2차원 행렬로 블록 표현 (문자와 위치 매핑)
   late List<List<String?>> matrix;
@@ -88,6 +93,7 @@ class Block {
     required this.color,
     this.rotationState = 0,
     this.isBomb = false,
+    this.isWildcard = false,
   }) {
     // 초기 행렬 생성
     _initMatrix();
@@ -428,6 +434,7 @@ class Block {
       color: color ?? this.color,
       rotationState: rotationState ?? this.rotationState,
       isBomb: isBomb ?? this.isBomb,
+      isWildcard: this.isWildcard,
     );
     copy.isPlaced = isPlaced ?? this.isPlaced;
     copy.matrix = matrix ?? this.matrix;

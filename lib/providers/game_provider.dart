@@ -78,8 +78,9 @@ class GameProvider with ChangeNotifier {
   bool _isGamePaused = false;
   int _level = 1;
   final List<Word> _formedWords = [];
-  int _wordClearCount = 0; // 단어 제거 횟수 카운터
-  bool _bombGenerated = false;
+  int _wordClearCount = 0;                   // 단어 제거 횟수 카운터
+  bool _bombGenerated = false;               // 폭탄 생성 플래그
+  bool _wildcardGenerated = false;           // 와일드카드 생성 플래그
 
   // 사용된 글자를 추적하는 세트 추가
   final Set<String> _usedCharacters = {};
@@ -200,6 +201,7 @@ class GameProvider with ChangeNotifier {
       _isGamePaused = false;
       _wordClearCount = 0;
       _bombGenerated = false;
+      _wildcardGenerated = false;
       _availableBlocks.clear();
       _usedCharacters.clear(); // 사용된 글자 목록 초기화
       _lastCompletedWord = ''; // 최근 완성 단어 초기화
@@ -240,9 +242,12 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// 새로운 블록 생성
-  Future<void> _generateNewBlock() async {
-    if (_blockManager.isBlockCountExceeded(_availableBlocks)) return;
+  /// 새 블록 생성
+  Future<void> generateNewBlock() async {
+    // 최대 블록 수 확인
+    if (_availableBlocks.length >= 5) {
+      return;
+    }
 
     // 3번마다 폭탄 블록 생성 (3, 6, 9, 12, ...)
     if (_wordClearCount > 0 && _wordClearCount % 3 == 0 && !_bombGenerated) {
@@ -307,7 +312,7 @@ class GameProvider with ChangeNotifier {
 
     // 새 블록 생성 (최대 5개까지)
     if (_availableBlocks.length < 5) {
-      _generateNewBlock();
+      await generateNewBlock();
     }
 
     // 단어 확인
@@ -354,6 +359,7 @@ class GameProvider with ChangeNotifier {
 
     // 폭탄 생성 플래그 리셋 - 매 단어 클리어마다 초기화하여 3의 배수 확인이 제대로 동작하도록 함
     _bombGenerated = false;
+    _wildcardGenerated = false;
 
     // 레벨 업 체크 (100점마다)
     _level = (_score ~/ 100) + 1;
