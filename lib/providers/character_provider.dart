@@ -315,8 +315,8 @@ class CharacterProvider with ChangeNotifier {
     _availableCharacters.remove(selectedChar);
 
     // 매번 남은 글자 수를 로그에 출력
-    print(
-        '📊 [DEBUG] 글자 "$selectedChar" 사용 후 남은 글자 수: ${_availableCharacters.length}개');
+    //print(
+    //    '📊 [DEBUG] 글자 "$selectedChar" 사용 후 남은 글자 수: ${_availableCharacters.length}개');
 
     // 선택된 글자가 포함된 단어 사용 횟수 업데이트
     _updateCharacterUsageInWords(selectedChar);

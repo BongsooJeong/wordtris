@@ -91,11 +91,11 @@ class GameProvider with ChangeNotifier {
   bool _isGamePaused = false;
   int _level = 1;
   final List<Word> _formedWords = [];
-  int _wordClearCount = 0;                   // 단어 제거 횟수 카운터
-  bool _bombGenerated = false;               // 폭탄 생성 플래그
-  bool _wildcardGenerated = false;           // 와일드카드 생성 플래그
-  int _blockCount = 0;                       // 총 블록 생성 카운트
-  int _wildcardFrequency = 3;                // 와일드카드 생성 빈도 (기본값: 3)
+  int _wordClearCount = 0; // 단어 제거 횟수 카운터
+  bool _bombGenerated = false; // 폭탄 생성 플래그
+  bool _wildcardGenerated = false; // 와일드카드 생성 플래그
+  int _blockCount = 0; // 총 블록 생성 카운트
+  int _wildcardFrequency = 3; // 와일드카드 생성 빈도 (기본값: 3)
 
   // 사용된 글자를 추적하는 세트 추가
   final Set<String> _usedCharacters = {};
@@ -217,8 +217,8 @@ class GameProvider with ChangeNotifier {
       _wordClearCount = 0;
       _bombGenerated = false;
       _wildcardGenerated = false;
-      _blockCount = 0;                       // 블록 카운트 초기화
-      _wildcardFrequency = 3;                // 와일드카드 생성 빈도 초기화
+      _blockCount = 0; // 블록 카운트 초기화
+      _wildcardFrequency = 3; // 와일드카드 생성 빈도 초기화
       _availableBlocks.clear();
       _usedCharacters.clear(); // 사용된 글자 목록 초기화
       _lastCompletedWord = ''; // 최근 완성 단어 초기화
@@ -271,7 +271,7 @@ class GameProvider with ChangeNotifier {
     }
 
     print('🔄 새 블록 생성 시작 - 현재 블록 수: ${_availableBlocks.length}');
-    
+
     // 3번마다 와일드카드 블록 생성
     if (_availableBlocks.length == 2) {
       //print('🎲 와일드카드 블록 생성 (3번째 블록)');
@@ -280,7 +280,7 @@ class GameProvider with ChangeNotifier {
       //print('📦 일반 블록 생성 (${_availableBlocks.length + 1}번째 블록)');
       _availableBlocks.add(await _blockManager.createRandomBlock());
     }
-    
+
     //print('✅ 블록 생성 완료 - 현재 블록 수: ${_availableBlocks.length}');
     notifyListeners();
   }
@@ -338,15 +338,15 @@ class GameProvider with ChangeNotifier {
 
     // 블록 카운트 증가 (총 몇 번째 블록인지 추적)
     _blockCount++;
-    
+
     // 새 블록 생성 (최대 4개까지)
     if (_availableBlocks.length < 4) {
       // 설정된 빈도에 따라 와일드카드 블록 생성
       if (_blockCount % _wildcardFrequency == 0) {
-        print('🎲 ${_blockCount}번째 블록: 와일드카드 블록 생성 (빈도: $_wildcardFrequency)');
+        // print('🎲 ${_blockCount}번째 블록: 와일드카드 블록 생성 (빈도: $_wildcardFrequency)');
         _availableBlocks.add(await _blockManager.generateWildcardBlock());
       } else {
-        print('📦 ${_blockCount}번째 블록: 일반 블록 생성');
+        // print('📦 ${_blockCount}번째 블록: 일반 블록 생성');
         _availableBlocks.add(await _blockManager.createRandomBlock());
       }
     }
@@ -412,17 +412,23 @@ class GameProvider with ChangeNotifier {
     // 3의 배수 단어 클리어마다 폭탄 블록 생성
     if (_wordClearCount % 3 == 0) {
       _bombGenerated = true;
-      print('💣 ${_wordClearCount}번째 단어 클리어: 폭탄 블록 생성');
-      
+      print('💣 $_wordClearCount번째 단어 클리어: 폭탄 블록 생성');
+
       // 폭탄 블록 생성 후 availableBlocks에 추가
       if (_availableBlocks.length < 4) {
+        // 트레이에 공간이 있는 경우 바로 추가
+        _availableBlocks.add(await _blockManager.generateBombBlock());
+      } else if (_availableBlocks.isNotEmpty) {
+        // 트레이가 가득 찬 경우 마지막 블록을 폭탄으로 교체
+        print('🔄 트레이가 가득 차 있어 마지막 블록을 폭탄으로 교체합니다.');
+        _availableBlocks.removeLast();
         _availableBlocks.add(await _blockManager.generateBombBlock());
       }
     } else {
       // 폭탄 생성 플래그 리셋
       _bombGenerated = false;
     }
-    
+
     // 와일드카드 플래그 초기화
     _wildcardGenerated = false;
 
@@ -487,7 +493,7 @@ class GameProvider with ChangeNotifier {
 
   // 와일드카드 생성 빈도 getter 및 setter
   int get wildcardFrequency => _wildcardFrequency;
-  
+
   /// 와일드카드 생성 빈도 설정
   /// [frequency]: 와일드카드가 생성되는 블록 간격 (예: 3이면 매 3번째 블록마다 생성)
   void setWildcardFrequency(int frequency) {
