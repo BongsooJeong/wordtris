@@ -265,8 +265,8 @@ class GameProvider with ChangeNotifier {
   /// 새 블록 생성
   Future<void> generateNewBlock() async {
     // 최대 블록 수 확인
-    if (_availableBlocks.length >= 5) {
-      print('❌ 최대 블록 수(5개)에 도달했습니다.');
+    if (_availableBlocks.length >= 4) {
+      print('❌ 최대 블록 수(4개)에 도달했습니다.');
       return;
     }
 
@@ -274,14 +274,14 @@ class GameProvider with ChangeNotifier {
     
     // 3번마다 와일드카드 블록 생성
     if (_availableBlocks.length == 2) {
-      print('🎲 와일드카드 블록 생성 (3번째 블록)');
+      //print('🎲 와일드카드 블록 생성 (3번째 블록)');
       _availableBlocks.add(await _blockManager.generateWildcardBlock());
     } else {
-      print('📦 일반 블록 생성 (${_availableBlocks.length + 1}번째 블록)');
+      //print('📦 일반 블록 생성 (${_availableBlocks.length + 1}번째 블록)');
       _availableBlocks.add(await _blockManager.createRandomBlock());
     }
     
-    print('✅ 블록 생성 완료 - 현재 블록 수: ${_availableBlocks.length}');
+    //print('✅ 블록 생성 완료 - 현재 블록 수: ${_availableBlocks.length}');
     notifyListeners();
   }
 
@@ -339,8 +339,8 @@ class GameProvider with ChangeNotifier {
     // 블록 카운트 증가 (총 몇 번째 블록인지 추적)
     _blockCount++;
     
-    // 새 블록 생성 (최대 5개까지)
-    if (_availableBlocks.length < 5) {
+    // 새 블록 생성 (최대 4개까지)
+    if (_availableBlocks.length < 4) {
       // 설정된 빈도에 따라 와일드카드 블록 생성
       if (_blockCount % _wildcardFrequency == 0) {
         print('🎲 ${_blockCount}번째 블록: 와일드카드 블록 생성 (빈도: $_wildcardFrequency)');
@@ -409,8 +409,21 @@ class GameProvider with ChangeNotifier {
     // 단어 제거 카운트 증가
     _wordClearCount++;
 
-    // 폭탄 생성 플래그 리셋 - 매 단어 클리어마다 초기화하여 3의 배수 확인이 제대로 동작하도록 함
-    _bombGenerated = false;
+    // 3의 배수 단어 클리어마다 폭탄 블록 생성
+    if (_wordClearCount % 3 == 0) {
+      _bombGenerated = true;
+      print('💣 ${_wordClearCount}번째 단어 클리어: 폭탄 블록 생성');
+      
+      // 폭탄 블록 생성 후 availableBlocks에 추가
+      if (_availableBlocks.length < 4) {
+        _availableBlocks.add(await _blockManager.generateBombBlock());
+      }
+    } else {
+      // 폭탄 생성 플래그 리셋
+      _bombGenerated = false;
+    }
+    
+    // 와일드카드 플래그 초기화
     _wildcardGenerated = false;
 
     // 레벨 업 체크 (100점마다)

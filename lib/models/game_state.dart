@@ -21,7 +21,7 @@ import '../utils/point.dart';
 ///   새 게임을 시작하기 위한 초기 상태 생성
 ///
 /// - generateNewBlocks(): GameState
-///   새로운 블록을 생성하여 활성 블록 리스트에 추가 (최대 5개)
+///   새로운 블록을 생성하여 활성 블록 리스트에 추가 (최대 4개)
 ///
 /// - placeBlock(Block block, List<Point> points): GameState
 ///   블록을 게임 그리드의 지정된 위치에 배치
@@ -225,12 +225,12 @@ class GameState {
   /// 새 블록 생성
   GameState generateNewBlocks() {
     // 현재 활성 블록 수 확인
-    if (activeBlocks.length >= 5) {
-      return this; // 최대 5개 블록으로 제한
+    if (activeBlocks.length >= 4) {
+      return this; // 최대 4개 블록으로 제한
     }
 
-    // 필요한 블록 수 (총 5개까지)
-    int needed = 5 - activeBlocks.length;
+    // 필요한 블록 수 (총 4개까지)
+    int needed = 4 - activeBlocks.length;
 
     // 새 블록 생성
     List<Block> newBlocks = List.from(activeBlocks);

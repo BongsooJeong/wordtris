@@ -45,7 +45,7 @@ class BlockManager {
   final Random _random = Random();
 
   // 블록 최대 개수
-  static const int maxAvailableBlocks = 5;
+  static const int maxAvailableBlocks = 4;
 
   // 색상 팔레트
   static const List<Color> blockColors = [
