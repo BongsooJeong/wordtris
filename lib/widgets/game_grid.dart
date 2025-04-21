@@ -8,6 +8,7 @@ import '../utils/point.dart';
 import 'dart:math' as math;
 import 'game_grid_animations.dart';
 import 'game_grid_block_placement.dart';
+import 'wildcard_star_widget.dart';
 
 /// GameGrid API 문서
 ///
@@ -110,6 +111,26 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final grid = Provider.of<GameProvider>(context).grid;
+    final rows = grid.rows;
+    final columns = grid.columns;
+
+    // 화면 크기 가져오기
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 600;
+
+    // 화면 크기에 따라 셀 크기 조정
+    final dynamicCellSize = isSmallScreen
+        ? (screenSize.width - 32) / columns // 모바일 화면에 맞게 셀 크기 조정
+        : widget.cellSize;
+
+    // 셀 간격 계산
+    const cellMargin = 1.0;
+    final totalCellSize = dynamicCellSize + (cellMargin * 2);
+
+    // 실제 셀 크기 (마진 제외)
+    final actualCellSize = dynamicCellSize;
+
     return Consumer<GameProvider>(
       builder: (context, gameProvider, child) {
         // 애니메이션 처리
@@ -160,14 +181,13 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
     final double totalCellSize = actualCellSize + cellSpacing;
 
     return DragTarget<Block>(
-      onAccept: (data) {
+      onAcceptWithDetails: (details) {
         // 드래그 상태 초기화
         setState(() {
           draggedBlock = null;
           draggedPosition = null;
         });
-      },
-      onAcceptWithDetails: (details) {
+        // 블록 배치 처리
         _blockPlacement.handleBlockPlacement(
             context,
             details,
@@ -219,19 +239,23 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (int y = 0; y < rows; y++)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (int x = 0; x < columns; x++)
-                  _buildGridCell(context, Provider.of<GameProvider>(context),
-                      grid, x, y, actualCellSize, cellMargin, totalCellSize),
-              ],
-            ),
-        ],
+      // FittedBox를 사용하여 화면 크기에 맞게 조정
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int y = 0; y < rows; y++)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int x = 0; x < columns; x++)
+                    _buildGridCell(context, Provider.of<GameProvider>(context),
+                        grid, x, y, actualCellSize, cellMargin, totalCellSize),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -300,6 +324,19 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
       );
     }
 
+    // 와일드카드 문자(★) 확인
+    bool isWildcardCell = cellText == '★';
+
+    // 와일드카드가 드래그 중인지 확인
+    bool isDraggedWildcard = false;
+    if (isPartOfDraggedBlock &&
+        draggedBlock != null &&
+        draggedBlock!.isWildcard) {
+      String? character =
+          _blockPlacement.getCharacterForPosition(draggedBlock!, x, y);
+      isDraggedWildcard = character == '★';
+    }
+
     return Container(
       width: cellSize,
       height: cellSize,
@@ -307,28 +344,38 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
       decoration: decoration,
       child: Center(
         child: cellText.isNotEmpty
-            ? Text(
-                cellText,
-                style: TextStyle(
-                  fontSize: cellSize * 0.6,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              )
-            : isPartOfDraggedBlock && draggedBlock != null
-                ? Text(
-                    // 드래그 중인 블록의 문자 표시
-                    _blockPlacement.getCharacterForPosition(
-                            draggedBlock!, x, y) ??
-                        '',
+            ? isWildcardCell
+                ? WildcardStarWidget(
+                    size: cellSize * 0.7,
+                    opacity: 1.0,
+                  )
+                : Text(
+                    cellText,
                     style: TextStyle(
                       fontSize: cellSize * 0.6,
                       fontWeight: FontWeight.bold,
-                      color: isValidPlacement
-                          ? Colors.white.withOpacity(0.7)
-                          : Colors.red.withOpacity(0.7),
+                      color: Colors.white,
                     ),
                   )
+            : isPartOfDraggedBlock && draggedBlock != null
+                ? isDraggedWildcard
+                    ? WildcardStarWidget(
+                        size: cellSize * 0.7,
+                        opacity: isValidPlacement ? 0.7 : 0.5,
+                      )
+                    : Text(
+                        // 드래그 중인 블록의 문자 표시
+                        _blockPlacement.getCharacterForPosition(
+                                draggedBlock!, x, y) ??
+                            '',
+                        style: TextStyle(
+                          fontSize: cellSize * 0.6,
+                          fontWeight: FontWeight.bold,
+                          color: isValidPlacement
+                              ? Colors.white.withOpacity(0.7)
+                              : Colors.red.withOpacity(0.7),
+                        ),
+                      )
                 : null,
       ),
     );

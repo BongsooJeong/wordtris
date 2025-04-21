@@ -1,5 +1,6 @@
 {
     "terminal.explorerKind": "integrated",
     "terminal.integrated.tabs.enabled": true,
-    "terminal.integrated.defaultProfile.windows": "Windows PowerShell"
+    "terminal.integrated.defaultProfile.windows": "Windows PowerShell",
+    "terminal.integrated.env.linux": {}
 }

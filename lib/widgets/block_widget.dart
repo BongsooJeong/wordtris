@@ -3,6 +3,7 @@ import 'dart:math' as Math;
 import '../models/block.dart';
 import '../utils/point.dart';
 import 'bomb_widget.dart';
+import 'wildcard_star_widget.dart';
 
 /// 블록 위젯 생성 클래스
 class BlockWidget extends StatelessWidget {
@@ -37,6 +38,8 @@ class BlockWidget extends StatelessWidget {
 
     // 폭탄 블록 여부 확인
     bool isBombBlock = block.isBomb;
+    // 와일드카드 블록 여부 확인
+    bool isWildcardBlock = block.isWildcard;
 
     return Container(
       width: gridWidth <= 2
@@ -120,21 +123,29 @@ class BlockWidget extends StatelessWidget {
                                 child: Center(
                                   child: isBombBlock
                                       ? BombWidget(opacity: opacity)
-                                      : FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: Text(
-                                              _getCharacterForPosition(i),
-                                              style: TextStyle(
-                                                fontSize: Math.min(
-                                                    actualCellSize * 0.6, 20),
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                      : isWildcardBlock
+                                          ? WildcardStarWidget(
+                                              size: Math.min(
+                                                  actualCellSize * 0.8, 28),
+                                              opacity: opacity,
+                                            )
+                                          : FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2.0),
+                                                child: Text(
+                                                  _getCharacterForPosition(i),
+                                                  style: TextStyle(
+                                                    fontSize: Math.min(
+                                                        actualCellSize * 0.6,
+                                                        20),
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
                                 ),
                               ),
                             ),

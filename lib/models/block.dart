@@ -81,7 +81,7 @@ class Block {
   bool isWildcard = false; // 와일드카드 여부
 
   // 와일드카드 문자 상수
-  static const String wildcardChar = '?';
+  static const String wildcardChar = '★';
 
   // 2차원 행렬로 블록 표현 (문자와 위치 매핑)
   late List<List<String?>> matrix;
@@ -434,7 +434,7 @@ class Block {
       color: color ?? this.color,
       rotationState: rotationState ?? this.rotationState,
       isBomb: isBomb ?? this.isBomb,
-      isWildcard: this.isWildcard,
+      isWildcard: isWildcard,
     );
     copy.isPlaced = isPlaced ?? this.isPlaced;
     copy.matrix = matrix ?? this.matrix;

@@ -551,19 +551,19 @@ class WordService {
     // 너무 짧은 단어는 무효
     if (word.length < 3) return false;
 
-    // 와일드카드 '?'가 포함된 경우 처리
-    if (word.contains('?')) {
+    // 와일드카드 '★'가 포함된 경우 처리
+    if (word.contains('★')) {
       // 단어의 초성 확인
       final String consonant = getConsonantFromWord(word);
-      
+
       // 해당 초성의 단어 목록 로드
       if (!_consonantWordMap.containsKey(consonant) ||
           _consonantWordMap[consonant]!.isEmpty) {
         await loadConsonantData(consonant);
       }
 
-      // 정규식 패턴 생성 (와일드카드 '?'를 임의의 한글 문자로 대체)
-      final pattern = word.replaceAll('?', '[가-힣]');
+      // 정규식 패턴 생성 (와일드카드 '★'를 임의의 한글 문자로 대체)
+      final pattern = word.replaceAll('★', '[가-힣]');
       final regex = RegExp('^$pattern\$');
 
       // 해당 초성의 단어들 중 패턴과 일치하는 단어가 있는지 확인
@@ -935,21 +935,21 @@ class WordService {
 
   /// 와일드카드가 포함된 단어에 매칭되는 실제 단어를 찾습니다
   Future<String?> findMatchingWord(String word) async {
-    if (!word.contains('?')) {
+    if (!word.contains('★')) {
       return null;
     }
 
     // 단어의 초성 확인
     final String consonant = getConsonantFromWord(word);
-    
+
     // 해당 초성의 단어 목록 로드
     if (!_consonantWordMap.containsKey(consonant) ||
         _consonantWordMap[consonant]!.isEmpty) {
       await loadConsonantData(consonant);
     }
 
-    // 정규식 패턴 생성 (와일드카드 '?'를 임의의 한글 문자로 대체)
-    final pattern = word.replaceAll('?', '[가-힣]');
+    // 정규식 패턴 생성 (와일드카드 '★'를 임의의 한글 문자로 대체)
+    final pattern = word.replaceAll('★', '[가-힣]');
     final regex = RegExp('^$pattern\$');
 
     // 해당 초성의 단어들 중 패턴과 일치하는 단어 찾기

@@ -376,7 +376,7 @@ class GameProvider with ChangeNotifier {
 
       // 와일드카드가 포함된 단어인 경우 실제 단어 찾기
       String actualWord = word.text;
-      if (word.text.contains('?')) {
+      if (word.text.contains('★')) {
         String? matchingWord = await _wordService.findMatchingWord(word.text);
         if (matchingWord != null) {
           actualWord = matchingWord;
@@ -393,7 +393,7 @@ class GameProvider with ChangeNotifier {
     // 단어가 여러 개면 첫 번째 단어 저장 (이미 저장되지 않은 경우)
     if (_lastCompletedWord.isEmpty && words.isNotEmpty) {
       String firstWord = words[0].text;
-      if (firstWord.contains('?')) {
+      if (firstWord.contains('★')) {
         String? matchingWord = await _wordService.findMatchingWord(firstWord);
         if (matchingWord != null) {
           firstWord = matchingWord;

@@ -61,6 +61,11 @@ class BlockTray extends StatelessWidget {
     final blocks = gameProvider.availableBlocks;
     final screenSize = MediaQuery.of(context).size;
 
+    // 화면 크기에 따라 셀 크기 동적 조정
+    final isSmallScreen = screenSize.width < 360;
+    final dynamicCellSize = isSmallScreen ? 34.0 : cellSize;
+    final dynamicPadding = isSmallScreen ? 8.0 : 16.0;
+
     // 하이라이트 핸들러 생성
     final highlightHandler =
         BlockHighlightHandler(wordSuggestionsKey: wordSuggestionsKey);
@@ -71,8 +76,8 @@ class BlockTray extends StatelessWidget {
       bottom: 0,
       child: Container(
         width: screenSize.width,
-        height: cellSize * 6,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        height: dynamicCellSize * 5.5, // 높이를 약간 줄임
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: dynamicPadding),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(
@@ -100,36 +105,39 @@ class BlockTray extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            // 블록 트레이 제목
+            // 블록 트레이 제목 (작은 화면에서는 글자 크기 줄임)
             Text(
-              '블록 트레이 (클릭하여 회전)',
-              style: Theme.of(context).textTheme.titleMedium,
+              isSmallScreen ? '블록 트레이' : '블록 트레이 (클릭하여 회전)',
+              style: isSmallScreen
+                  ? Theme.of(context).textTheme.titleSmall
+                  : Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             // 블록 목록
             Expanded(
               child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: cellSize * 4,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: blocks.length,
-                        itemBuilder: (context, index) {
-                          final block = blocks[index];
-                          return BlockDraggable(
-                            block: block,
-                            cellSize: cellSize,
-                            highlightHandler: highlightHandler,
-                          );
-                        },
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          for (int i = 0; i < blocks.length; i++)
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: isSmallScreen ? 2.0 : 4.0),
+                              child: BlockDraggable(
+                                block: blocks[i],
+                                cellSize: dynamicCellSize,
+                                highlightHandler: highlightHandler,
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ),
