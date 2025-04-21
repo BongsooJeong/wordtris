@@ -525,43 +525,55 @@ class WordService {
     // 너무 짧은 단어는 무효
     if (word.length < 3) return false;
 
-    // print('단어 비동기 확인: "$word"');
+    // 와일드카드 '?'가 포함된 경우 처리
+    if (word.contains('?')) {
+      // 단어의 초성 확인
+      final String consonant = getConsonantFromWord(word);
+      
+      // 해당 초성의 단어 목록 로드
+      if (!_consonantWordMap.containsKey(consonant) ||
+          _consonantWordMap[consonant]!.isEmpty) {
+        await loadConsonantData(consonant);
+      }
 
-    // 캐시 확인
+      // 정규식 패턴 생성 (와일드카드 '?'를 임의의 한글 문자로 대체)
+      final pattern = word.replaceAll('?', '[가-힣]');
+      final regex = RegExp('^$pattern\$');
+
+      // 해당 초성의 단어들 중 패턴과 일치하는 단어가 있는지 확인
+      if (_consonantWordMap.containsKey(consonant)) {
+        for (String validWord in _consonantWordMap[consonant]!) {
+          if (regex.hasMatch(validWord)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    // 일반적인 단어 검증 로직
     if (_wordCache.containsKey(word)) {
-      // print('캐시에서 비동기 확인: ${_wordCache[word]}');
       return _wordCache[word]!;
     }
 
-    // 단어의 초성 확인
     final String consonant = getConsonantFromWord(word);
-    // print('비동기 초성: "$consonant"');
 
-    // 해당 초성의 단어 목록 로드 (아직 로드되지 않은 경우)
     if (!_consonantWordMap.containsKey(consonant) ||
         _consonantWordMap[consonant]!.isEmpty) {
-      // print('비동기: 초성 "$consonant"의 단어 데이터 로드 시작...');
-      bool loaded = await loadConsonantData(consonant);
-      // print('비동기: 초성 "$consonant"의 단어 데이터 로드 ${loaded ? "성공" : "실패"}');
-    } else {
-      // print('비동기: 초성 "$consonant"의 단어 데이터 이미 로드됨 (${_consonantWordMap[consonant]!.length}개 단어)');
+      await loadConsonantData(consonant);
     }
 
-    // 초성에 해당하는 단어 데이터가 있으면 확인
     if (_consonantWordMap.containsKey(consonant) &&
         _consonantWordMap[consonant]!.isNotEmpty) {
       final bool isValid = _consonantWordMap[consonant]!.contains(word);
       _wordCache[word] = isValid;
-      // print('비동기: 초성 데이터에서 확인: $isValid');
       return isValid;
     }
 
-    // 기존 로직: 전체 데이터베이스에서 확인
     try {
       if (_database == null) {
         final isValid = _checkWordInDatabase(word);
         _wordCache[word] = isValid;
-        // print('비동기: 내장 데이터에서 확인: $isValid');
         return isValid;
       }
 
@@ -574,7 +586,6 @@ class WordService {
 
       final bool isValid = result.isNotEmpty;
       _wordCache[word] = isValid;
-      // print('비동기: 데이터베이스에서 확인: $isValid');
       return isValid;
     } catch (e) {
       print('단어 비동기 조회 오류: $e');
