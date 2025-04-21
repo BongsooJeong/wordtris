@@ -8,9 +8,10 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('워드트리스'),
+        title: _buildAnimatedTitle(),
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        elevation: 4.0,
+        backgroundColor: Colors.indigo.shade700,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -30,13 +31,7 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 로고 또는 제목
-                const Text(
-                  '한국어 워드트리스',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                _buildLogo(),
                 const SizedBox(height: 10),
                 const Text(
                   '블록을 배치하여 단어를 만들어보세요!',
@@ -121,6 +116,176 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // 애니메이션 타이틀 위젯 생성
+  Widget _buildAnimatedTitle() {
+    return ShaderMask(
+      shaderCallback: (bounds) {
+        return const LinearGradient(
+          colors: [
+            Colors.purple,
+            Colors.blue,
+            Colors.lightBlueAccent,
+            Colors.blue,
+            Colors.purple,
+          ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds);
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            '워드',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.2,
+              shadows: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4.0,
+                  offset: Offset(1.0, 1.0),
+                ),
+              ],
+            ),
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // 그림자 효과
+              Text(
+                '트리스',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 4
+                    ..color = Colors.indigo.shade900.withOpacity(0.3),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const Text(
+                '트리스',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 큰 로고 위젯 생성
+  Widget _buildLogo() {
+    return ShaderMask(
+      shaderCallback: (bounds) {
+        return const LinearGradient(
+          colors: [
+            Colors.purple,
+            Colors.blue,
+            Colors.lightBlueAccent,
+            Colors.blue,
+            Colors.purple,
+          ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          tileMode: TileMode.mirror,
+        ).createShader(bounds);
+      },
+      child: Column(
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '한국어',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                  shadows: [
+                    BoxShadow(
+                      color: Colors.indigo.shade900.withOpacity(0.5),
+                      blurRadius: 4.0,
+                      offset: const Offset(1.0, 1.0),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '워드',
+                style: TextStyle(
+                  fontSize: 36.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 2.0,
+                  shadows: [
+                    BoxShadow(
+                      color: Colors.indigo.shade900.withOpacity(0.5),
+                      blurRadius: 4.0,
+                      offset: const Offset(2.0, 2.0),
+                    ),
+                  ],
+                ),
+              ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // 그림자 효과
+                  Text(
+                    '트리스',
+                    style: TextStyle(
+                      fontSize: 36.0,
+                      fontWeight: FontWeight.bold,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 6
+                        ..color = Colors.indigo.shade900.withOpacity(0.3),
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                  Text(
+                    '트리스',
+                    style: TextStyle(
+                      fontSize: 36.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 2.0,
+                      shadows: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 4.0,
+                          offset: const Offset(1.0, 1.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

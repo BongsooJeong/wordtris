@@ -135,8 +135,10 @@ class _GameScreenState extends State<GameScreen> {
         // 게임 화면 구성
         return Scaffold(
           appBar: AppBar(
-            title: const Text('워드트리스'),
+            title: _buildAnimatedTitle(),
             centerTitle: true,
+            elevation: 4.0,
+            backgroundColor: Colors.indigo.shade700,
             actions: [
               // 새로고침 버튼
               IconButton(
@@ -278,6 +280,74 @@ class _GameScreenState extends State<GameScreen> {
                 color: Colors.blue.shade800,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 애니메이션 타이틀 위젯 생성
+  Widget _buildAnimatedTitle() {
+    return ShaderMask(
+      shaderCallback: (bounds) {
+        return const LinearGradient(
+          colors: [
+            Colors.purple,
+            Colors.blue,
+            Colors.lightBlueAccent,
+            Colors.blue,
+            Colors.purple,
+          ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds);
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            '워드',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.2,
+              shadows: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4.0,
+                  offset: Offset(1.0, 1.0),
+                ),
+              ],
+            ),
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // 그림자 효과
+              Text(
+                '트리스',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 4
+                    ..color = Colors.indigo.shade900.withOpacity(0.3),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const Text(
+                '트리스',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
           ),
         ],
       ),
