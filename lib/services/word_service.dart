@@ -8,6 +8,7 @@
 /// - 초성별 단어 인덱싱 및 로딩
 /// - 단어 유효성 검사
 /// - 단어 검색 및 제안
+/// - 와일드카드 문자 지원
 /// - 웹/모바일 환경 대응
 ///
 /// 초기화 및 데이터 로드:
@@ -20,24 +21,49 @@
 /// - _loadInitialWords(Database db): Future<void>
 ///   초기 단어 데이터 로드
 ///
+/// - _loadValidWords(): Future<void>
+///   유효한 단어 목록 로드
+///
 /// 단어 처리:
+/// - isValidWord(String word): bool
+///   단어의 유효성 동기식 검사
+///
 /// - isValidWordAsync(String word): Future<bool>
 ///   단어의 유효성 비동기 검사
 ///
+/// - getWord(String pattern): List<String>
+///   패턴에 맞는 단어 동기식 검색
+///
 /// - getWordAsync(String pattern): Future<List<String>>
-///   패턴에 맞는 단어 검색
+///   패턴에 맞는 단어 비동기 검색
+///
+/// - findMatchingWord(String word): Future<String?>
+///   와일드카드가 포함된 단어에 매칭되는 실제 단어 찾기
 ///
 /// 초성 관리:
-/// - loadConsonantData(String consonant): Future<void>
+/// - loadConsonantData(String consonant): Future<bool>
 ///   특정 초성의 단어 데이터 로드
+///
+/// - getConsonantFromWord(String word): String
+///   단어의 초성 판별
+///
+/// - isConsonantDataLoaded(String consonant): bool
+///   특정 초성의 데이터 로드 여부 확인
 ///
 /// - preloadCommonConsonants(): Future<void>
 ///   자주 사용되는 초성 데이터 미리 로드
 ///
-/// 캐시 관리:
-/// - clearCache(): void
-///   단어 캐시 초기화
+/// 유틸리티 메서드:
+/// - getValidWords(): Set<String>
+///   현재 유효한 단어 목록 반환
 ///
+/// - getWordCount(): Future<int>
+///   데이터베이스에 저장된 총 단어 수 반환
+///
+/// - close(): Future<void>
+///   데이터베이스 연결 종료
+///
+/// 캐시 관리:
 /// - _loadWordIndex(): Future<bool>
 ///   초성 인덱스 파일 로드
 

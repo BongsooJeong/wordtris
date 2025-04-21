@@ -2,6 +2,49 @@ import 'package:flutter/services.dart';
 import 'dart:math';
 import '../services/word_service.dart';
 
+/// WordTris 게임의 문자 관리 클래스 API 문서
+///
+/// [CharacterManager] 클래스
+/// 한글 문자 생성, 단어 세트 관리, 사용된 단어 추적 등을 담당
+///
+/// 주요 기능:
+/// - 빈도 기반 한글 문자 관리
+/// - 게임에 사용할 단어 세트 선택 및 관리
+/// - 사용 가능한 글자 목록 생성 및 관리
+/// - 단어 사용 횟수 추적
+/// - 자음/모음 문자 생성
+///
+/// 초기화 메서드:
+/// - initialize(): Future<void>
+///   문자 관리자 초기화 및 빈도 데이터 로드
+///
+/// 단어 관련 메서드:
+/// - getInitialWordSet(): Future<List<String>>
+///   초기 단어 세트 선택 및 반환
+///
+/// - getNewWordBatch(List<String> currentWords): Future<List<String>>
+///   새로운 단어 배치 가져오기
+///
+/// - getDefaultWords(): List<String>
+///   기본 단어 목록 반환
+///
+/// - generateAvailableCharacters(List<String> words): Set<String>
+///   단어 목록에서 사용 가능한 글자 세트 생성
+///
+/// - findWordsContainingCharacter(String character, List<String> wordList): List<String>
+///   특정 글자를 포함하는 단어 찾기
+///
+/// 문자 관련 메서드:
+/// - getRandomCharacter(Set<String> availableChars): String
+///   사용 가능한 글자 중 랜덤 선택
+///
+/// - isRareCharacter(String char): bool
+///   희귀 문자 여부 확인 (점수 계산용)
+///
+/// 유틸리티 메서드:
+/// - isWordValid(String word): bool
+///   단어 사용 가능 상태 확인
+
 /// 한글 문자 관리를 위한 내부 클래스
 ///
 /// 문자 생성, 단어 세트 관리, 사용된 단어 추적 등의 내부 로직을 처리

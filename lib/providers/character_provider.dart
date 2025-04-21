@@ -11,6 +11,50 @@ import '../services/word_service.dart';
 /// - 빈도 기반 한글 문자 생성
 /// - 단어 세트에서 문자 관리
 /// - 사용된 단어 추적
+/// - 표시할 단어 목록 관리
+/// - 사용 가능한 글자 목록 유지
+/// - 단어 사용 횟수 추적
+///
+/// 초기화 메서드:
+/// - initialize(): Future<void>
+///   문자 제공자 초기화 및 초기 단어 세트 선택
+///
+/// 단어 관련 메서드:
+/// - selectNewWordSet({bool replaceAll = false}): Future<void>
+///   새 단어 세트 선택 (전체 교체 또는 추가)
+///
+/// - updateWordUsage(String word): void
+///   단어 사용 기록 업데이트
+///
+/// - incrementWordUsageCount(String word): void
+///   단어 사용 횟수 증가
+///
+/// 문자 관련 메서드:
+/// - getRandomCharacter(): Future<String>
+///   사용 가능한 글자 중 하나를 선택하고 목록에서 제거
+///
+/// - getFrequencyBasedChar(): Future<String>
+///   빈도 기반으로 한글 문자 선택
+///
+/// - getRandomConsonantChar(): Future<String>
+///   랜덤 자음 기반 문자 선택
+///
+/// - getRandomVowelChar(): Future<String>
+///   랜덤 모음 기반 문자 선택
+///
+/// 유틸리티 메서드:
+/// - isRareCharacter(String char): bool
+///   희귀 문자 여부 확인 (점수 계산용)
+///
+/// Getters:
+/// - selectedWords: List<String>
+///   현재 화면에 표시할 단어 목록
+///
+/// - wordUsageCount: Map<String, int>
+///   각 단어의 사용 횟수
+///
+/// - availableCharacters: Set<String>
+///   현재 사용 가능한 글자 목록
 class CharacterProvider with ChangeNotifier {
   final CharacterManager _manager;
 

@@ -11,27 +11,30 @@ import 'word_processor.dart';
 /// 주요 기능:
 /// - 다양한 모양과 크기의 블록 생성
 /// - 빈도 기반 한글 문자를 포함한 블록 생성
-/// - 특수 블록(폭탄 블록 등) 생성
+/// - 특수 블록(폭탄, 와일드카드 등) 생성
 /// - 블록 개수 관리
 ///
 /// 블록 생성 메서드:
-/// - generateNewBlock(): Block
+/// - generateNewBlock(): Future<Block>
 ///   빈도 기반으로 새로운 단일 블록 생성
 ///
-/// - generateConsonantBlock(): Block
+/// - generateConsonantBlock(): Future<Block>
 ///   자음 기반의 단일 블록 생성
 ///
-/// - generateVowelBlock(): Block
+/// - generateVowelBlock(): Future<Block>
 ///   모음 기반의 단일 블록 생성
 ///
-/// - generateBlocks(int count): List<Block>
+/// - generateBlocks(int count): Future<List<Block>>
 ///   지정된 수만큼의 랜덤 블록 생성
 ///
-/// - createRandomBlock(): Block
+/// - createRandomBlock(): Future<Block>
 ///   다양한 모양과 크기의 랜덤 블록 생성
 ///
-/// - generateBombBlock(): Block
+/// - generateBombBlock(): Future<Block>
 ///   폭탄 블록 생성
+///
+/// - generateWildcardBlock(): Future<Block>
+///   와일드카드 블록 생성 (모든 글자로 사용 가능)
 ///
 /// 유틸리티 메서드:
 /// - isBlockCountExceeded(List<Block> blocks): bool

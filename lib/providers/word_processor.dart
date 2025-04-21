@@ -17,6 +17,7 @@ import 'character_provider.dart';
 /// - 단어 검증 및 점수 계산
 /// - 사전 검색 기능
 /// - 그리드에서 단어 찾기
+/// - 와일드카드 문자 지원
 /// - CharacterProvider와 연동하여 문자 관리
 ///
 /// 초기화 메서드:
@@ -24,10 +25,10 @@ import 'character_provider.dart';
 ///   한글 처리를 위한 초기 설정 수행
 ///
 /// 게임 그리드 관리:
-/// - initializeGrid(int rows, int cols): void
+/// - initializeGrid(int rows, int cols): Future<void>
 ///   게임 그리드 초기화
 ///
-/// - updateGridCharacter(int row, int col): void
+/// - updateGridCharacter(int row, int col): Future<void>
 ///   그리드의 특정 위치 문자 업데이트
 ///
 /// - isAdjacentOrSame(Position current, Position next): bool
@@ -42,18 +43,24 @@ import 'character_provider.dart';
 /// - resetSelection(): void
 ///   선택 초기화
 ///
-/// - submitWord(): bool
+/// - submitWord(): Future<bool>
 ///   선택한 단어 제출
 ///
 /// 단어 처리 메서드:
 /// - findWords(Grid grid): Future<List<Word>>
 ///   그리드에서 유효한 단어 찾기
 ///
+/// - _checkAndAddWord(String word, List<Point> cells, List<Word> wordCandidates): Future<void>
+///   단어가 유효한지 확인하고 결과에 추가
+///
 /// - calculateWordPoints(Word word, int level): int
 ///   단어 객체의 점수 계산
 ///
-/// - calculateWordPointsForString(String word, {int level}): int
+/// - calculateWordPointsForString(String word, {int level = 1}): int
 ///   문자열의 점수 계산
+///
+/// - _calculateWordPointsInternal(String word, int level): int
+///   내부 단어 점수 계산 구현
 ///
 /// - getWordSuggestions(String pattern): Future<List<String>>
 ///   패턴에 맞는 단어 제안 가져오기
@@ -63,7 +70,7 @@ import 'character_provider.dart';
 ///   국립국어원 사전에서 단어 검색
 ///
 /// 단어 세트 관리:
-/// - selectNewWordSet(): Future<void>
+/// - selectNewWordSet({bool replaceAll = false}): Future<void>
 ///   CharacterProvider에 새 단어 세트 선택 요청
 ///
 /// - syncWithCharacterProvider(): void
@@ -73,13 +80,13 @@ import 'character_provider.dart';
 ///   WordProcessor 상태 초기화
 ///
 /// 문자 생성 관련:
-/// - getFrequencyBasedChar(): String
+/// - getFrequencyBasedChar(): Future<String>
 ///   CharacterProvider를 통해 빈도 기반 문자 가져오기
 ///
-/// - getRandomConsonantChar(): String
+/// - getRandomConsonantChar(): Future<String>
 ///   CharacterProvider를 통해 자음 기반 랜덤 문자 가져오기
 ///
-/// - getRandomVowelChar(): String
+/// - getRandomVowelChar(): Future<String>
 ///   CharacterProvider를 통해 모음 기반 랜덤 문자 가져오기
 ///
 /// Getters:

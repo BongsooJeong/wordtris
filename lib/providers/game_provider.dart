@@ -27,6 +27,10 @@ import 'character_provider.dart';
 /// - formedWords: 완성된 단어 목록
 /// - wordClearCount: 단어 제거 횟수
 /// - bombGenerated: 폭탄 블록 생성 여부
+/// - lastCompletedWord: 가장 최근에 완성한 단어
+/// - lastWordPoints: 최근 완성한 단어의 점수
+/// - usedCharacters: 게임에서 사용된 글자 목록
+/// - wildcardGenerated: 와일드카드 블록 생성 여부
 ///
 /// 초기화 메서드:
 /// - initialize(): Future<void>
@@ -45,9 +49,15 @@ import 'character_provider.dart';
 /// - placeBlock(Block block, List<Point> positions): Future<bool>
 ///   블록을 그리드에 배치
 ///
+/// - moveBlock(Direction direction): bool
+///   그리드에서 블록 이동하기
+///
 /// 단어 관련 메서드:
 /// - getWordSuggestions(String pattern): Future<List<String>>
 ///   패턴에 맞는 단어 제안 가져오기
+///
+/// - selectNewWordSet({bool replaceAll = false}): Future<void>
+///   새 단어 세트 선택하기
 ///
 /// 내부 메서드:
 /// - _generateBlocks(): void
@@ -61,6 +71,9 @@ import 'character_provider.dart';
 ///
 /// - _checkGameOver(): void
 ///   게임 오버 상태 확인
+///
+/// - _validateWord(String word): Future<bool>
+///   단어 유효성 검증
 ///
 /// 애니메이션 관련:
 /// - resetAnimationState(): void
