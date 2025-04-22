@@ -130,6 +130,7 @@ class GameLayout extends StatelessWidget {
             padding:
                 EdgeInsets.symmetric(horizontal: isVerySmallScreen ? 2.0 : 4.0),
             child: WordSuggestions(
+              key: wordSuggestionsKey,
               words: gameProvider.suggestedWordSet,
               wordUsageCount: gameProvider.wordUsageCounts,
               usedCharacters: gameProvider.usedCharacters,
@@ -223,6 +224,7 @@ class GameLayout extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: WordSuggestions(
+                  key: wordSuggestionsKey,
                   words: gameProvider.suggestedWordSet,
                   wordUsageCount: gameProvider.wordUsageCounts,
                   usedCharacters: gameProvider.usedCharacters,
@@ -327,6 +329,7 @@ class GameLayout extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: WordSuggestions(
+                    key: wordSuggestionsKey,
                     words: gameProvider.suggestedWordSet,
                     wordUsageCount: gameProvider.wordUsageCounts,
                     usedCharacters: gameProvider.usedCharacters,
