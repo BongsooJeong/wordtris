@@ -130,10 +130,16 @@ class _GameScreenState extends State<GameScreen> {
           return Center(child: Text(gameProvider.errorMessage));
         }
 
+        // 화면 크기 확인
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isSmallScreen = screenWidth < 600;
+
         // 게임 화면 구성
         return Scaffold(
           appBar: AppBar(
-            title: const AnimatedTitle(),
+            title: AnimatedTitle(
+              isCompactMode: isSmallScreen, // 작은 화면에서는 컴팩트 모드 활성화
+            ),
             centerTitle: true,
             elevation: 4.0,
             backgroundColor: Colors.indigo.shade700,

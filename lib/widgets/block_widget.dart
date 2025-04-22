@@ -10,12 +10,14 @@ class BlockWidget extends StatelessWidget {
   final Block block;
   final double opacity;
   final double cellSize;
+  final bool isCompactMode;
 
   const BlockWidget({
     super.key,
     required this.block,
     this.opacity = 1.0,
     this.cellSize = 40.0,
+    this.isCompactMode = false,
   });
 
   @override
@@ -41,17 +43,25 @@ class BlockWidget extends StatelessWidget {
     // 와일드카드 블록 여부 확인
     bool isWildcardBlock = block.isWildcard;
 
+    // 컴팩트 모드에서는 더 작은 여백 사용
+    final containerPadding = isCompactMode ? 4.0 : 8.0;
+    final borderRadius = isCompactMode ? 8.0 : 12.0;
+
+    // 컴팩트 모드에서는 더 작은 너비/높이 계산
+    final widthFactor = isCompactMode ? 3.0 : 3.5;
+    final heightFactor = isCompactMode ? 3.0 : 3.5;
+
     return Container(
       width: gridWidth <= 2
-          ? cellSize * 3.5
+          ? cellSize * widthFactor
           : (gridWidth <= 3 ? cellSize * 4.5 : cellSize * 5.5),
       height: gridHeight <= 2
-          ? cellSize * 3.5
+          ? cellSize * heightFactor
           : (gridHeight <= 3 ? cellSize * 4.5 : cellSize * 5.5),
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(containerPadding),
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
           color: block.color.withOpacity(0.5),
           width: 1.5,

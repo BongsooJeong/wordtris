@@ -87,6 +87,10 @@ class WordSuggestionsState extends State<WordSuggestions> {
     // 표시할 필터링된 단어 목록 가져오기
     final filteredWords = _getFilteredWords();
 
+    // 화면 크기 확인
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
     return Container(
       width:
           widget.isCompactMode ? double.infinity : 170, // 컴팩트 모드에서는 가로 전체 너비 사용
@@ -101,21 +105,32 @@ class WordSuggestionsState extends State<WordSuggestions> {
           ),
         ],
       ),
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(8),
+      margin: widget.isCompactMode
+          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+          : const EdgeInsets.all(8),
+      padding: widget.isCompactMode
+          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
+          : const EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '추천 단어',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.indigo,
-            ),
+          Row(
+            children: [
+              const Text(
+                '추천 단어',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                ),
+              ),
+              if (widget.isCompactMode && isSmallScreen) const Spacer(),
+              if (widget.isCompactMode && isSmallScreen)
+                Icon(Icons.swipe, size: 14, color: Colors.grey.shade600),
+            ],
           ),
-          const SizedBox(height: 4),
-          const Divider(),
+          const SizedBox(height: 2),
+          const Divider(height: 8),
           Expanded(
             child: filteredWords.isEmpty
                 ? const Center(
@@ -123,12 +138,12 @@ class WordSuggestionsState extends State<WordSuggestions> {
                       '표시할 단어가 없습니다',
                       style: TextStyle(
                         color: Colors.grey,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                   )
                 : widget.isCompactMode
-                    ? _buildCompactWordList(filteredWords)
+                    ? _buildCompactWordList(filteredWords, isSmallScreen)
                     : _buildNormalWordList(filteredWords),
           ),
         ],
@@ -210,7 +225,7 @@ class WordSuggestionsState extends State<WordSuggestions> {
   }
 
   // 컴팩트 모드의 단어 목록 (가로 스크롤)
-  Widget _buildCompactWordList(List<String> filteredWords) {
+  Widget _buildCompactWordList(List<String> filteredWords, bool isSmallScreen) {
     return ListView.builder(
       key: ValueKey('compact_word_list_${filteredWords.hashCode}'),
       scrollDirection: Axis.horizontal,
@@ -219,6 +234,12 @@ class WordSuggestionsState extends State<WordSuggestions> {
       itemBuilder: (context, index) {
         final word = filteredWords[index];
         final isHighlighted = _wordContainsHighlightedChar(word);
+
+        // 작은 화면에서는 더 작은 카드 크기 사용
+        final verticalPadding = isSmallScreen ? 6.0 : 8.0;
+        final horizontalPadding = isSmallScreen ? 8.0 : 12.0;
+        final wordFontSize = isSmallScreen ? 14.0 : 16.0;
+        final iconSize = isSmallScreen ? 12.0 : 14.0;
 
         return Card(
           color: isHighlighted ? Colors.blue.shade50 : Colors.grey.shade50,
@@ -238,7 +259,8 @@ class WordSuggestionsState extends State<WordSuggestions> {
             },
             borderRadius: BorderRadius.circular(8),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding, vertical: verticalPadding),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -249,7 +271,7 @@ class WordSuggestionsState extends State<WordSuggestions> {
                           TextSpan(
                             text: word[i],
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: wordFontSize,
                               fontWeight:
                                   widget.usedCharacters?.contains(word[i]) ==
                                           true
@@ -271,8 +293,8 @@ class WordSuggestionsState extends State<WordSuggestions> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Icon(Icons.search, size: 14, color: Colors.blue),
+                  const SizedBox(height: 2),
+                  Icon(Icons.search, size: iconSize, color: Colors.blue),
                 ],
               ),
             ),

@@ -75,11 +75,13 @@ import 'wildcard_star_widget.dart';
 class GameGrid extends StatefulWidget {
   final double cellSize;
   final double gridPadding;
+  final bool autoSize; // 자동 크기 조정 여부를 결정하는 옵션
 
   const GameGrid({
     super.key,
     this.cellSize = 32.0,
     this.gridPadding = 16.0,
+    this.autoSize = true, // 기본값으로 자동 크기 조정 활성화
   });
 
   @override
@@ -109,19 +111,40 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  /// 화면 크기에 따른 셀 크기 계산
+  double _calculateDynamicCellSize(BuildContext context, int columns) {
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final padding = widget.gridPadding * 2;
+
+    // 디바이스 크기별 셀 크기 계산 로직
+    if (screenWidth < 360) {
+      // 매우 작은 모바일 기기 (작은 스마트폰)
+      return (screenWidth - padding - 16) / columns; // 추가 마진 적용
+    } else if (screenWidth < 480) {
+      // 일반적인 모바일 기기
+      return (screenWidth - padding - 24) / columns;
+    } else if (screenWidth < 600) {
+      // 큰 모바일 기기
+      return (screenWidth - padding - 32) / columns;
+    } else if (screenWidth < 840) {
+      // 태블릿 (세로 모드)
+      return math.min(48.0, (screenWidth * 0.7 - padding) / columns);
+    } else {
+      // 태블릿 (가로 모드) 또는 데스크톱
+      return math.min(widget.cellSize, (screenWidth * 0.6 - padding) / columns);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final grid = Provider.of<GameProvider>(context).grid;
     final rows = grid.rows;
     final columns = grid.columns;
 
-    // 화면 크기 가져오기
-    final screenSize = MediaQuery.of(context).size;
-    final isSmallScreen = screenSize.width < 600;
-
-    // 화면 크기에 따라 셀 크기 조정
-    final dynamicCellSize = isSmallScreen
-        ? (screenSize.width - 32) / columns // 모바일 화면에 맞게 셀 크기 조정
+    // 자동 크기 조정이 활성화된 경우, 화면 크기에 맞게 셀 크기 계산
+    final dynamicCellSize = widget.autoSize
+        ? _calculateDynamicCellSize(context, columns)
         : widget.cellSize;
 
     // 셀 간격 계산
@@ -137,7 +160,8 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
         _handleAnimations(gameProvider);
 
         // 게임 그리드 빌드
-        return _buildGameGrid(context, gameProvider);
+        return _buildGameGrid(
+            context, gameProvider, dynamicCellSize, cellMargin, totalCellSize);
       },
     );
   }
@@ -169,16 +193,19 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
   }
 
   /// 게임 그리드 구축
-  Widget _buildGameGrid(BuildContext context, GameProvider gameProvider) {
+  Widget _buildGameGrid(BuildContext context, GameProvider gameProvider,
+      double actualCellSize, double cellMargin, double totalCellSize) {
     final grid = gameProvider.grid;
     final rows = grid.rows;
     final columns = grid.columns;
 
-    // 셀 사이즈 및 간격 정의
-    final double actualCellSize = widget.cellSize;
-    const double cellMargin = 1.0;
-    const double cellSpacing = cellMargin * 2;
-    final double totalCellSize = actualCellSize + cellSpacing;
+    // 화면 크기에 따른 그리드 패딩 조정
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicGridPadding = screenWidth < 360
+        ? 6.0
+        : screenWidth < 480
+            ? 8.0
+            : widget.gridPadding;
 
     return DragTarget<Block>(
       onAcceptWithDetails: (details) {
@@ -191,13 +218,13 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
         _blockPlacement.handleBlockPlacement(
             context,
             details,
-            widget.gridPadding,
+            dynamicGridPadding,
             totalCellSize,
             (point) => _animations.startExplosionAnimation(point));
       },
       onMove: (details) {
         _blockPlacement.handleBlockDrag(
-            context, details, widget.gridPadding, totalCellSize);
+            context, details, dynamicGridPadding, totalCellSize);
       },
       onLeave: (data) {
         // 드래그가 그리드 영역을 벗어났을 때
@@ -210,20 +237,20 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
         return Stack(
           children: [
             // 기본 그리드
-            _buildGridBase(
-                grid, rows, columns, actualCellSize, cellMargin, totalCellSize),
+            _buildGridBase(grid, rows, columns, actualCellSize, cellMargin,
+                totalCellSize, dynamicGridPadding),
 
             // 폭발 효과 애니메이션
             if (_animations.explosionCenter != null &&
                 _animations.explosionAnimation != null)
               _animations.buildExplosionEffect(
-                  totalCellSize, widget.gridPadding, actualCellSize),
+                  totalCellSize, dynamicGridPadding, actualCellSize),
 
             // 사라지는 셀 애니메이션
             if (_animations.fadeAnimation != null &&
                 _animations.fadingCells.isNotEmpty)
               ..._animations.buildFadingCells(totalCellSize, actualCellSize,
-                  cellMargin, widget.gridPadding),
+                  cellMargin, dynamicGridPadding),
           ],
         );
       },
@@ -232,9 +259,9 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
 
   /// 그리드 기본 구조 구축
   Widget _buildGridBase(Grid grid, int rows, int columns, double actualCellSize,
-      double cellMargin, double totalCellSize) {
+      double cellMargin, double totalCellSize, double dynamicGridPadding) {
     return Container(
-      padding: EdgeInsets.all(widget.gridPadding),
+      padding: EdgeInsets.all(dynamicGridPadding),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8.0),
@@ -242,6 +269,7 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
       // FittedBox를 사용하여 화면 크기에 맞게 조정
       child: FittedBox(
         fit: BoxFit.contain,
+        alignment: Alignment.center,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

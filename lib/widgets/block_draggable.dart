@@ -10,12 +10,14 @@ class BlockDraggable extends StatelessWidget {
   final Block block;
   final double cellSize;
   final BlockHighlightHandler highlightHandler;
+  final bool isCompactMode; // 모바일 뷰를 위한 컴팩트 모드
 
   const BlockDraggable({
     super.key,
     required this.block,
     required this.cellSize,
     required this.highlightHandler,
+    this.isCompactMode = false, // 기본값은 일반 모드
   });
 
   /// 블록의 회전 처리
@@ -30,14 +32,27 @@ class BlockDraggable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 화면 크기에 따른 패딩 조정
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding =
+        isCompactMode ? (screenWidth < 360 ? 2.0 : 4.0) : 8.0;
+
+    // 드래그 피드백의 투명도 조정
+    final feedbackOpacity = isCompactMode ? 0.8 : 0.7;
+
+    // 드래그 시작될 때 진동 효과 (모바일에서 중요)
+    void handleDragStart() {
+      // 드래그 시작 시 처리
+      highlightHandler.highlightBlockCharacters(block);
+
+      // 모바일 기기에서 진동 피드백 추가 (나중에 HapticFeedback 추가)
+    }
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: Draggable<Block>(
         data: block,
-        onDragStarted: () {
-          // 드래그 시작 시 처리
-          highlightHandler.highlightBlockCharacters(block);
-        },
+        onDragStarted: handleDragStart,
         onDragEnd: (details) {
           // 드래그 종료 시 처리
           highlightHandler.highlightBlockCharacters(block, clear: true);
@@ -49,10 +64,10 @@ class BlockDraggable extends StatelessWidget {
         // 드래그 중일 때 보여줄 위젯
         feedback: Material(
           color: Colors.transparent,
-          elevation: 4.0,
+          elevation: isCompactMode ? 3.0 : 4.0,
           child: BlockWidget(
             block: block,
-            opacity: 0.7,
+            opacity: feedbackOpacity,
             cellSize: cellSize,
           ),
         ),
@@ -73,12 +88,16 @@ class BlockDraggable extends StatelessWidget {
         ),
         child: MouseRegion(
           onEnter: (_) {
-            // 마우스가 블록에 들어왔을 때
-            highlightHandler.highlightBlockCharacters(block);
+            // 마우스가 블록에 들어왔을 때 (데스크탑 전용)
+            if (!isCompactMode) {
+              highlightHandler.highlightBlockCharacters(block);
+            }
           },
           onExit: (_) {
-            // 마우스가 블록에서 나갔을 때
-            highlightHandler.highlightBlockCharacters(block, clear: true);
+            // 마우스가 블록에서 나갔을 때 (데스크탑 전용)
+            if (!isCompactMode) {
+              highlightHandler.highlightBlockCharacters(block, clear: true);
+            }
           },
           child: GestureDetector(
             onTap: () => _handleTap(context, block),
@@ -86,6 +105,7 @@ class BlockDraggable extends StatelessWidget {
               block: block,
               opacity: 1.0,
               cellSize: cellSize,
+              isCompactMode: isCompactMode, // 컴팩트 모드 전달
             ),
           ),
         ),
