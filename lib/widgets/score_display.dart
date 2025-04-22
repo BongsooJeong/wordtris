@@ -61,6 +61,10 @@ class ScoreDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 화면 크기에 따라 레이아웃 조정
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
     return Container(
       padding: const EdgeInsets.all(12.0),
       margin: const EdgeInsets.all(8.0),
@@ -75,96 +79,203 @@ class ScoreDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          // 점수 섹션
-          Column(
-            children: [
-              const Text(
-                '점수',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-              Text(
-                '$score',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-
-          // 구분선
-          Container(
-            height: 40,
-            width: 1,
-            color: Colors.grey.shade300,
-          ),
-
-          // 최근 완성 단어 섹션
-          Column(
-            children: [
-              const Text(
-                '최근 단어',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-              Text(
-                lastWord.isEmpty ? '-' : lastWord,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (lastWordPoints > 0)
-                Text(
-                  '+$lastWordPoints',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade800,
+      child: isSmallScreen
+          // 세로 레이아웃 (모바일)
+          ? Column(
+              children: [
+                // 점수 섹션
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '점수: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      Text(
+                        '$score',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-            ],
-          ),
 
-          // 구분선
-          Container(
-            height: 40,
-            width: 1,
-            color: Colors.grey.shade300,
-          ),
+                // 구분선
+                Divider(
+                  height: 16,
+                  thickness: 1,
+                  color: Colors.grey.shade300,
+                ),
 
-          // 레벨 섹션
-          Column(
-            children: [
-              const Text(
-                '레벨',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                // 최근 완성 단어 섹션
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '최근 단어: ',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                      Text(
+                        lastWord.isEmpty ? '-' : lastWord,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (lastWordPoints > 0)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            '+$lastWordPoints',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade800,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                '$level',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+
+                // 구분선
+                Divider(
+                  height: 16,
+                  thickness: 1,
+                  color: Colors.grey.shade300,
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
+
+                // 레벨 섹션
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '레벨: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      Text(
+                        '$level',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          // 가로 레이아웃 (기존)
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // 점수 섹션
+                Column(
+                  children: [
+                    const Text(
+                      '점수',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    Text(
+                      '$score',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // 구분선
+                Container(
+                  height: 40,
+                  width: 1,
+                  color: Colors.grey.shade300,
+                ),
+
+                // 최근 완성 단어 섹션
+                Column(
+                  children: [
+                    const Text(
+                      '최근 단어',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    Text(
+                      lastWord.isEmpty ? '-' : lastWord,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (lastWordPoints > 0)
+                      Text(
+                        '+$lastWordPoints',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange.shade800,
+                        ),
+                      ),
+                  ],
+                ),
+
+                // 구분선
+                Container(
+                  height: 40,
+                  width: 1,
+                  color: Colors.grey.shade300,
+                ),
+
+                // 레벨 섹션
+                Column(
+                  children: [
+                    const Text(
+                      '레벨',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    Text(
+                      '$level',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 }

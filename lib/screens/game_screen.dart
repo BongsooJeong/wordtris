@@ -3,13 +3,12 @@ import 'package:provider/provider.dart';
 import '../models/block.dart';
 import '../models/game_state.dart';
 import '../providers/game_provider.dart';
-import '../widgets/game_grid.dart';
-import '../widgets/block_tray.dart';
-import '../widgets/score_display.dart';
-import '../widgets/word_suggestions.dart';
+import '../widgets/animated_title.dart';
+import '../widgets/game_layout.dart';
 import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import '../widgets/word_suggestions.dart';
 
 /// WordTris 게임의 메인 화면을 구성하는 위젯 API 문서
 ///
@@ -20,7 +19,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 /// - 게임 화면 UI 구성
 /// - 게임 상태 관리
 /// - 단어 검색 및 제안 기능
-/// - 폭탄 생성 및 표시
 ///
 /// 상태 관리:
 /// - initState(): void
@@ -135,7 +133,7 @@ class _GameScreenState extends State<GameScreen> {
         // 게임 화면 구성
         return Scaffold(
           appBar: AppBar(
-            title: _buildAnimatedTitle(),
+            title: const AnimatedTitle(),
             centerTitle: true,
             elevation: 4.0,
             backgroundColor: Colors.indigo.shade700,
@@ -150,332 +148,11 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ],
           ),
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              // 화면 크기에 따라 레이아웃 조정
-              final isSmallScreen = constraints.maxWidth < 600;
-
-              if (isSmallScreen) {
-                // 모바일 화면용 세로 레이아웃
-                return Column(
-                  children: [
-                    // 점수 디스플레이
-                    ScoreDisplay(
-                      score: gameProvider.score,
-                      level: gameProvider.level,
-                      lastWord: gameProvider.lastCompletedWord,
-                      lastWordPoints: gameProvider.lastWordPoints,
-                    ),
-
-                    // 폭탄 인디케이터 추가
-                    Consumer<GameProvider>(
-                      builder: (context, gameProvider, child) {
-                        return _buildBombIndicator(gameProvider);
-                      },
-                    ),
-
-                    // 게임 그리드와 블록 트레이 영역
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          // 게임 그리드
-                          const Positioned.fill(
-                            bottom: 150, // 트레이 높이만큼 공간 확보
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: GameGrid(
-                                cellSize: 48.0,
-                                gridPadding: 4.0,
-                              ),
-                            ),
-                          ),
-
-                          // 블록 트레이 (화면 하단에 고정)
-                          BlockTray(
-                            cellSize: 40.0,
-                            spacing: 8.0,
-                            wordSuggestionsKey: _wordSuggestionsKey,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // 하단 단어 추천 영역 (작은 영역으로 표시)
-                    SizedBox(
-                      height: 100,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: WordSuggestions(
-                          key: _wordSuggestionsKey,
-                          words: gameProvider.suggestedWordSet,
-                          wordUsageCount: gameProvider.wordUsageCounts,
-                          usedCharacters: gameProvider.usedCharacters,
-                          onDictionaryLookup: gameProvider.openDictionary,
-                          isCompactMode: true,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              } else {
-                // 데스크톱 화면용 가로 레이아웃 (기존 코드)
-                return Row(
-                  children: [
-                    // 메인 게임 영역
-                    Expanded(
-                      flex: 3,
-                      child: Stack(
-                        children: [
-                          Column(
-                            children: [
-                              // 점수 디스플레이
-                              ScoreDisplay(
-                                score: gameProvider.score,
-                                level: gameProvider.level,
-                                lastWord: gameProvider.lastCompletedWord,
-                                lastWordPoints: gameProvider.lastWordPoints,
-                              ),
-
-                              // 폭탄 인디케이터 추가
-                              Consumer<GameProvider>(
-                                builder: (context, gameProvider, child) {
-                                  return _buildBombIndicator(gameProvider);
-                                },
-                              ),
-
-                              // 게임 그리드
-                              const Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: GameGrid(
-                                    cellSize: 48.0,
-                                    gridPadding: 4.0,
-                                  ),
-                                ),
-                              ),
-
-                              // 블록 트레이를 위한 공간 확보
-                              const SizedBox(height: 150),
-                            ],
-                          ),
-
-                          // 블록 트레이 (화면 하단에 고정)
-                          BlockTray(
-                            cellSize: 40.0,
-                            spacing: 8.0,
-                            wordSuggestionsKey: _wordSuggestionsKey,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // 추천 단어 영역
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: WordSuggestions(
-                          key: _wordSuggestionsKey,
-                          words: gameProvider.suggestedWordSet,
-                          wordUsageCount: gameProvider.wordUsageCounts,
-                          usedCharacters: gameProvider.usedCharacters,
-                          onDictionaryLookup: gameProvider.openDictionary,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-            },
+          body: GameLayout(
+            wordSuggestionsKey: _wordSuggestionsKey,
           ),
         );
       },
-    );
-  }
-
-  // 폭탄 인디케이터 위젯
-  Widget _buildBombIndicator(GameProvider gameProvider) {
-    // 폭탄 생성까지 남은 턴 수 계산 (3의 배수마다 생성)
-    int clearedWords = gameProvider.wordClearCount;
-    int remainingTurns = 3 - (clearedWords % 3);
-    bool bombActive = remainingTurns == 0 || gameProvider.bombGenerated;
-
-    // 화면 크기 확인
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-
-    // 상태 텍스트 및 색상 설정 (작은 화면에서는 더 짧은 텍스트)
-    String statusText = bombActive
-        ? '💣 폭탄 준비!'
-        : isSmallScreen
-            ? '단어 3개 완성 후 폭탄 등장'
-            : '단어 3개 완성 후 폭탄이 나타납니다';
-
-    Color borderColor = bombActive ? Colors.red : Colors.orange.shade300;
-    Color bgColor = bombActive ? Colors.red.shade50 : Colors.white;
-    Color textColor = bombActive ? Colors.red.shade700 : Colors.black87;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
-      margin: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(
-          color: borderColor,
-          width: 1.5,
-        ),
-      ),
-      child: isSmallScreen
-          // 작은 화면에서는 단순화된 레이아웃
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  bombActive ? Icons.warning_amber : Icons.info_outline,
-                  color: bombActive ? Colors.red : Colors.orange.shade700,
-                  size: 18,
-                ),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    statusText,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '($clearedWords)',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade700,
-                  ),
-                ),
-              ],
-            )
-          // 일반 화면에서는 기존 레이아웃
-          : Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 8,
-              runSpacing: 4,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      bombActive ? Icons.warning_amber : Icons.info_outline,
-                      color: bombActive ? Colors.red : Colors.orange.shade700,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        statusText,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 6.0, vertical: 2.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(4.0),
-                    border: Border.all(color: Colors.blue.shade300, width: 1.0),
-                  ),
-                  child: Text(
-                    '총 완성 단어: $clearedWords',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade800,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-
-  // 애니메이션 타이틀 위젯 생성
-  Widget _buildAnimatedTitle() {
-    return ShaderMask(
-      shaderCallback: (bounds) {
-        return const LinearGradient(
-          colors: [
-            Colors.purple,
-            Colors.blue,
-            Colors.lightBlueAccent,
-            Colors.blue,
-            Colors.purple,
-          ],
-          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ).createShader(bounds);
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            '워드',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 1.2,
-              shadows: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4.0,
-                  offset: Offset(1.0, 1.0),
-                ),
-              ],
-            ),
-          ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              // 그림자 효과
-              Text(
-                '트리스',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  foreground: Paint()
-                    ..style = PaintingStyle.stroke
-                    ..strokeWidth = 4
-                    ..color = Colors.indigo.shade900.withOpacity(0.3),
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const Text(
-                '트리스',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
