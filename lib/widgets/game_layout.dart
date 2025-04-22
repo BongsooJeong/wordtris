@@ -45,23 +45,30 @@ class GameLayout extends StatelessWidget {
       BuildContext context, GameProvider gameProvider, double screenWidth) {
     // 화면 크기에 따른 동적 셀 크기 조정
     final dynamicCellSize = screenWidth < 360 ? 36.0 : 42.0;
-    final trayHeight = dynamicCellSize * 4.5; // 트레이 높이 축소
+    final trayHeight = dynamicCellSize * 4.2; // 트레이 높이 최적화
     final isVerySmallScreen = screenWidth < 320;
 
     return Column(
       children: [
+        // 애니메이션 타이틀 추가
+        Padding(
+          padding:
+              EdgeInsets.symmetric(vertical: isVerySmallScreen ? 2.0 : 4.0),
+          child: const AnimatedTitle(isCompactMode: true),
+        ),
+
         // 점수 디스플레이 (세로 모드로 변경)
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 점수 및 레벨 정보 (왼쪽 세로 배치)
-            Expanded(
-              flex: 3,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isVerySmallScreen ? 4.0 : 8.0,
-                  vertical: isVerySmallScreen ? 2.0 : 4.0,
-                ),
+        Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: isVerySmallScreen ? 4.0 : 8.0,
+            vertical: isVerySmallScreen ? 2.0 : 4.0,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 점수 및 레벨 정보 (왼쪽 세로 배치)
+              Expanded(
+                flex: 3,
                 child: ScoreDisplay(
                   score: gameProvider.score,
                   level: gameProvider.level,
@@ -70,17 +77,17 @@ class GameLayout extends StatelessWidget {
                   isCompactMode: true, // 세로 배치 모드 활성화
                 ),
               ),
-            ),
 
-            // 폭탄 인디케이터 (오른쪽 세로 배치)
-            Expanded(
-              flex: 2,
-              child: BombIndicator(
-                gameProvider: gameProvider,
-                isCompactMode: true, // 컴팩트 모드 활성화
+              // 폭탄 인디케이터 (오른쪽 세로 배치)
+              Expanded(
+                flex: 2,
+                child: BombIndicator(
+                  gameProvider: gameProvider,
+                  isCompactMode: true, // 컴팩트 모드 활성화
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
 
         // 게임 그리드와 블록 트레이 영역
@@ -91,8 +98,10 @@ class GameLayout extends StatelessWidget {
               Positioned.fill(
                 bottom: trayHeight, // 트레이 높이만큼 공간 확보
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 4.0, vertical: 2.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isVerySmallScreen ? 2.0 : 4.0,
+                    vertical: isVerySmallScreen ? 0.0 : 2.0,
+                  ),
                   child: GameGrid(
                     cellSize: dynamicCellSize,
                     gridPadding: screenWidth < 360 ? 2.0 : 4.0,
@@ -107,7 +116,7 @@ class GameLayout extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: BlockTray(
-                  cellSize: dynamicCellSize - 6.0, // 그리드보다 작게 설정
+                  cellSize: dynamicCellSize - 8.0, // 더 작은 셀 크기로 설정
                   spacing: screenWidth < 360 ? 2.0 : 4.0, // 공간 절약
                   wordSuggestionsKey: wordSuggestionsKey,
                   isCompactMode: true, // 컴팩트 모드 활성화
@@ -121,7 +130,8 @@ class GameLayout extends StatelessWidget {
         SizedBox(
           height: screenWidth < 360 ? 70 : 80,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding:
+                EdgeInsets.symmetric(horizontal: isVerySmallScreen ? 2.0 : 4.0),
             child: WordSuggestions(
               key: wordSuggestionsKey,
               words: gameProvider.suggestedWordSet,
@@ -144,6 +154,12 @@ class GameLayout extends StatelessWidget {
 
     return Column(
       children: [
+        // 상단 타이틀 추가
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 6.0),
+          child: AnimatedTitle(),
+        ),
+
         // 상단 정보 영역 (세로 배치로 변경)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,88 +250,102 @@ class GameLayout extends StatelessWidget {
     // 화면 크기에 따른 동적 셀 크기 조정
     final cellSize = screenWidth > 1200 ? 52.0 : 48.0;
 
-    return Row(
+    return Column(
       children: [
+        // 상단 타이틀 추가
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: AnimatedTitle(),
+        ),
+
         // 메인 게임 영역
         Expanded(
-          flex: 3,
-          child: Stack(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                children: [
-                  // 점수 디스플레이와 폭탄 인디케이터를 가로로 배치
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 점수 디스플레이 (왼쪽)
-                      Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ScoreDisplay(
-                            score: gameProvider.score,
-                            level: gameProvider.level,
-                            lastWord: gameProvider.lastCompletedWord,
-                            lastWordPoints: gameProvider.lastWordPoints,
-                            isCompactMode: false, // 데스크톱에서는 가로 배치 유지
+              // 게임 그리드 및 관련 요소
+              Expanded(
+                flex: 3,
+                child: Stack(
+                  children: [
+                    Column(
+                      children: [
+                        // 점수 디스플레이와 폭탄 인디케이터를 가로로 배치
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 점수 디스플레이 (왼쪽)
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ScoreDisplay(
+                                  score: gameProvider.score,
+                                  level: gameProvider.level,
+                                  lastWord: gameProvider.lastCompletedWord,
+                                  lastWordPoints: gameProvider.lastWordPoints,
+                                  isCompactMode: false, // 데스크톱에서는 가로 배치 유지
+                                ),
+                              ),
+                            ),
+
+                            // 폭탄 인디케이터 (오른쪽)
+                            Expanded(
+                              flex: 1,
+                              child: BombIndicator(gameProvider: gameProvider),
+                            ),
+                          ],
+                        ),
+
+                        // 게임 그리드
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GameGrid(
+                              cellSize: cellSize,
+                              gridPadding: 6.0,
+                              autoSize: true, // 자동 크기 조정 활성화
+                            ),
                           ),
                         ),
-                      ),
 
-                      // 폭탄 인디케이터 (오른쪽)
-                      Expanded(
-                        flex: 1,
-                        child: BombIndicator(gameProvider: gameProvider),
-                      ),
-                    ],
-                  ),
+                        // 블록 트레이를 위한 공간 확보
+                        SizedBox(height: cellSize * 3.5),
+                      ],
+                    ),
 
-                  // 게임 그리드
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GameGrid(
-                        cellSize: cellSize,
-                        gridPadding: 6.0,
-                        autoSize: true, // 자동 크기 조정 활성화
+                    // 블록 트레이 (화면 하단에 고정)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: BlockTray(
+                        cellSize: cellSize - 4.0,
+                        spacing: 8.0,
+                        wordSuggestionsKey: wordSuggestionsKey,
+                        isCompactMode: false, // 데스크톱에서는 일반 모드 유지
                       ),
                     ),
-                  ),
-
-                  // 블록 트레이를 위한 공간 확보
-                  SizedBox(height: cellSize * 3.5),
-                ],
+                  ],
+                ),
               ),
 
-              // 블록 트레이 (화면 하단에 고정)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: BlockTray(
-                  cellSize: cellSize - 4.0,
-                  spacing: 8.0,
-                  wordSuggestionsKey: wordSuggestionsKey,
-                  isCompactMode: false, // 데스크톱에서는 일반 모드 유지
+              // 추천 단어 영역
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: WordSuggestions(
+                    key: wordSuggestionsKey,
+                    words: gameProvider.suggestedWordSet,
+                    wordUsageCount: gameProvider.wordUsageCounts,
+                    usedCharacters: gameProvider.usedCharacters,
+                    onDictionaryLookup: gameProvider.openDictionary,
+                    isCompactMode: false,
+                  ),
                 ),
               ),
             ],
-          ),
-        ),
-
-        // 추천 단어 영역
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: WordSuggestions(
-              key: wordSuggestionsKey,
-              words: gameProvider.suggestedWordSet,
-              wordUsageCount: gameProvider.wordUsageCounts,
-              usedCharacters: gameProvider.usedCharacters,
-              onDictionaryLookup: gameProvider.openDictionary,
-              isCompactMode: false,
-            ),
           ),
         ),
       ],

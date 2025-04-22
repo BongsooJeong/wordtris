@@ -70,107 +70,109 @@ class BlockTray extends StatelessWidget {
     // 화면 크기와 모드에 따른 동적 설정
     final screenWidth = screenSize.width;
     final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenWidth < 320;
 
     // 컴팩트 모드에서 더 작은 셀과 패딩 크기 사용
     final dynamicCellSize = isCompactMode
-        ? (isSmallScreen ? 32.0 : 36.0)
+        ? (isVerySmallScreen ? 28.0 : (isSmallScreen ? 32.0 : 36.0))
         : (isSmallScreen ? 34.0 : cellSize);
 
     final dynamicPadding = isCompactMode
-        ? (isSmallScreen ? 6.0 : 10.0)
+        ? (isVerySmallScreen ? 4.0 : (isSmallScreen ? 6.0 : 10.0))
         : (isSmallScreen ? 8.0 : 16.0);
 
     final trayHeight =
-        isCompactMode ? dynamicCellSize * 4.0 : dynamicCellSize * 5.5;
+        isCompactMode ? dynamicCellSize * 3.8 : dynamicCellSize * 5.5;
 
     // 하이라이트 핸들러 생성
     final highlightHandler =
         BlockHighlightHandler(wordSuggestionsKey: wordSuggestionsKey);
 
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: Container(
-        width: screenSize.width,
-        height: trayHeight,
-        padding: EdgeInsets.symmetric(
-          vertical: isCompactMode ? 4.0 : 8.0,
-          horizontal: dynamicPadding,
+    return Container(
+      width: screenSize.width,
+      height: trayHeight,
+      padding: EdgeInsets.symmetric(
+        vertical: isCompactMode ? (isVerySmallScreen ? 2.0 : 4.0) : 8.0,
+        horizontal: dynamicPadding,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(isCompactMode ? 12.0 : 20.0),
+          topRight: Radius.circular(isCompactMode ? 12.0 : 20.0),
         ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(isCompactMode ? 16.0 : 20.0),
-            topRight: Radius.circular(isCompactMode ? 16.0 : 20.0),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(isCompactMode ? 0.15 : 0.2),
-              blurRadius: isCompactMode ? 6.0 : 8.0,
-              offset: Offset(0, isCompactMode ? -2.0 : -3.0),
-            )
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 드래그 핸들
-            Container(
-              width: 40,
-              height: isCompactMode ? 3.0 : 4.0,
-              margin: EdgeInsets.only(bottom: isCompactMode ? 4.0 : 8.0),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(2),
-              ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isCompactMode ? 0.15 : 0.2),
+            blurRadius: isCompactMode ? 6.0 : 8.0,
+            offset: Offset(0, isCompactMode ? -2.0 : -3.0),
+          )
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 드래그 핸들
+          Container(
+            width: 40,
+            height: isCompactMode ? (isVerySmallScreen ? 2.0 : 3.0) : 4.0,
+            margin: EdgeInsets.only(
+                bottom: isCompactMode ? (isVerySmallScreen ? 2.0 : 4.0) : 8.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(2),
             ),
+          ),
 
-            // 트레이 제목 텍스트 (컴팩트 모드에서는 작게)
-            if (!isCompactMode || screenWidth > 360)
-              Text(
+          // 트레이 제목 텍스트 (컴팩트 모드에서는 작게)
+          if ((!isCompactMode || screenWidth > 360) && !isVerySmallScreen)
+            Padding(
+              padding: EdgeInsets.only(bottom: isCompactMode ? 2.0 : 4.0),
+              child: Text(
                 isCompactMode || isSmallScreen ? '블록 트레이' : '블록 트레이 (클릭하여 회전)',
                 style: TextStyle(
                   fontSize: isCompactMode
-                      ? (isSmallScreen ? 12.0 : 13.0)
+                      ? (isSmallScreen ? 11.0 : 12.0)
                       : (isSmallScreen ? 13.0 : 14.0),
                   fontWeight: FontWeight.w500,
                 ),
               ),
+            ),
 
-            const SizedBox(height: 4),
+          // 블록 목록
+          Expanded(
+            child: Center(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // 블록 간격 동적 조정
+                  final blockPadding =
+                      isCompactMode ? (isVerySmallScreen ? 1.0 : 2.0) : 4.0;
 
-            // 블록 목록
-            Expanded(
-              child: Center(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          for (int i = 0; i < blocks.length; i++)
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isCompactMode ? 2.0 : 4.0,
-                              ),
-                              child: BlockDraggable(
-                                block: blocks[i],
-                                cellSize: dynamicCellSize,
-                                highlightHandler: highlightHandler,
-                              ),
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (int i = 0; i < blocks.length; i++)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: blockPadding,
                             ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                            child: BlockDraggable(
+                              block: blocks[i],
+                              cellSize: dynamicCellSize,
+                              highlightHandler: highlightHandler,
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

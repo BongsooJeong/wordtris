@@ -30,7 +30,9 @@ class BombIndicator extends StatelessWidget {
         : isCompactMode
             ? isVerySmallScreen
                 ? '폭탄 준비중'
-                : '단어 3개 후 폭탄'
+                : isSmallScreen
+                    ? '폭탄 준비중'
+                    : '단어 3개 후 폭탄'
             : isSmallScreen
                 ? '단어 3개 완성 후 폭탄 등장'
                 : '단어 3개 완성 후 폭탄이 나타납니다';
@@ -42,11 +44,11 @@ class BombIndicator extends StatelessWidget {
     // 가장 컴팩트한 디자인 (컴팩트 모드 + 매우 작은 화면)
     if (isCompactMode && isVerySmallScreen) {
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-        margin: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+        margin: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 2.0),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(6.0),
+          borderRadius: BorderRadius.circular(4.0),
           border: Border.all(
             color: borderColor,
             width: 1.0,
@@ -58,14 +60,14 @@ class BombIndicator extends StatelessWidget {
             Icon(
               bombActive ? Icons.warning_amber : Icons.info_outline,
               color: bombActive ? Colors.red : Colors.orange.shade700,
-              size: 12,
+              size: 10,
             ),
             const SizedBox(width: 2),
             Flexible(
               child: Text(
                 statusText,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 9,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                 ),
@@ -77,7 +79,7 @@ class BombIndicator extends StatelessWidget {
             Text(
               '($clearedWords)',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 8,
                 fontWeight: FontWeight.bold,
                 color: Colors.blue.shade700,
               ),
@@ -90,8 +92,14 @@ class BombIndicator extends StatelessWidget {
     // 컴팩트 모드 디자인 (일반 작은 화면)
     if (isCompactMode) {
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-        margin: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+        padding: EdgeInsets.symmetric(
+          vertical: isSmallScreen ? 3.0 : 4.0,
+          horizontal: isSmallScreen ? 4.0 : 6.0,
+        ),
+        margin: EdgeInsets.symmetric(
+          vertical: isSmallScreen ? 1.0 : 2.0,
+          horizontal: isSmallScreen ? 4.0 : 6.0,
+        ),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(6.0),
@@ -106,14 +114,14 @@ class BombIndicator extends StatelessWidget {
             Icon(
               bombActive ? Icons.warning_amber : Icons.info_outline,
               color: bombActive ? Colors.red : Colors.orange.shade700,
-              size: 14,
+              size: isSmallScreen ? 12 : 14,
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: isSmallScreen ? 2 : 4),
             Flexible(
               child: Text(
                 statusText,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: isSmallScreen ? 10 : 11,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                 ),
@@ -121,10 +129,12 @@ class BombIndicator extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: isSmallScreen ? 2 : 4),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
+              padding: EdgeInsets.symmetric(
+                horizontal: isSmallScreen ? 3.0 : 4.0,
+                vertical: 1.0,
+              ),
               decoration: BoxDecoration(
                 color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(4.0),
@@ -133,7 +143,7 @@ class BombIndicator extends StatelessWidget {
               child: Text(
                 '$clearedWords',
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: isSmallScreen ? 9 : 10,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue.shade800,
                 ),

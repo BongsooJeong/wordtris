@@ -67,34 +67,47 @@ class ScoreDisplay extends StatelessWidget {
     // 스크린 크기에 따른 동적 설정
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 360;
+    final isVerySmallScreen = screenWidth < 320;
 
     // 작은 화면일 경우 더 작은 글꼴 크기 적용
-    final titleFontSize = isSmallScreen ? 14.0 : (isCompactMode ? 15.0 : 16.0);
-    final scoreFontSize = isSmallScreen ? 20.0 : (isCompactMode ? 22.0 : 24.0);
-    final wordFontSize = isSmallScreen ? 14.0 : (isCompactMode ? 16.0 : 18.0);
-    final pointsFontSize = isSmallScreen ? 12.0 : (isCompactMode ? 13.0 : 14.0);
+    final titleFontSize = isVerySmallScreen
+        ? 12.0
+        : (isSmallScreen ? 14.0 : (isCompactMode ? 15.0 : 16.0));
+    final scoreFontSize = isVerySmallScreen
+        ? 18.0
+        : (isSmallScreen ? 20.0 : (isCompactMode ? 22.0 : 24.0));
+    final wordFontSize = isVerySmallScreen
+        ? 12.0
+        : (isSmallScreen ? 14.0 : (isCompactMode ? 16.0 : 18.0));
+    final pointsFontSize = isVerySmallScreen
+        ? 10.0
+        : (isSmallScreen ? 12.0 : (isCompactMode ? 13.0 : 14.0));
 
     return Container(
-      padding: EdgeInsets.all(isCompactMode ? 8.0 : 12.0),
-      margin: EdgeInsets.all(isCompactMode ? 4.0 : 8.0),
+      padding: EdgeInsets.all(
+          isCompactMode ? (isVerySmallScreen ? 6.0 : 8.0) : 12.0),
+      margin:
+          EdgeInsets.all(isCompactMode ? (isVerySmallScreen ? 2.0 : 4.0) : 8.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            blurRadius: isCompactMode ? 3 : 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: isCompactMode
           // 세로 레이아웃 (모바일)
           ? Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // 점수 섹션
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  padding: EdgeInsets.symmetric(
+                      vertical: isVerySmallScreen ? 2.0 : 4.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -119,14 +132,15 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Divider(
-                  height: 12,
+                  height: isVerySmallScreen ? 8 : 12,
                   thickness: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 최근 완성 단어 섹션
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  padding: EdgeInsets.symmetric(
+                      vertical: isVerySmallScreen ? 2.0 : 4.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -138,11 +152,14 @@ class ScoreDisplay extends StatelessWidget {
                           color: Colors.red,
                         ),
                       ),
-                      Text(
-                        lastWord.isEmpty ? '-' : lastWord,
-                        style: TextStyle(
-                          fontSize: wordFontSize,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          lastWord.isEmpty ? '-' : lastWord,
+                          style: TextStyle(
+                            fontSize: wordFontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (lastWordPoints > 0)
@@ -163,14 +180,15 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Divider(
-                  height: 12,
+                  height: isVerySmallScreen ? 8 : 12,
                   thickness: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 레벨 섹션
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  padding: EdgeInsets.symmetric(
+                      vertical: isVerySmallScreen ? 2.0 : 4.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

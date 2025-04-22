@@ -90,6 +90,7 @@ class WordSuggestionsState extends State<WordSuggestions> {
     // 화면 크기 확인
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 600;
+    final isVerySmallScreen = screenWidth < 320;
 
     return Container(
       width:
@@ -106,44 +107,51 @@ class WordSuggestionsState extends State<WordSuggestions> {
         ],
       ),
       margin: widget.isCompactMode
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+          ? EdgeInsets.symmetric(
+              horizontal: isVerySmallScreen ? 4 : 8,
+              vertical: isVerySmallScreen ? 2 : 4)
           : const EdgeInsets.all(8),
       padding: widget.isCompactMode
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
+          ? EdgeInsets.symmetric(
+              horizontal: isVerySmallScreen ? 4 : 8,
+              vertical: isVerySmallScreen ? 3 : 6)
           : const EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Text(
+              Text(
                 '추천 단어',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: isVerySmallScreen ? 12 : (isSmallScreen ? 13 : 14),
                   fontWeight: FontWeight.bold,
                   color: Colors.indigo,
                 ),
               ),
-              if (widget.isCompactMode && isSmallScreen) const Spacer(),
-              if (widget.isCompactMode && isSmallScreen)
-                Icon(Icons.swipe, size: 14, color: Colors.grey.shade600),
+              if (widget.isCompactMode) const Spacer(),
+              if (widget.isCompactMode)
+                Icon(Icons.swipe,
+                    size: isVerySmallScreen ? 12 : 14,
+                    color: Colors.grey.shade600),
             ],
           ),
-          const SizedBox(height: 2),
-          const Divider(height: 8),
+          SizedBox(height: isVerySmallScreen ? 1 : 2),
+          Divider(height: isVerySmallScreen ? 6 : 8),
           Expanded(
             child: filteredWords.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       '표시할 단어가 없습니다',
                       style: TextStyle(
                         color: Colors.grey,
-                        fontSize: 12,
+                        fontSize: isVerySmallScreen ? 10 : 12,
                       ),
                     ),
                   )
                 : widget.isCompactMode
-                    ? _buildCompactWordList(filteredWords, isSmallScreen)
+                    ? _buildCompactWordList(
+                        filteredWords, isSmallScreen, isVerySmallScreen)
                     : _buildNormalWordList(filteredWords),
           ),
         ],
@@ -225,30 +233,37 @@ class WordSuggestionsState extends State<WordSuggestions> {
   }
 
   // 컴팩트 모드의 단어 목록 (가로 스크롤)
-  Widget _buildCompactWordList(List<String> filteredWords, bool isSmallScreen) {
+  Widget _buildCompactWordList(
+      List<String> filteredWords, bool isSmallScreen, bool isVerySmallScreen) {
     return ListView.builder(
       key: ValueKey('compact_word_list_${filteredWords.hashCode}'),
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      padding: EdgeInsets.symmetric(
+        vertical: isVerySmallScreen ? 1 : 2,
+        horizontal: isVerySmallScreen ? 1 : 2,
+      ),
       itemCount: filteredWords.length,
       itemBuilder: (context, index) {
         final word = filteredWords[index];
         final isHighlighted = _wordContainsHighlightedChar(word);
 
         // 작은 화면에서는 더 작은 카드 크기 사용
-        final verticalPadding = isSmallScreen ? 6.0 : 8.0;
-        final horizontalPadding = isSmallScreen ? 8.0 : 12.0;
-        final wordFontSize = isSmallScreen ? 14.0 : 16.0;
-        final iconSize = isSmallScreen ? 12.0 : 14.0;
+        final verticalPadding =
+            isVerySmallScreen ? 2.0 : (isSmallScreen ? 3.0 : 4.0);
+        final horizontalPadding =
+            isVerySmallScreen ? 3.0 : (isSmallScreen ? 5.0 : 8.0);
+        final wordFontSize =
+            isVerySmallScreen ? 10.0 : (isSmallScreen ? 11.0 : 12.0);
+        final iconSize = isVerySmallScreen ? 8.0 : (isSmallScreen ? 9.0 : 10.0);
 
         return Card(
           color: isHighlighted ? Colors.blue.shade50 : Colors.grey.shade50,
-          elevation: 2,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          elevation: isVerySmallScreen ? 0 : 1,
+          margin: EdgeInsets.symmetric(horizontal: isVerySmallScreen ? 1 : 2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
             side: isHighlighted
-                ? BorderSide(color: Colors.blue.shade300, width: 1.5)
+                ? BorderSide(color: Colors.blue.shade300, width: 1.0)
                 : BorderSide.none,
           ),
           child: InkWell(
@@ -257,45 +272,56 @@ class WordSuggestionsState extends State<WordSuggestions> {
                 await widget.onDictionaryLookup!(word);
               }
             },
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
             child: Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: horizontalPadding, vertical: verticalPadding),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        for (int i = 0; i < word.length; i++)
-                          TextSpan(
-                            text: word[i],
-                            style: TextStyle(
-                              fontSize: wordFontSize,
-                              fontWeight:
-                                  widget.usedCharacters?.contains(word[i]) ==
+              // SizedBox 높이를 더 작게 조정
+              child: SizedBox(
+                height: isVerySmallScreen ? 24 : (isSmallScreen ? 28 : 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          children: [
+                            for (int i = 0; i < word.length; i++)
+                              TextSpan(
+                                text: word[i],
+                                style: TextStyle(
+                                  fontSize: wordFontSize,
+                                  fontWeight: widget.usedCharacters
+                                              ?.contains(word[i]) ==
                                           true
                                       ? FontWeight.normal
                                       : FontWeight.bold,
-                              color: isHighlighted
-                                  ? Colors.blue.shade700
-                                  : (widget.usedCharacters?.contains(word[i]) ==
-                                          true
-                                      ? Colors.red.shade300
-                                      : Colors.black),
-                              decoration:
-                                  widget.usedCharacters?.contains(word[i]) ==
+                                  color: isHighlighted
+                                      ? Colors.blue.shade700
+                                      : (widget.usedCharacters
+                                                  ?.contains(word[i]) ==
+                                              true
+                                          ? Colors.red.shade300
+                                          : Colors.black),
+                                  decoration: widget.usedCharacters
+                                              ?.contains(word[i]) ==
                                           true
                                       ? TextDecoration.lineThrough
                                       : null,
-                            ),
-                          ),
-                      ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Icon(Icons.search, size: iconSize, color: Colors.blue),
-                ],
+                    SizedBox(height: isVerySmallScreen ? 1 : 2),
+                    Icon(Icons.search, size: iconSize, color: Colors.blue),
+                  ],
+                ),
               ),
             ),
           ),

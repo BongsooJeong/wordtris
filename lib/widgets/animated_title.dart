@@ -14,7 +14,15 @@ class AnimatedTitle extends StatelessWidget {
     // 화면 크기에 따른 폰트 크기 조정
     final screenWidth = MediaQuery.of(context).size.width;
     final fontSize = _calculateFontSize(screenWidth);
-    final letterSpacing = screenWidth < 360 ? 0.8 : 1.2;
+    final letterSpacing = screenWidth < 360
+        ? (isCompactMode ? 0.5 : 0.8)
+        : (isCompactMode ? 0.8 : 1.2);
+
+    final shadowBlur = isCompactMode ? (screenWidth < 320 ? 2.0 : 3.0) : 4.0;
+
+    final strokeWidth = isCompactMode
+        ? (screenWidth < 320 ? 2.0 : 2.5)
+        : (screenWidth < 360 ? 3 : 4);
 
     return ShaderMask(
       shaderCallback: (bounds) {
@@ -41,11 +49,11 @@ class AnimatedTitle extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.white,
               letterSpacing: letterSpacing,
-              shadows: const [
+              shadows: [
                 BoxShadow(
                   color: Colors.black26,
-                  blurRadius: 4.0,
-                  offset: Offset(1.0, 1.0),
+                  blurRadius: shadowBlur,
+                  offset: const Offset(1.0, 1.0),
                 ),
               ],
             ),
@@ -61,7 +69,7 @@ class AnimatedTitle extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   foreground: Paint()
                     ..style = PaintingStyle.stroke
-                    ..strokeWidth = screenWidth < 360 ? 3 : 4
+                    ..strokeWidth = strokeWidth.toDouble()
                     ..color = Colors.indigo.shade900.withOpacity(0.3),
                   letterSpacing: letterSpacing,
                 ),
@@ -84,14 +92,24 @@ class AnimatedTitle extends StatelessWidget {
 
   // 화면 너비에 따른 폰트 크기 계산
   double _calculateFontSize(double screenWidth) {
-    if (screenWidth < 320) {
-      return 18.0; // 매우 작은 화면
-    } else if (screenWidth < 360) {
-      return 20.0; // 작은 모바일 화면
-    } else if (screenWidth < 480) {
-      return 22.0; // 일반 모바일 화면
+    if (isCompactMode) {
+      if (screenWidth < 320) {
+        return 16.0; // 매우 작은 화면에서 컴팩트 모드
+      } else if (screenWidth < 360) {
+        return 18.0; // 작은 모바일 화면에서 컴팩트 모드
+      } else {
+        return 20.0; // 일반 모바일 화면에서 컴팩트 모드
+      }
     } else {
-      return 24.0; // 태블릿 이상 크기
+      if (screenWidth < 320) {
+        return 18.0; // 매우 작은 화면
+      } else if (screenWidth < 360) {
+        return 20.0; // 작은 모바일 화면
+      } else if (screenWidth < 480) {
+        return 22.0; // 일반 모바일 화면
+      } else {
+        return 24.0; // 태블릿 이상 크기
+      }
     }
   }
 }

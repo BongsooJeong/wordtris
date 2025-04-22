@@ -115,21 +115,34 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
   double _calculateDynamicCellSize(BuildContext context, int columns) {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
     final padding = widget.gridPadding * 2;
 
+    // 최적 비율 계산 (화면 높이의 일정 비율 이내로 제한)
+    const maxHeightRatio = 0.5; // 화면 높이의 최대 50%까지 사용
+    final availableHeight = screenHeight * maxHeightRatio;
+
     // 디바이스 크기별 셀 크기 계산 로직
-    if (screenWidth < 360) {
-      // 매우 작은 모바일 기기 (작은 스마트폰)
-      return (screenWidth - padding - 16) / columns; // 추가 마진 적용
+    if (screenWidth < 320) {
+      // 매우 작은 모바일 기기
+      final baseSize = (screenWidth - padding - 16) / columns;
+      // 세로 공간도 고려하여 최종 크기 결정
+      return math.min(baseSize, availableHeight / 10); // 약 10줄 표시 가능하도록
+    } else if (screenWidth < 360) {
+      // 작은 모바일 기기
+      final baseSize = (screenWidth - padding - 16) / columns;
+      return math.min(baseSize, availableHeight / 10);
     } else if (screenWidth < 480) {
       // 일반적인 모바일 기기
-      return (screenWidth - padding - 24) / columns;
+      final baseSize = (screenWidth - padding - 24) / columns;
+      return math.min(baseSize, availableHeight / 10);
     } else if (screenWidth < 600) {
       // 큰 모바일 기기
-      return (screenWidth - padding - 32) / columns;
+      final baseSize = (screenWidth - padding - 28) / columns;
+      return math.min(baseSize, availableHeight / 10);
     } else if (screenWidth < 840) {
       // 태블릿 (세로 모드)
-      return math.min(48.0, (screenWidth * 0.7 - padding) / columns);
+      return math.min(46.0, (screenWidth * 0.7 - padding) / columns);
     } else {
       // 태블릿 (가로 모드) 또는 데스크톱
       return math.min(widget.cellSize, (screenWidth * 0.6 - padding) / columns);
