@@ -9,7 +9,7 @@
 /// ├─ 테두리: 둥근 모서리 (8.0)
 /// ├─ 그림자: 검은색 12% (블러: 4, y-오프셋: 2)
 /// │
-/// └─ Row (mainAxisAlignment: spaceAround)
+/// └─ Row (mainAxisAlignment: spaceAround) 또는 Column (isCompactMode가 true인 경우)
 ///    ├─ Column (점수 섹션)
 ///    │  ├─ Text ("점수")
 ///    │  │  └─ 스타일: 파란색, 16pt, 굵게
@@ -42,6 +42,7 @@
 /// - `level`: 표시할 레벨 값
 /// - `lastWord`: 최근 완성한 단어
 /// - `lastWordPoints`: 최근 완성한 단어의 점수
+/// - `isCompactMode`: 컴팩트 모드 여부 (세로 배치)
 
 import 'package:flutter/material.dart';
 
@@ -50,6 +51,7 @@ class ScoreDisplay extends StatelessWidget {
   final int level;
   final String lastWord;
   final int lastWordPoints;
+  final bool isCompactMode;
 
   const ScoreDisplay({
     super.key,
@@ -57,17 +59,24 @@ class ScoreDisplay extends StatelessWidget {
     required this.level,
     this.lastWord = '',
     this.lastWordPoints = 0,
+    this.isCompactMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 화면 크기에 따라 레이아웃 조정
+    // 스크린 크기에 따른 동적 설정
     final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
+    final isSmallScreen = screenWidth < 360;
+
+    // 작은 화면일 경우 더 작은 글꼴 크기 적용
+    final titleFontSize = isSmallScreen ? 14.0 : (isCompactMode ? 15.0 : 16.0);
+    final scoreFontSize = isSmallScreen ? 20.0 : (isCompactMode ? 22.0 : 24.0);
+    final wordFontSize = isSmallScreen ? 14.0 : (isCompactMode ? 16.0 : 18.0);
+    final pointsFontSize = isSmallScreen ? 12.0 : (isCompactMode ? 13.0 : 14.0);
 
     return Container(
-      padding: const EdgeInsets.all(12.0),
-      margin: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(isCompactMode ? 8.0 : 12.0),
+      margin: EdgeInsets.all(isCompactMode ? 4.0 : 8.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -79,7 +88,7 @@ class ScoreDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: isSmallScreen
+      child: isCompactMode
           // 세로 레이아웃 (모바일)
           ? Column(
               children: [
@@ -89,18 +98,18 @@ class ScoreDisplay extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '점수: ',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: titleFontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
                         ),
                       ),
                       Text(
                         '$score',
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: scoreFontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -110,7 +119,7 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Divider(
-                  height: 16,
+                  height: 12,
                   thickness: 1,
                   color: Colors.grey.shade300,
                 ),
@@ -121,18 +130,18 @@ class ScoreDisplay extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '최근 단어: ',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: titleFontSize - 2,
                           fontWeight: FontWeight.bold,
                           color: Colors.red,
                         ),
                       ),
                       Text(
                         lastWord.isEmpty ? '-' : lastWord,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: wordFontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -142,7 +151,7 @@ class ScoreDisplay extends StatelessWidget {
                           child: Text(
                             '+$lastWordPoints',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: pointsFontSize,
                               fontWeight: FontWeight.bold,
                               color: Colors.orange.shade800,
                             ),
@@ -154,7 +163,7 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Divider(
-                  height: 16,
+                  height: 12,
                   thickness: 1,
                   color: Colors.grey.shade300,
                 ),
@@ -165,18 +174,18 @@ class ScoreDisplay extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '레벨: ',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: titleFontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
                         ),
                       ),
                       Text(
                         '$level',
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: scoreFontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -192,18 +201,18 @@ class ScoreDisplay extends StatelessWidget {
                 // 점수 섹션
                 Column(
                   children: [
-                    const Text(
+                    Text(
                       '점수',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: titleFontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue,
                       ),
                     ),
                     Text(
                       '$score',
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: TextStyle(
+                        fontSize: scoreFontSize,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -220,18 +229,18 @@ class ScoreDisplay extends StatelessWidget {
                 // 최근 완성 단어 섹션
                 Column(
                   children: [
-                    const Text(
+                    Text(
                       '최근 단어',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: titleFontSize - 2,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
                     ),
                     Text(
                       lastWord.isEmpty ? '-' : lastWord,
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: wordFontSize,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -239,7 +248,7 @@ class ScoreDisplay extends StatelessWidget {
                       Text(
                         '+$lastWordPoints',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: pointsFontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.orange.shade800,
                         ),
@@ -257,18 +266,18 @@ class ScoreDisplay extends StatelessWidget {
                 // 레벨 섹션
                 Column(
                   children: [
-                    const Text(
+                    Text(
                       '레벨',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: titleFontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
                       ),
                     ),
                     Text(
                       '$level',
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: TextStyle(
+                        fontSize: scoreFontSize,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

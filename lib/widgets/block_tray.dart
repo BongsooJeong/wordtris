@@ -20,6 +20,10 @@
 /// - wordSuggestionsKey: GlobalKey<WordSuggestionsState>?
 ///   단어 제안 위젯의 키 (기본값: null)
 ///
+/// - isCompactMode: bool
+///   컴팩트 모드 여부 (기본값: false)
+///   모바일 화면에서 더 작고 간결한 레이아웃 사용
+///
 /// 레이아웃 구조:
 /// ```
 /// Positioned (화면 하단에 고정)
@@ -47,12 +51,14 @@ class BlockTray extends StatelessWidget {
   final double cellSize;
   final double spacing;
   final GlobalKey<WordSuggestionsState>? wordSuggestionsKey;
+  final bool isCompactMode;
 
   const BlockTray({
     super.key,
     this.cellSize = 40.0,
     this.spacing = 16.0,
     this.wordSuggestionsKey,
+    this.isCompactMode = false,
   });
 
   @override
@@ -61,10 +67,21 @@ class BlockTray extends StatelessWidget {
     final blocks = gameProvider.availableBlocks;
     final screenSize = MediaQuery.of(context).size;
 
-    // 화면 크기에 따라 셀 크기 동적 조정
-    final isSmallScreen = screenSize.width < 360;
-    final dynamicCellSize = isSmallScreen ? 34.0 : cellSize;
-    final dynamicPadding = isSmallScreen ? 8.0 : 16.0;
+    // 화면 크기와 모드에 따른 동적 설정
+    final screenWidth = screenSize.width;
+    final isSmallScreen = screenWidth < 360;
+
+    // 컴팩트 모드에서 더 작은 셀과 패딩 크기 사용
+    final dynamicCellSize = isCompactMode
+        ? (isSmallScreen ? 32.0 : 36.0)
+        : (isSmallScreen ? 34.0 : cellSize);
+
+    final dynamicPadding = isCompactMode
+        ? (isSmallScreen ? 6.0 : 10.0)
+        : (isSmallScreen ? 8.0 : 16.0);
+
+    final trayHeight =
+        isCompactMode ? dynamicCellSize * 4.0 : dynamicCellSize * 5.5;
 
     // 하이라이트 핸들러 생성
     final highlightHandler =
@@ -76,19 +93,22 @@ class BlockTray extends StatelessWidget {
       bottom: 0,
       child: Container(
         width: screenSize.width,
-        height: dynamicCellSize * 5.5, // 높이를 약간 줄임
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: dynamicPadding),
+        height: trayHeight,
+        padding: EdgeInsets.symmetric(
+          vertical: isCompactMode ? 4.0 : 8.0,
+          horizontal: dynamicPadding,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(isCompactMode ? 16.0 : 20.0),
+            topRight: Radius.circular(isCompactMode ? 16.0 : 20.0),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, -3),
+              color: Colors.black.withOpacity(isCompactMode ? 0.15 : 0.2),
+              blurRadius: isCompactMode ? 6.0 : 8.0,
+              offset: Offset(0, isCompactMode ? -2.0 : -3.0),
             )
           ],
         ),
@@ -98,21 +118,28 @@ class BlockTray extends StatelessWidget {
             // 드래그 핸들
             Container(
               width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 8),
+              height: isCompactMode ? 3.0 : 4.0,
+              margin: EdgeInsets.only(bottom: isCompactMode ? 4.0 : 8.0),
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            // 블록 트레이 제목 (작은 화면에서는 글자 크기 줄임)
-            Text(
-              isSmallScreen ? '블록 트레이' : '블록 트레이 (클릭하여 회전)',
-              style: isSmallScreen
-                  ? Theme.of(context).textTheme.titleSmall
-                  : Theme.of(context).textTheme.titleMedium,
-            ),
+
+            // 트레이 제목 텍스트 (컴팩트 모드에서는 작게)
+            if (!isCompactMode || screenWidth > 360)
+              Text(
+                isCompactMode || isSmallScreen ? '블록 트레이' : '블록 트레이 (클릭하여 회전)',
+                style: TextStyle(
+                  fontSize: isCompactMode
+                      ? (isSmallScreen ? 12.0 : 13.0)
+                      : (isSmallScreen ? 13.0 : 14.0),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
             const SizedBox(height: 4),
+
             // 블록 목록
             Expanded(
               child: Center(
@@ -127,7 +154,8 @@ class BlockTray extends StatelessWidget {
                           for (int i = 0; i < blocks.length; i++)
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: isSmallScreen ? 2.0 : 4.0),
+                                horizontal: isCompactMode ? 2.0 : 4.0,
+                              ),
                               child: BlockDraggable(
                                 block: blocks[i],
                                 cellSize: dynamicCellSize,
