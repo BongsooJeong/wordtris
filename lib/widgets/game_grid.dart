@@ -92,6 +92,8 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
   Block? draggedBlock;
   Offset? draggedPosition;
 
+  bool _disposed = false; // 위젯이 dispose 되었는지 추적하는 플래그
+
   // 애니메이션과 블록 배치 관련 인스턴스 선언
   late final GameGridAnimations _animations;
   late final GameGridBlockPlacement _blockPlacement;
@@ -106,9 +108,17 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _disposed = true; // dispose 상태 표시
     // 애니메이션 컨트롤러 해제
     _animations.dispose();
     super.dispose();
+  }
+
+  /// 안전하게 setState를 호출하는 메서드
+  void _safeSetState(VoidCallback fn) {
+    if (!_disposed && mounted) {
+      setState(fn);
+    }
   }
 
   /// 화면 크기에 따른 셀 크기 계산
@@ -185,6 +195,8 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
         !_animations.isAnimatingRemoval) {
       // 애니메이션 실행이 아직 시작되지 않았을 때만 애니메이션 시작
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_disposed || !mounted) return; // 위젯이 dispose된 경우 추가 처리 방지
+
         // 애니메이션 시작 전에 제거된 셀 목록 복사
         List<RemovedCell> cellsToAnimate =
             List.from(gameProvider.grid.lastRemovedCells);
@@ -200,6 +212,7 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
       // 애니메이션 중이지만 lastRemovedCells가 남아있는 경우
       // 애니메이션이 진행 중인 상태에서 새로운 셀 제거가 일어난 경우, Provider의 상태만 초기화
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_disposed || !mounted) return; // 위젯이 dispose된 경우 추가 처리 방지
         gameProvider.resetAnimationState();
       });
     }
@@ -223,7 +236,7 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
     return DragTarget<Block>(
       onAcceptWithDetails: (details) {
         // 드래그 상태 초기화
-        setState(() {
+        _safeSetState(() {
           draggedBlock = null;
           draggedPosition = null;
         });
@@ -241,7 +254,7 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
       },
       onLeave: (data) {
         // 드래그가 그리드 영역을 벗어났을 때
-        setState(() {
+        _safeSetState(() {
           draggedBlock = null;
           draggedPosition = null;
         });

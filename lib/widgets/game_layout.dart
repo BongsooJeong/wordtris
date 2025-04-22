@@ -50,12 +50,9 @@ class GameLayout extends StatelessWidget {
 
     return Column(
       children: [
-        // 애니메이션 타이틀 추가
-        Padding(
-          padding:
-              EdgeInsets.symmetric(vertical: isVerySmallScreen ? 2.0 : 4.0),
-          child: const AnimatedTitle(isCompactMode: true),
-        ),
+        // 애니메이션 타이틀은 이미 AppBar에 있으므로 제거
+        // 상단 여백만 유지
+        SizedBox(height: isVerySmallScreen ? 2.0 : 4.0),
 
         // 점수 디스플레이 (세로 모드로 변경)
         Container(
@@ -133,7 +130,6 @@ class GameLayout extends StatelessWidget {
             padding:
                 EdgeInsets.symmetric(horizontal: isVerySmallScreen ? 2.0 : 4.0),
             child: WordSuggestions(
-              key: wordSuggestionsKey,
               words: gameProvider.suggestedWordSet,
               wordUsageCount: gameProvider.wordUsageCounts,
               usedCharacters: gameProvider.usedCharacters,
@@ -154,11 +150,9 @@ class GameLayout extends StatelessWidget {
 
     return Column(
       children: [
-        // 상단 타이틀 추가
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 6.0),
-          child: AnimatedTitle(),
-        ),
+        // 타이틀은 이미 AppBar에 있으므로 제거
+        // 상단 여백만 유지
+        const SizedBox(height: 6.0),
 
         // 상단 정보 영역 (세로 배치로 변경)
         Row(
@@ -225,11 +219,10 @@ class GameLayout extends StatelessWidget {
                 ),
               ),
 
-              // 추천 단어 영역 (오른쪽)
+              // 추천 단어 영역 (오른쪽) - GlobalKey 사용하지 않음
               Expanded(
                 flex: 1,
                 child: WordSuggestions(
-                  key: wordSuggestionsKey,
                   words: gameProvider.suggestedWordSet,
                   wordUsageCount: gameProvider.wordUsageCounts,
                   usedCharacters: gameProvider.usedCharacters,
@@ -252,11 +245,9 @@ class GameLayout extends StatelessWidget {
 
     return Column(
       children: [
-        // 상단 타이틀 추가
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: AnimatedTitle(),
-        ),
+        // 타이틀은 이미 AppBar에 있으므로 제거
+        // 상단 여백만 유지
+        const SizedBox(height: 8.0),
 
         // 메인 게임 영역
         Expanded(
@@ -330,13 +321,12 @@ class GameLayout extends StatelessWidget {
                 ),
               ),
 
-              // 추천 단어 영역
+              // 추천 단어 영역 - GlobalKey 사용하지 않음
               Expanded(
                 flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: WordSuggestions(
-                    key: wordSuggestionsKey,
                     words: gameProvider.suggestedWordSet,
                     wordUsageCount: gameProvider.wordUsageCounts,
                     usedCharacters: gameProvider.usedCharacters,

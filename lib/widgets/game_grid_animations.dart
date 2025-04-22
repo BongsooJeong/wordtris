@@ -43,7 +43,8 @@ import '../providers/game_provider.dart';
 /// 게임 그리드의 애니메이션을 관리하는 클래스
 class GameGridAnimations {
   final TickerProvider _tickerProvider;
-  final Function(VoidCallback) _setState;
+  final Function(VoidCallback)? _setState;
+  bool _disposed = false;
 
   // 폭발 애니메이션 관련 변수
   AnimationController? _explosionController;
@@ -69,8 +70,20 @@ class GameGridAnimations {
       : _tickerProvider = state,
         _setState = state.setState;
 
+  // 안전하게 setState 호출하는 메서드
+  void _safeSetState(VoidCallback fn) {
+    if (_disposed) return;
+    try {
+      _setState?.call(fn);
+    } catch (e) {
+      // 위젯이 이미 해제되었거나 상태를 업데이트할 수 없는 경우 무시
+      print('Animation setState 실패: $e');
+    }
+  }
+
   /// 리소스 해제
   void dispose() {
+    _disposed = true;
     stopAllAnimations();
   }
 
@@ -78,30 +91,39 @@ class GameGridAnimations {
   void stopAllAnimations() {
     // 폭발 애니메이션 멈추기
     if (_explosionController != null) {
-      _explosionController!.stop();
+      if (_explosionController!.isAnimating) {
+        _explosionController!.stop();
+      }
       _explosionController!.dispose();
       _explosionController = null;
     }
 
     // 페이드 애니메이션 멈추기
     if (_fadeController != null) {
-      _fadeController!.stop();
+      if (_fadeController!.isAnimating) {
+        _fadeController!.stop();
+      }
       _fadeController!.dispose();
       _fadeController = null;
     }
 
-    // 애니메이션 상태 초기화
-    _setState(() {
-      _explosionCenter = null;
-      _fadingCells = [];
-      _animatingRemoval = false;
-    });
+    // 직접 상태 업데이트 (setState는 호출하지 않음)
+    _explosionCenter = null;
+    _fadingCells = [];
+    _animatingRemoval = false;
   }
 
   /// 폭발 애니메이션 시작
   void startExplosionAnimation(Point center) {
+    if (_disposed) return;
+
     // 이전 애니메이션 컨트롤러 해제
-    _explosionController?.dispose();
+    if (_explosionController != null) {
+      if (_explosionController!.isAnimating) {
+        _explosionController!.stop();
+      }
+      _explosionController!.dispose();
+    }
 
     // 애니메이션 컨트롤러 초기화
     _explosionController = AnimationController(
@@ -115,26 +137,35 @@ class GameGridAnimations {
       curve: Curves.easeOut,
     );
 
-    // 폭발 위치 설정
-    _setState(() {
-      _explosionCenter = center;
-    });
+    // 상태 변수 직접 업데이트
+    _explosionCenter = center;
 
-    // 애니메이션 시작
+    // 상태 업데이트로 UI에 알림
+    _safeSetState(() {});
+
+    // 애니메이션 시작 및 완료 이벤트 핸들러
     _explosionController!.forward().then((_) {
-      // 애니메이션 종료 후 상태 초기화
-      _setState(() {
-        _explosionCenter = null;
-      });
+      if (_disposed) return;
+
+      // 애니메이션 종료 후 상태 초기화 (직접 업데이트)
+      _explosionCenter = null;
+
+      // 상태 업데이트로 UI에 알림
+      _safeSetState(() {});
     });
   }
 
   /// 셀 사라짐 애니메이션 시작
   void startCellFadeAnimation(List<RemovedCell> cells) {
-    if (cells.isEmpty) return;
+    if (_disposed || cells.isEmpty) return;
 
     // 이전 애니메이션 컨트롤러 해제
-    _fadeController?.dispose();
+    if (_fadeController != null) {
+      if (_fadeController!.isAnimating) {
+        _fadeController!.stop();
+      }
+      _fadeController!.dispose();
+    }
 
     // 애니메이션 컨트롤러 초기화
     _fadeController = AnimationController(
@@ -148,19 +179,23 @@ class GameGridAnimations {
       curve: Curves.easeInOut,
     );
 
-    // 애니메이션 상태 설정
-    _setState(() {
-      _fadingCells = cells;
-      _animatingRemoval = true;
-    });
+    // 상태 변수 직접 업데이트
+    _fadingCells = List.from(cells); // 복사본 생성
+    _animatingRemoval = true;
 
-    // 애니메이션 시작
+    // 상태 업데이트로 UI에 알림
+    _safeSetState(() {});
+
+    // 애니메이션 시작 및 완료 이벤트 핸들러
     _fadeController!.forward().then((_) {
-      // 애니메이션 종료 후 상태 초기화
-      _setState(() {
-        _fadingCells = [];
-        _animatingRemoval = false;
-      });
+      if (_disposed) return;
+
+      // 애니메이션 종료 후 상태 초기화 (직접 업데이트)
+      _fadingCells = [];
+      _animatingRemoval = false;
+
+      // 상태 업데이트로 UI에 알림
+      _safeSetState(() {});
     });
   }
 
