@@ -8,15 +8,9 @@ class BlockHighlightHandler {
 
   BlockHighlightHandler({this.wordSuggestionsKey});
 
-  /// 블록 문자를 하이라이트
+  /// 블록 문자를 하이라이트 (기능 비활성화)
   void highlightBlockCharacters(Block block, {bool clear = false}) {
-    if (wordSuggestionsKey?.currentState == null) return;
-
-    if (clear) {
-      wordSuggestionsKey!.currentState!.clearHighlights();
-    } else {
-      final characters = Set<String>.from(block.characters);
-      wordSuggestionsKey!.currentState!.setHighlightedCharacters(characters);
-    }
+    // 하이라이트 기능을 비활성화
+    // 호환성을 위해 메서드는 유지
   }
 }

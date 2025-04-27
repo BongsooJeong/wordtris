@@ -40,26 +40,21 @@ class BlockDraggable extends StatelessWidget {
     // 드래그 피드백의 투명도 조정
     final feedbackOpacity = isCompactMode ? 0.8 : 0.7;
 
-    // 드래그 시작될 때 진동 효과 (모바일에서 중요)
-    void handleDragStart() {
-      // 드래그 시작 시 처리
-      highlightHandler.highlightBlockCharacters(block);
-
-      // 모바일 기기에서 진동 피드백 추가 (나중에 HapticFeedback 추가)
-    }
-
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: Draggable<Block>(
         data: block,
-        onDragStarted: handleDragStart,
+        onDragStarted: () {
+          // 추천 단어 하이라이트 기능 제거
+          // 모바일 기기에서 진동 피드백 추가 (나중에 HapticFeedback 추가)
+        },
         onDragEnd: (details) {
           // 드래그 종료 시 처리
-          highlightHandler.highlightBlockCharacters(block, clear: true);
+          // 하이라이트 처리 제거
         },
         onDraggableCanceled: (velocity, offset) {
           // 드래그 취소 시 처리
-          highlightHandler.highlightBlockCharacters(block, clear: true);
+          // 하이라이트 처리 제거
         },
         // 드래그 중일 때 보여줄 위젯
         feedback: Material(
@@ -86,27 +81,13 @@ class BlockDraggable extends StatelessWidget {
             cellSize: cellSize,
           ),
         ),
-        child: MouseRegion(
-          onEnter: (_) {
-            // 마우스가 블록에 들어왔을 때 (데스크탑 전용)
-            if (!isCompactMode) {
-              highlightHandler.highlightBlockCharacters(block);
-            }
-          },
-          onExit: (_) {
-            // 마우스가 블록에서 나갔을 때 (데스크탑 전용)
-            if (!isCompactMode) {
-              highlightHandler.highlightBlockCharacters(block, clear: true);
-            }
-          },
-          child: GestureDetector(
-            onTap: () => _handleTap(context, block),
-            child: BlockWidget(
-              block: block,
-              opacity: 1.0,
-              cellSize: cellSize,
-              isCompactMode: isCompactMode, // 컴팩트 모드 전달
-            ),
+        child: GestureDetector(
+          onTap: () => _handleTap(context, block),
+          child: BlockWidget(
+            block: block,
+            opacity: 1.0,
+            cellSize: cellSize,
+            isCompactMode: isCompactMode, // 컴팩트 모드 전달
           ),
         ),
       ),
