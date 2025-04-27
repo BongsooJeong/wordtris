@@ -5,7 +5,6 @@ import '../widgets/game_grid.dart';
 import '../widgets/block_tray.dart';
 import '../widgets/score_display.dart';
 import '../widgets/word_suggestions.dart';
-import '../widgets/bomb_indicator.dart';
 import '../widgets/animated_title.dart';
 
 /// 게임 화면의 레이아웃을 관리하는 위젯
@@ -75,15 +74,6 @@ class GameLayout extends StatelessWidget {
                       lastWord: gameProvider.lastCompletedWord,
                       lastWordPoints: gameProvider.lastWordPoints,
                       isCompactMode: true, // 세로 배치 모드 활성화
-                    ),
-                  ),
-
-                  // 폭탄 인디케이터 (오른쪽 세로 배치)
-                  Expanded(
-                    flex: 2,
-                    child: BombIndicator(
-                      gameProvider: gameProvider,
-                      isCompactMode: true, // 컴팩트 모드 활성화
                     ),
                   ),
                 ],
@@ -192,15 +182,6 @@ class GameLayout extends StatelessWidget {
                 ),
               ),
             ),
-
-            // 폭탄 인디케이터 (오른쪽)
-            Expanded(
-              flex: 2,
-              child: BombIndicator(
-                gameProvider: gameProvider,
-                isCompactMode: screenWidth < 720, // 작은 태블릿에서만 컴팩트 모드
-              ),
-            ),
           ],
         ),
 
@@ -300,12 +281,6 @@ class GameLayout extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                            ),
-
-                            // 폭탄 인디케이터 (오른쪽)
-                            Expanded(
-                              flex: 1,
-                              child: BombIndicator(gameProvider: gameProvider),
                             ),
                           ],
                         ),

@@ -37,9 +37,6 @@ import '../widgets/word_suggestions.dart';
 /// UI 구성 메서드:
 /// - build(BuildContext context): Widget
 ///   전체 게임 화면 구성
-///
-/// - _buildBombIndicator(GameProvider gameProvider): Widget
-///   폭탄 생성 상태 표시 위젯 구성
 
 /// 게임 화면 위젯
 class GameScreen extends StatefulWidget {
