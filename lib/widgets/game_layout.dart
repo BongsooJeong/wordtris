@@ -54,34 +54,52 @@ class GameLayout extends StatelessWidget {
         // 상단 여백만 유지
         SizedBox(height: isVerySmallScreen ? 2.0 : 4.0),
 
-        // 점수 디스플레이 (세로 모드로 변경)
+        // 점수 디스플레이 및 추천 단어 (상단 영역)
         Container(
           margin: EdgeInsets.symmetric(
             horizontal: isVerySmallScreen ? 4.0 : 8.0,
             vertical: isVerySmallScreen ? 2.0 : 4.0,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
             children: [
-              // 점수 및 레벨 정보 (왼쪽 세로 배치)
-              Expanded(
-                flex: 3,
-                child: ScoreDisplay(
-                  score: gameProvider.score,
-                  level: gameProvider.level,
-                  lastWord: gameProvider.lastCompletedWord,
-                  lastWordPoints: gameProvider.lastWordPoints,
-                  isCompactMode: true, // 세로 배치 모드 활성화
-                ),
+              // 점수 및 폭탄 인디케이터 (가로 배치)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 점수 및 레벨 정보 (왼쪽 세로 배치)
+                  Expanded(
+                    flex: 3,
+                    child: ScoreDisplay(
+                      score: gameProvider.score,
+                      level: gameProvider.level,
+                      lastWord: gameProvider.lastCompletedWord,
+                      lastWordPoints: gameProvider.lastWordPoints,
+                      isCompactMode: true, // 세로 배치 모드 활성화
+                    ),
+                  ),
+
+                  // 폭탄 인디케이터 (오른쪽 세로 배치)
+                  Expanded(
+                    flex: 2,
+                    child: BombIndicator(
+                      gameProvider: gameProvider,
+                      isCompactMode: true, // 컴팩트 모드 활성화
+                    ),
+                  ),
+                ],
               ),
 
-              // 폭탄 인디케이터 (오른쪽 세로 배치)
-              Expanded(
-                flex: 2,
-                child: BombIndicator(
-                  gameProvider: gameProvider,
-                  isCompactMode: true, // 컴팩트 모드 활성화
-                ),
+              // 추천 단어 패널 (접힌 상태) - 높이 제한 없이 자연스러운 크기로
+              const SizedBox(height: 4),
+              // 자동 크기 조정을 위해 SizedBox 대신 Container 사용
+              WordSuggestions(
+                key: wordSuggestionsKey,
+                words: gameProvider.suggestedWordSet,
+                wordUsageCount: gameProvider.wordUsageCounts,
+                usedCharacters: gameProvider.usedCharacters,
+                onDictionaryLookup: gameProvider.openDictionary,
+                isCompactMode: true, // 컴팩트 모드 활성화
+                initiallyExpanded: false, // 접힌 상태로 시작
               ),
             ],
           ),
@@ -122,23 +140,6 @@ class GameLayout extends StatelessWidget {
             ],
           ),
         ),
-
-        // 하단 단어 추천 영역 (최소 크기로 표시)
-        SizedBox(
-          height: screenWidth < 360 ? 70 : 80,
-          child: Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: isVerySmallScreen ? 2.0 : 4.0),
-            child: WordSuggestions(
-              key: wordSuggestionsKey,
-              words: gameProvider.suggestedWordSet,
-              wordUsageCount: gameProvider.wordUsageCounts,
-              usedCharacters: gameProvider.usedCharacters,
-              onDictionaryLookup: gameProvider.openDictionary,
-              isCompactMode: true, // 컴팩트 모드 활성화
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -164,12 +165,30 @@ class GameLayout extends StatelessWidget {
               flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ScoreDisplay(
-                  score: gameProvider.score,
-                  level: gameProvider.level,
-                  lastWord: gameProvider.lastCompletedWord,
-                  lastWordPoints: gameProvider.lastWordPoints,
-                  isCompactMode: true, // 태블릿에서도 세로 배치로 변경
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 점수 디스플레이
+                    ScoreDisplay(
+                      score: gameProvider.score,
+                      level: gameProvider.level,
+                      lastWord: gameProvider.lastCompletedWord,
+                      lastWordPoints: gameProvider.lastWordPoints,
+                      isCompactMode: true, // 태블릿에서도 세로 배치로 변경
+                    ),
+
+                    // 추천 단어 패널 (접힌 상태)
+                    const SizedBox(height: 8),
+                    WordSuggestions(
+                      key: wordSuggestionsKey,
+                      words: gameProvider.suggestedWordSet,
+                      wordUsageCount: gameProvider.wordUsageCounts,
+                      usedCharacters: gameProvider.usedCharacters,
+                      onDictionaryLookup: gameProvider.openDictionary,
+                      isCompactMode: false,
+                      initiallyExpanded: false, // 접힌 상태로 시작
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -187,49 +206,28 @@ class GameLayout extends StatelessWidget {
 
         // 게임 영역 (중앙)
         Expanded(
-          child: Row(
+          child: Stack(
             children: [
-              // 게임 그리드 (왼쪽)
-              Expanded(
-                flex: 3,
-                child: Stack(
-                  children: [
-                    // 게임 그리드
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GameGrid(
-                        cellSize: cellSize,
-                        gridPadding: 6.0,
-                        autoSize: true, // 자동 크기 조정 활성화
-                      ),
-                    ),
-
-                    // 블록 트레이 (화면 하단에 고정)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: BlockTray(
-                        cellSize: cellSize - 4.0,
-                        spacing: 6.0,
-                        wordSuggestionsKey: wordSuggestionsKey,
-                        isCompactMode: screenWidth < 720, // 작은 태블릿에서만 컴팩트 모드
-                      ),
-                    ),
-                  ],
+              // 게임 그리드
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GameGrid(
+                  cellSize: cellSize,
+                  gridPadding: 6.0,
+                  autoSize: true, // 자동 크기 조정 활성화
                 ),
               ),
 
-              // 추천 단어 영역 (오른쪽) - GlobalKey 사용하지 않음
-              Expanded(
-                flex: 1,
-                child: WordSuggestions(
-                  key: wordSuggestionsKey,
-                  words: gameProvider.suggestedWordSet,
-                  wordUsageCount: gameProvider.wordUsageCounts,
-                  usedCharacters: gameProvider.usedCharacters,
-                  onDictionaryLookup: gameProvider.openDictionary,
-                  isCompactMode: false,
+              // 블록 트레이 (화면 하단에 고정)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: BlockTray(
+                  cellSize: cellSize - 4.0,
+                  spacing: 6.0,
+                  wordSuggestionsKey: wordSuggestionsKey,
+                  isCompactMode: screenWidth < 720, // 작은 태블릿에서만 컴팩트 모드
                 ),
               ),
             ],
@@ -263,21 +261,43 @@ class GameLayout extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        // 점수 디스플레이와 폭탄 인디케이터를 가로로 배치
+                        // 점수 디스플레이와 폭탄 인디케이터 & 추천 단어를 가로로 배치
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // 점수 디스플레이 (왼쪽)
+                            // 왼쪽 영역: 점수 디스플레이 + 추천 단어
                             Expanded(
                               flex: 3,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: ScoreDisplay(
-                                  score: gameProvider.score,
-                                  level: gameProvider.level,
-                                  lastWord: gameProvider.lastCompletedWord,
-                                  lastWordPoints: gameProvider.lastWordPoints,
-                                  isCompactMode: false, // 데스크톱에서는 가로 배치 유지
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 점수 디스플레이
+                                    ScoreDisplay(
+                                      score: gameProvider.score,
+                                      level: gameProvider.level,
+                                      lastWord: gameProvider.lastCompletedWord,
+                                      lastWordPoints:
+                                          gameProvider.lastWordPoints,
+                                      isCompactMode: false, // 데스크톱에서는 가로 배치 유지
+                                    ),
+
+                                    // 추천 단어 패널 (접힌 상태)
+                                    const SizedBox(height: 8),
+                                    WordSuggestions(
+                                      key: wordSuggestionsKey,
+                                      words: gameProvider.suggestedWordSet,
+                                      wordUsageCount:
+                                          gameProvider.wordUsageCounts,
+                                      usedCharacters:
+                                          gameProvider.usedCharacters,
+                                      onDictionaryLookup:
+                                          gameProvider.openDictionary,
+                                      isCompactMode: false,
+                                      initiallyExpanded: false, // 접힌 상태로 시작
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -320,22 +340,6 @@ class GameLayout extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-
-              // 추천 단어 영역 - GlobalKey 사용하지 않음
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: WordSuggestions(
-                    key: wordSuggestionsKey,
-                    words: gameProvider.suggestedWordSet,
-                    wordUsageCount: gameProvider.wordUsageCounts,
-                    usedCharacters: gameProvider.usedCharacters,
-                    onDictionaryLookup: gameProvider.openDictionary,
-                    isCompactMode: false,
-                  ),
                 ),
               ),
             ],
