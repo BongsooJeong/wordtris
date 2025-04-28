@@ -83,9 +83,10 @@ class GameGridBlockPlacement {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.offset);
 
-    // 위치를 한 칸 오른쪽으로 이동시킴
+    // 드래그 중인 블록이 더 가운데로 보이도록 위치 조정
+    // X 좌표를 1칸 정도 오른쪽으로 이동
     final Offset adjustedPosition = Offset(
-      localPosition.dx + totalCellSize, // X 좌표를 한 칸 오른쪽으로 이동
+      localPosition.dx + totalCellSize * 1.0, // X 좌표를 1.0칸 오른쪽으로 이동
       localPosition.dy,
     );
 
@@ -108,9 +109,9 @@ class GameGridBlockPlacement {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final localPosition = renderBox.globalToLocal(details.offset);
 
-    // 위치를 한 칸 오른쪽으로 이동시킴
+    // 배치 시에도 동일한 조정 적용
     final Offset adjustedPosition = Offset(
-      localPosition.dx + totalCellSize, // X 좌표를 한 칸 오른쪽으로 이동
+      localPosition.dx + totalCellSize * 1.0, // X 좌표를 1.0칸 오른쪽으로 이동
       localPosition.dy,
     );
 

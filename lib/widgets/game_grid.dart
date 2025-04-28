@@ -286,29 +286,49 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
   /// 그리드 기본 구조 구축
   Widget _buildGridBase(Grid grid, int rows, int columns, double actualCellSize,
       double cellMargin, double totalCellSize, double dynamicGridPadding) {
-    return Container(
-      padding: EdgeInsets.all(dynamicGridPadding),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      // FittedBox를 사용하여 화면 크기에 맞게 조정
-      child: FittedBox(
-        fit: BoxFit.contain,
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (int y = 0; y < rows; y++)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (int x = 0; x < columns; x++)
-                    _buildGridCell(context, Provider.of<GameProvider>(context),
-                        grid, x, y, actualCellSize, cellMargin, totalCellSize),
-                ],
-              ),
-          ],
+    // 셀 마진 미세 조정 (오버플로우 방지)
+    final adjustedCellMargin = cellMargin * 0.9;
+
+    return Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        child: Container(
+          padding: EdgeInsets.all(dynamicGridPadding),
+          constraints: BoxConstraints(
+            maxWidth: totalCellSize * columns + (dynamicGridPadding * 2),
+            maxHeight: totalCellSize * rows + (dynamicGridPadding * 2),
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (int y = 0; y < rows; y++)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (int x = 0; x < columns; x++)
+                        _buildGridCell(
+                            context,
+                            Provider.of<GameProvider>(context),
+                            grid,
+                            x,
+                            y,
+                            actualCellSize,
+                            adjustedCellMargin,
+                            totalCellSize),
+                    ],
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -325,6 +345,9 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
     double cellMargin,
     double totalCellSize,
   ) {
+    // 미세하게 셀 크기 조정 (오버플로우 방지)
+    final adjustedSize = cellSize * 0.98;
+
     // 현재 셀의 상태 확인
     Cell cell = grid.cells[y][x];
     Color cellColor = Colors.grey.shade200;
@@ -392,21 +415,21 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
     }
 
     return Container(
-      width: cellSize,
-      height: cellSize,
+      width: adjustedSize,
+      height: adjustedSize,
       margin: EdgeInsets.all(cellMargin),
       decoration: decoration,
       child: Center(
         child: cellText.isNotEmpty
             ? isWildcardCell
                 ? WildcardStarWidget(
-                    size: cellSize * 0.7,
+                    size: adjustedSize * 0.7,
                     opacity: 1.0,
                   )
                 : Text(
                     cellText,
                     style: TextStyle(
-                      fontSize: cellSize * 0.6,
+                      fontSize: adjustedSize * 0.6,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -414,7 +437,7 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
             : isPartOfDraggedBlock && draggedBlock != null
                 ? isDraggedWildcard
                     ? WildcardStarWidget(
-                        size: cellSize * 0.7,
+                        size: adjustedSize * 0.7,
                         opacity: isValidPlacement ? 0.7 : 0.5,
                       )
                     : Text(
@@ -423,7 +446,7 @@ class _GameGridState extends State<GameGrid> with TickerProviderStateMixin {
                                 draggedBlock!, x, y) ??
                             '',
                         style: TextStyle(
-                          fontSize: cellSize * 0.6,
+                          fontSize: adjustedSize * 0.6,
                           fontWeight: FontWeight.bold,
                           color: isValidPlacement
                               ? Colors.white.withOpacity(0.7)

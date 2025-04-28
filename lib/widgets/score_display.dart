@@ -71,33 +71,33 @@ class ScoreDisplay extends StatelessWidget {
 
     // 작은 화면일 경우 더 작은 글꼴 크기 적용
     final titleFontSize = isVerySmallScreen
-        ? 10.0
-        : (isSmallScreen ? 11.0 : (isCompactMode ? 12.0 : 16.0));
+        ? 12.0
+        : (isSmallScreen ? 13.0 : (isCompactMode ? 14.0 : 16.0));
     final scoreFontSize = isVerySmallScreen
-        ? 14.0
-        : (isSmallScreen ? 16.0 : (isCompactMode ? 18.0 : 24.0));
+        ? 16.0
+        : (isSmallScreen ? 18.0 : (isCompactMode ? 20.0 : 24.0));
     final wordFontSize = isVerySmallScreen
-        ? 10.0
-        : (isSmallScreen ? 12.0 : (isCompactMode ? 14.0 : 18.0));
+        ? 12.0
+        : (isSmallScreen ? 14.0 : (isCompactMode ? 16.0 : 18.0));
     final pointsFontSize = isVerySmallScreen
-        ? 9.0
-        : (isSmallScreen ? 10.0 : (isCompactMode ? 11.0 : 14.0));
+        ? 10.0
+        : (isSmallScreen ? 11.0 : (isCompactMode ? 12.0 : 14.0));
 
     // 모바일에서 더 작은 패딩 적용
     final containerPadding = isCompactMode
         ? EdgeInsets.symmetric(
             vertical: isVerySmallScreen ? 4.0 : 6.0,
-            horizontal: isVerySmallScreen ? 8.0 : 10.0,
+            horizontal: isVerySmallScreen ? 6.0 : 10.0,
           )
         : const EdgeInsets.all(12.0);
 
-    // 컴팩트 모드에서 더 작은 마진 적용
+    // 컴팩트 모드에서 마진 적용 (여백을 조금 추가)
     final containerMargin = isCompactMode
-        ? EdgeInsets.symmetric(
-            vertical: isVerySmallScreen ? 2.0 : 3.0,
-            horizontal: isVerySmallScreen ? 2.0 : 4.0,
-          )
+        ? const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0)
         : const EdgeInsets.all(8.0);
+
+    // 구분선 높이 조정
+    final dividerHeight = isVerySmallScreen ? 28.0 : 34.0;
 
     // 모든 모드에서 Row 레이아웃 사용
     return Container(
@@ -132,6 +132,7 @@ class ScoreDisplay extends StatelessWidget {
                         color: Colors.blue,
                       ),
                     ),
+                    const SizedBox(height: 1), // 최소 간격 추가
                     Text(
                       '$score',
                       style: TextStyle(
@@ -144,7 +145,7 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Container(
-                  height: isVerySmallScreen ? 30 : 35,
+                  height: dividerHeight,
                   width: 1,
                   color: Colors.grey.shade300,
                 ),
@@ -181,6 +182,7 @@ class ScoreDisplay extends StatelessWidget {
                             ),
                         ],
                       ),
+                      const SizedBox(height: 1), // 최소 간격 추가
                       Container(
                         constraints: BoxConstraints(
                           maxWidth: isVerySmallScreen ? 80 : 90,
@@ -201,32 +203,39 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Container(
-                  height: isVerySmallScreen ? 30 : 35,
+                  height: dividerHeight,
                   width: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 레벨 섹션
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '레벨',
-                      style: TextStyle(
-                        fontSize: titleFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                FittedBox(
+                  // FittedBox로 감싸서 내용이 공간에 맞게 조정되도록 함
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '레벨',
+                        style: TextStyle(
+                          fontSize: titleFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '$level',
-                      style: TextStyle(
-                        fontSize: scoreFontSize,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 1), // 최소 간격 추가
+                      Text(
+                        '$level',
+                        style: TextStyle(
+                          fontSize: isVerySmallScreen
+                              ? scoreFontSize - 2
+                              : scoreFontSize, // 작은 화면에서는 글꼴 크기 축소
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             )
@@ -236,6 +245,7 @@ class ScoreDisplay extends StatelessWidget {
               children: [
                 // 점수 섹션
                 Column(
+                  mainAxisSize: MainAxisSize.min, // 최소 크기 사용
                   children: [
                     Text(
                       '점수',
@@ -245,6 +255,7 @@ class ScoreDisplay extends StatelessWidget {
                         color: Colors.blue,
                       ),
                     ),
+                    const SizedBox(height: 2), // 최소 간격
                     Text(
                       '$score',
                       style: TextStyle(
@@ -257,13 +268,14 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Container(
-                  height: 40,
+                  height: dividerHeight,
                   width: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 최근 완성 단어 섹션
                 Column(
+                  mainAxisSize: MainAxisSize.min, // 최소 크기 사용
                   children: [
                     Text(
                       '최근 단어',
@@ -273,6 +285,7 @@ class ScoreDisplay extends StatelessWidget {
                         color: Colors.red,
                       ),
                     ),
+                    const SizedBox(height: 2), // 최소 간격
                     Text(
                       lastWord.isEmpty ? '-' : lastWord,
                       style: TextStyle(
@@ -280,6 +293,7 @@ class ScoreDisplay extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    if (lastWordPoints > 0) const SizedBox(height: 2), // 최소 간격
                     if (lastWordPoints > 0)
                       Text(
                         '+$lastWordPoints',
@@ -294,13 +308,14 @@ class ScoreDisplay extends StatelessWidget {
 
                 // 구분선
                 Container(
-                  height: 40,
+                  height: dividerHeight,
                   width: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 레벨 섹션
                 Column(
+                  mainAxisSize: MainAxisSize.min, // 최소 크기 사용
                   children: [
                     Text(
                       '레벨',
@@ -310,6 +325,7 @@ class ScoreDisplay extends StatelessWidget {
                         color: Colors.green,
                       ),
                     ),
+                    const SizedBox(height: 2), // 최소 간격
                     Text(
                       '$level',
                       style: TextStyle(
