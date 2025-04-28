@@ -84,19 +84,19 @@ class BlockTray extends StatelessWidget {
 
     // 트레이 높이를 약간 증가시키고 모바일에서 더 잘 보이게 함
     final trayHeight = isCompactMode
-        ? dynamicCellSize * (isVerySmallScreen ? 5.0 : 5.2)
-        : dynamicCellSize * 5.5;
+        ? dynamicCellSize * (isVerySmallScreen ? 5.0 : 5.5)
+        : dynamicCellSize * 6.0;
 
     // 하이라이트 핸들러 생성
     final highlightHandler =
         BlockHighlightHandler(wordSuggestionsKey: wordSuggestionsKey);
 
     return Container(
-      width: screenSize.width,
+      width: double.infinity,
       height: trayHeight,
       padding: EdgeInsets.symmetric(
-        vertical: isCompactMode ? (isVerySmallScreen ? 2.0 : 3.0) : 8.0,
-        horizontal: dynamicPadding,
+        vertical: isCompactMode ? (isVerySmallScreen ? 2.0 : 3.0) : 6.0,
+        horizontal: isCompactMode ? dynamicPadding : 8.0,
       ),
       decoration: BoxDecoration(
         // 배경색을 더 눈에 띄게 변경 (약간 파란 색조가 있는 밝은 회색)
@@ -160,32 +160,38 @@ class BlockTray extends StatelessWidget {
 
                 // 모바일에서는 블록을 스크롤 없이 모두 보이도록 조정
                 return Center(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 첫 번째 블록 앞에 작은 여백 추가
-                        SizedBox(width: isCompactMode ? 2.0 : 4.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: constraints.maxWidth,
+                    ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // 첫 번째 블록 앞에 작은 여백 추가
+                          SizedBox(width: isCompactMode ? 4.0 : 2.0),
 
-                        // 블록들 나열
-                        for (int i = 0; i < blocks.length; i++)
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: blockPadding,
+                          // 블록들 나열
+                          for (int i = 0; i < blocks.length; i++)
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isCompactMode ? blockPadding : 2.0,
+                              ),
+                              child: BlockDraggable(
+                                block: blocks[i],
+                                cellSize: dynamicCellSize,
+                                highlightHandler: highlightHandler,
+                                isCompactMode: isCompactMode,
+                              ),
                             ),
-                            child: BlockDraggable(
-                              block: blocks[i],
-                              cellSize: dynamicCellSize,
-                              highlightHandler: highlightHandler,
-                              isCompactMode: isCompactMode,
-                            ),
-                          ),
 
-                        // 마지막 블록 뒤에 작은 여백 추가
-                        SizedBox(width: isCompactMode ? 2.0 : 4.0),
-                      ],
+                          // 마지막 블록 뒤에 작은 여백 추가
+                          SizedBox(width: isCompactMode ? 4.0 : 2.0),
+                        ],
+                      ),
                     ),
                   ),
                 );
