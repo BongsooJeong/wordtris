@@ -130,9 +130,10 @@ class GameLayout extends StatelessWidget {
   /// 태블릿 화면용 혼합 레이아웃 구성 (600px <= 화면 너비 < 900px)
   Widget _buildTabletLayout(
       BuildContext context, GameProvider gameProvider, double screenWidth) {
-    final cellSize = screenWidth < 720 ? 42.0 : 46.0;
-    // 트레이 높이를 더 크게 조정
-    final trayHeight = cellSize * 4.8;
+    // 셀 크기를 더 작게 조정하여 5개 블록이 모두 표시되도록 함
+    final cellSize = screenWidth < 720 ? 36.0 : 40.0;
+    // 트레이 높이를 더 크게 조정하여 모든 블록이 보이도록 함
+    final trayHeight = cellSize * 5.2;
 
     return Column(
       children: [
@@ -158,7 +159,7 @@ class GameLayout extends StatelessWidget {
                       level: gameProvider.level,
                       lastWord: gameProvider.lastCompletedWord,
                       lastWordPoints: gameProvider.lastWordPoints,
-                      isCompactMode: true, // 태블릿에서도 세로 배치로 변경
+                      isCompactMode: true, // 태블릿에서도 컴팩트 모드 사용
                     ),
 
                     // 추천 단어 패널 (접힌 상태)
@@ -169,7 +170,7 @@ class GameLayout extends StatelessWidget {
                       wordUsageCount: gameProvider.wordUsageCounts,
                       usedCharacters: gameProvider.usedCharacters,
                       onDictionaryLookup: gameProvider.openDictionary,
-                      isCompactMode: false,
+                      isCompactMode: true, // 작은 태블릿에서는 컴팩트 모드
                       initiallyExpanded: false, // 접힌 상태로 시작
                     ),
                   ],
@@ -184,12 +185,15 @@ class GameLayout extends StatelessWidget {
           child: Stack(
             children: [
               // 게임 그리드
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GameGrid(
-                  cellSize: cellSize,
-                  gridPadding: 6.0,
-                  autoSize: true, // 자동 크기 조정 활성화
+              Positioned.fill(
+                bottom: trayHeight, // 트레이 높이만큼 공간 확보
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GameGrid(
+                    cellSize: cellSize,
+                    gridPadding: 6.0,
+                    autoSize: true, // 자동 크기 조정 활성화
+                  ),
                 ),
               ),
 
@@ -199,10 +203,11 @@ class GameLayout extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: BlockTray(
-                  cellSize: cellSize - 4.0,
-                  spacing: 6.0,
+                  cellSize:
+                      cellSize - (screenWidth < 720 ? 2.0 : 4.0), // 셀 크기 조정
+                  spacing: screenWidth < 720 ? 2.0 : 4.0, // 공간 조정
                   wordSuggestionsKey: wordSuggestionsKey,
-                  isCompactMode: screenWidth < 720, // 작은 태블릿에서만 컴팩트 모드
+                  isCompactMode: true, // 태블릿에서도 컴팩트 모드 사용
                 ),
               ),
             ],
