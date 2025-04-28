@@ -70,46 +70,67 @@ class MobileGameLayout extends StatelessWidget {
               ),
             ),
 
-            // 단어 제안 영역 (접혀있는 상태로 시작)
-            Container(
-              height: isVerySmallScreen ? 35 : 45, // 높이 더 증가
-              padding: const EdgeInsets.symmetric(
-                horizontal: 4.0,
-              ),
-              child: WordSuggestions(
-                key: wordSuggestionsKey,
-                words: gameProvider.suggestedWordSet,
-                wordUsageCount: gameProvider.wordUsageCounts,
-                usedCharacters: gameProvider.usedCharacters,
-                onDictionaryLookup: gameProvider.openDictionary,
-                isCompactMode: true,
-                initiallyExpanded: false,
-              ),
-            ),
-
-            // 게임 그리드 - 비율 증가
+            // 게임 그리드와 추천 단어 패널을 포함하는 Stack
             Expanded(
-              flex: 6, // 5에서 6으로 증가
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Center(
-                  child: GameGrid(
-                    cellSize: dynamicCellSize,
-                    gridPadding: isVerySmallScreen ? 2.0 : 4.0,
-                    autoSize: true,
+              flex: 8,
+              child: Stack(
+                children: [
+                  // 배경 GestureDetector - 화면의 아무 곳이나 터치하면 추천 단어 패널 닫기
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: () {
+                        // 추천 단어 패널이 열려있으면 닫기
+                        if (wordSuggestionsKey.currentState != null) {
+                          wordSuggestionsKey.currentState!.toggleExpanded();
+                        }
+                      },
+                    ),
                   ),
-                ),
+
+                  // 게임 그리드
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Center(
+                      child: GameGrid(
+                        cellSize: dynamicCellSize,
+                        gridPadding: isVerySmallScreen ? 2.0 : 4.0,
+                        autoSize: true,
+                      ),
+                    ),
+                  ),
+
+                  // 추천 단어 패널 - 그리드 위에 겹치는 형태로 배치
+                  Positioned(
+                    top: 10.0,
+                    left: 4.0,
+                    right: 4.0,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      child: WordSuggestions(
+                        key: wordSuggestionsKey,
+                        words: gameProvider.suggestedWordSet,
+                        wordUsageCount: gameProvider.wordUsageCounts,
+                        usedCharacters: gameProvider.usedCharacters,
+                        onDictionaryLookup: gameProvider.openDictionary,
+                        isCompactMode: false,
+                        initiallyExpanded: false,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
             // 블록 트레이 - 비율 감소
             Expanded(
-              flex: 2, // 3에서 2로 감소
+              flex: 2,
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: BlockTray(
-                  cellSize: dynamicCellSize * 0.9, // 셀 크기 약간 감소
-                  spacing: isVerySmallScreen ? 2.0 : 4.0,
+                  cellSize: dynamicCellSize * 0.8, // 0.9에서 0.8로 셀 크기 더 감소
+                  spacing: isVerySmallScreen ? 2.0 : 3.0, // 간격도 약간 조정
                   wordSuggestionsKey: wordSuggestionsKey,
                   isCompactMode: true,
                 ),
@@ -148,30 +169,12 @@ class MobileGameLayout extends StatelessWidget {
               flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(4.0), // 8.0에서 4.0으로 감소
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 점수 디스플레이
-                    ScoreDisplay(
-                      score: gameProvider.score,
-                      level: gameProvider.level,
-                      lastWord: gameProvider.lastCompletedWord,
-                      lastWordPoints: gameProvider.lastWordPoints,
-                      isCompactMode: true,
-                    ),
-
-                    // 추천 단어 패널 (접힌 상태)
-                    const SizedBox(height: 4), // 8.0에서 4.0으로 감소
-                    WordSuggestions(
-                      key: wordSuggestionsKey,
-                      words: gameProvider.suggestedWordSet,
-                      wordUsageCount: gameProvider.wordUsageCounts,
-                      usedCharacters: gameProvider.usedCharacters,
-                      onDictionaryLookup: gameProvider.openDictionary,
-                      isCompactMode: true,
-                      initiallyExpanded: false,
-                    ),
-                  ],
+                child: ScoreDisplay(
+                  score: gameProvider.score,
+                  level: gameProvider.level,
+                  lastWord: gameProvider.lastCompletedWord,
+                  lastWordPoints: gameProvider.lastWordPoints,
+                  isCompactMode: true,
                 ),
               ),
             ),
@@ -180,54 +183,91 @@ class MobileGameLayout extends StatelessWidget {
 
         // 게임 영역 (중앙)
         Expanded(
-          child: Column(
+          child: Stack(
             children: [
-              // 게임 그리드
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8.0,
-                      right: 8.0,
-                      top: 4.0, // 8.0에서 4.0으로 감소
-                      bottom: 4.0, // 8.0에서 4.0으로 감소
-                    ),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // 사용 가능한 공간에 맞춰 그리드 표시
-                        final availableHeight =
-                            constraints.maxHeight - 4.0; // 8.0에서 4.0으로 감소
-                        return ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: math.min(
-                                availableHeight, maxGridHeight - trayHeight),
-                            maxWidth: constraints.maxWidth,
-                          ),
-                          child: GameGrid(
-                            cellSize: cellSize,
-                            gridPadding: 6.0,
-                            autoSize: true,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+              // 배경 GestureDetector - 화면의 아무 곳이나 터치하면 추천 단어 패널 닫기
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    // 추천 단어 패널이 열려있으면 닫기
+                    if (wordSuggestionsKey.currentState != null) {
+                      wordSuggestionsKey.currentState!.toggleExpanded();
+                    }
+                  },
                 ),
               ),
 
-              // 그리드와 트레이 사이 간격 추가
-              const SizedBox(height: 4.0),
+              Column(
+                children: [
+                  // 게임 그리드
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 8.0,
+                          right: 8.0,
+                          top: 4.0, // 8.0에서 4.0으로 감소
+                          bottom: 4.0, // 8.0에서 4.0으로 감소
+                        ),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            // 사용 가능한 공간에 맞춰 그리드 표시
+                            final availableHeight =
+                                constraints.maxHeight - 4.0; // 8.0에서 4.0으로 감소
+                            return ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: math.min(availableHeight,
+                                    maxGridHeight - trayHeight),
+                                maxWidth: constraints.maxWidth,
+                              ),
+                              child: GameGrid(
+                                cellSize: cellSize,
+                                gridPadding: 6.0,
+                                autoSize: true,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
 
-              // 블록 트레이 (화면 하단에 고정)
-              SizedBox(
-                height: trayHeight,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: BlockTray(
-                    cellSize: cellSize - (screenWidth < 720 ? 2.0 : 4.0),
-                    spacing: screenWidth < 720 ? 2.0 : 4.0,
-                    wordSuggestionsKey: wordSuggestionsKey,
-                    isCompactMode: true,
+                  // 그리드와 트레이 사이 간격 추가
+                  const SizedBox(height: 4.0),
+
+                  // 블록 트레이 (화면 하단에 고정)
+                  SizedBox(
+                    height: trayHeight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: BlockTray(
+                        cellSize: cellSize - (screenWidth < 720 ? 2.0 : 4.0),
+                        spacing: screenWidth < 720 ? 2.0 : 4.0,
+                        wordSuggestionsKey: wordSuggestionsKey,
+                        isCompactMode: true,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // 추천 단어 패널 - 그리드 위에 겹치는 형태로 배치
+              Positioned(
+                top: 10.0,
+                left: 8.0,
+                right: 8.0,
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  child: WordSuggestions(
+                    key: wordSuggestionsKey,
+                    words: gameProvider.suggestedWordSet,
+                    wordUsageCount: gameProvider.wordUsageCounts,
+                    usedCharacters: gameProvider.usedCharacters,
+                    onDictionaryLookup: gameProvider.openDictionary,
+                    isCompactMode: false,
+                    initiallyExpanded: false,
                   ),
                 ),
               ),
