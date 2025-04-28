@@ -72,17 +72,20 @@ class BlockTray extends StatelessWidget {
     final isSmallScreen = screenWidth < 360;
     final isVerySmallScreen = screenWidth < 320;
 
-    // 컴팩트 모드에서 더 작은 셀과 패딩 크기 사용
+    // 모바일에서 더 작은 셀 크기 사용 - 많은 블록이 보이도록 조정
     final dynamicCellSize = isCompactMode
-        ? (isVerySmallScreen ? 28.0 : (isSmallScreen ? 32.0 : 36.0))
+        ? (isVerySmallScreen ? 24.0 : (isSmallScreen ? 26.0 : 30.0))
         : (isSmallScreen ? 34.0 : cellSize);
 
+    // 모바일에서 더 작은 패딩 적용
     final dynamicPadding = isCompactMode
-        ? (isVerySmallScreen ? 4.0 : (isSmallScreen ? 6.0 : 10.0))
+        ? (isVerySmallScreen ? 2.0 : (isSmallScreen ? 4.0 : 6.0))
         : (isSmallScreen ? 8.0 : 16.0);
 
-    final trayHeight =
-        isCompactMode ? dynamicCellSize * 3.8 : dynamicCellSize * 5.5;
+    // 트레이 높이를 약간 증가시키고 모바일에서 더 잘 보이게 함
+    final trayHeight = isCompactMode
+        ? dynamicCellSize * (isVerySmallScreen ? 5.0 : 5.2)
+        : dynamicCellSize * 5.5;
 
     // 하이라이트 핸들러 생성
     final highlightHandler =
@@ -92,20 +95,25 @@ class BlockTray extends StatelessWidget {
       width: screenSize.width,
       height: trayHeight,
       padding: EdgeInsets.symmetric(
-        vertical: isCompactMode ? (isVerySmallScreen ? 2.0 : 4.0) : 8.0,
+        vertical: isCompactMode ? (isVerySmallScreen ? 2.0 : 3.0) : 8.0,
         horizontal: dynamicPadding,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // 배경색을 더 눈에 띄게 변경 (약간 파란 색조가 있는 밝은 회색)
+        color: isCompactMode ? Colors.blue.shade50 : Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(isCompactMode ? 12.0 : 20.0),
           topRight: Radius.circular(isCompactMode ? 12.0 : 20.0),
         ),
+        // 테두리를 추가하여 경계를 명확하게 함
+        border: isCompactMode
+            ? Border(top: BorderSide(color: Colors.blue.shade200, width: 1.5))
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isCompactMode ? 0.15 : 0.2),
-            blurRadius: isCompactMode ? 6.0 : 8.0,
-            offset: Offset(0, isCompactMode ? -2.0 : -3.0),
+            color: Colors.black.withOpacity(isCompactMode ? 0.25 : 0.2),
+            blurRadius: isCompactMode ? 8.0 : 8.0,
+            offset: Offset(0, isCompactMode ? -3.0 : -3.0),
           )
         ],
       ),
@@ -117,14 +125,16 @@ class BlockTray extends StatelessWidget {
             width: 40,
             height: isCompactMode ? (isVerySmallScreen ? 2.0 : 3.0) : 4.0,
             margin: EdgeInsets.only(
-                bottom: isCompactMode ? (isVerySmallScreen ? 2.0 : 4.0) : 8.0),
+                bottom: isCompactMode ? (isVerySmallScreen ? 2.0 : 3.0) : 8.0),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.5),
+              color: isCompactMode
+                  ? Colors.blue.shade300
+                  : Colors.grey.withOpacity(0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
 
-          // 트레이 제목 텍스트 (컴팩트 모드에서는 작게)
+          // 트레이 제목 텍스트 (컴팩트 모드에서 작게 표시)
           if ((!isCompactMode || screenWidth > 360) && !isVerySmallScreen)
             Padding(
               padding: EdgeInsets.only(bottom: isCompactMode ? 2.0 : 4.0),
@@ -135,25 +145,31 @@ class BlockTray extends StatelessWidget {
                       ? (isSmallScreen ? 11.0 : 12.0)
                       : (isSmallScreen ? 13.0 : 14.0),
                   fontWeight: FontWeight.w500,
+                  color: isCompactMode ? Colors.blue.shade800 : Colors.black87,
                 ),
               ),
             ),
 
           // 블록 목록
           Expanded(
-            child: Center(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  // 블록 간격 동적 조정
-                  final blockPadding =
-                      isCompactMode ? (isVerySmallScreen ? 1.0 : 2.0) : 4.0;
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // 블록 간격 동적 조정 - 매우 작게 설정하여 더 많은 블록이 보이도록 함
+                final blockPadding =
+                    isCompactMode ? (isVerySmallScreen ? 0.5 : 1.0) : 4.0;
 
-                  return SingleChildScrollView(
+                // 모바일에서는 블록을 스크롤 없이 모두 보이도록 조정
+                return Center(
+                  child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // 첫 번째 블록 앞에 작은 여백 추가
+                        SizedBox(width: isCompactMode ? 2.0 : 4.0),
+
+                        // 블록들 나열
                         for (int i = 0; i < blocks.length; i++)
                           Padding(
                             padding: EdgeInsets.symmetric(
@@ -163,13 +179,17 @@ class BlockTray extends StatelessWidget {
                               block: blocks[i],
                               cellSize: dynamicCellSize,
                               highlightHandler: highlightHandler,
+                              isCompactMode: isCompactMode,
                             ),
                           ),
+
+                        // 마지막 블록 뒤에 작은 여백 추가
+                        SizedBox(width: isCompactMode ? 2.0 : 4.0),
                       ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],

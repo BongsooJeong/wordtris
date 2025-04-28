@@ -44,7 +44,8 @@ class GameLayout extends StatelessWidget {
       BuildContext context, GameProvider gameProvider, double screenWidth) {
     // 화면 크기에 따른 동적 셀 크기 조정
     final dynamicCellSize = screenWidth < 360 ? 36.0 : 42.0;
-    final trayHeight = dynamicCellSize * 4.2; // 트레이 높이 최적화
+    // 트레이 높이를 더 크게 조정하여 5개 블록이 모두 보이게 함
+    final trayHeight = dynamicCellSize * (screenWidth < 360 ? 5.0 : 5.5);
     final isVerySmallScreen = screenWidth < 320;
 
     return Column(
@@ -61,22 +62,13 @@ class GameLayout extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // 점수 및 폭탄 인디케이터 (가로 배치)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 점수 및 레벨 정보 (왼쪽 세로 배치)
-                  Expanded(
-                    flex: 3,
-                    child: ScoreDisplay(
-                      score: gameProvider.score,
-                      level: gameProvider.level,
-                      lastWord: gameProvider.lastCompletedWord,
-                      lastWordPoints: gameProvider.lastWordPoints,
-                      isCompactMode: true, // 세로 배치 모드 활성화
-                    ),
-                  ),
-                ],
+              // 점수 정보 (가로 배치로 변경됨)
+              ScoreDisplay(
+                score: gameProvider.score,
+                level: gameProvider.level,
+                lastWord: gameProvider.lastCompletedWord,
+                lastWordPoints: gameProvider.lastWordPoints,
+                isCompactMode: true, // 컴팩트 모드 활성화
               ),
 
               // 추천 단어 패널 (접힌 상태) - 높이 제한 없이 자연스러운 크기로
@@ -121,7 +113,8 @@ class GameLayout extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: BlockTray(
-                  cellSize: dynamicCellSize - 8.0, // 더 작은 셀 크기로 설정
+                  cellSize: dynamicCellSize -
+                      (screenWidth < 360 ? 4.0 : 6.0), // 셀 크기 약간 증가
                   spacing: screenWidth < 360 ? 2.0 : 4.0, // 공간 절약
                   wordSuggestionsKey: wordSuggestionsKey,
                   isCompactMode: true, // 컴팩트 모드 활성화
@@ -138,7 +131,8 @@ class GameLayout extends StatelessWidget {
   Widget _buildTabletLayout(
       BuildContext context, GameProvider gameProvider, double screenWidth) {
     final cellSize = screenWidth < 720 ? 42.0 : 46.0;
-    final trayHeight = cellSize * 4.5;
+    // 트레이 높이를 더 크게 조정
+    final trayHeight = cellSize * 4.8;
 
     return Column(
       children: [

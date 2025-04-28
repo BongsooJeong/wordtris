@@ -71,23 +71,38 @@ class ScoreDisplay extends StatelessWidget {
 
     // 작은 화면일 경우 더 작은 글꼴 크기 적용
     final titleFontSize = isVerySmallScreen
-        ? 12.0
-        : (isSmallScreen ? 14.0 : (isCompactMode ? 15.0 : 16.0));
-    final scoreFontSize = isVerySmallScreen
-        ? 18.0
-        : (isSmallScreen ? 20.0 : (isCompactMode ? 22.0 : 24.0));
-    final wordFontSize = isVerySmallScreen
-        ? 12.0
-        : (isSmallScreen ? 14.0 : (isCompactMode ? 16.0 : 18.0));
-    final pointsFontSize = isVerySmallScreen
         ? 10.0
-        : (isSmallScreen ? 12.0 : (isCompactMode ? 13.0 : 14.0));
+        : (isSmallScreen ? 11.0 : (isCompactMode ? 12.0 : 16.0));
+    final scoreFontSize = isVerySmallScreen
+        ? 14.0
+        : (isSmallScreen ? 16.0 : (isCompactMode ? 18.0 : 24.0));
+    final wordFontSize = isVerySmallScreen
+        ? 10.0
+        : (isSmallScreen ? 12.0 : (isCompactMode ? 14.0 : 18.0));
+    final pointsFontSize = isVerySmallScreen
+        ? 9.0
+        : (isSmallScreen ? 10.0 : (isCompactMode ? 11.0 : 14.0));
 
+    // 모바일에서 더 작은 패딩 적용
+    final containerPadding = isCompactMode
+        ? EdgeInsets.symmetric(
+            vertical: isVerySmallScreen ? 4.0 : 6.0,
+            horizontal: isVerySmallScreen ? 8.0 : 10.0,
+          )
+        : const EdgeInsets.all(12.0);
+
+    // 컴팩트 모드에서 더 작은 마진 적용
+    final containerMargin = isCompactMode
+        ? EdgeInsets.symmetric(
+            vertical: isVerySmallScreen ? 2.0 : 3.0,
+            horizontal: isVerySmallScreen ? 2.0 : 4.0,
+          )
+        : const EdgeInsets.all(8.0);
+
+    // 모든 모드에서 Row 레이아웃 사용
     return Container(
-      padding: EdgeInsets.all(
-          isCompactMode ? (isVerySmallScreen ? 6.0 : 8.0) : 12.0),
-      margin:
-          EdgeInsets.all(isCompactMode ? (isVerySmallScreen ? 2.0 : 4.0) : 8.0),
+      padding: containerPadding,
+      margin: containerMargin,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -100,59 +115,76 @@ class ScoreDisplay extends StatelessWidget {
         ],
       ),
       child: isCompactMode
-          // 세로 레이아웃 (모바일)
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
+          ? Row(
+              // 모바일 가로 레이아웃 (컴팩트 모드)
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // 점수 섹션
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: isVerySmallScreen ? 2.0 : 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '점수: ',
-                        style: TextStyle(
-                          fontSize: titleFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '점수',
+                      style: TextStyle(
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
                       ),
-                      Text(
-                        '$score',
-                        style: TextStyle(
-                          fontSize: scoreFontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    Text(
+                      '$score',
+                      style: TextStyle(
+                        fontSize: scoreFontSize,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
 
                 // 구분선
-                Divider(
-                  height: isVerySmallScreen ? 8 : 12,
-                  thickness: 1,
+                Container(
+                  height: isVerySmallScreen ? 30 : 35,
+                  width: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 최근 완성 단어 섹션
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: isVerySmallScreen ? 2.0 : 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        '최근 단어: ',
-                        style: TextStyle(
-                          fontSize: titleFontSize - 2,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '최근',
+                            style: TextStyle(
+                              fontSize: titleFontSize - 1,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                          if (lastWordPoints > 0)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4.0),
+                              child: Text(
+                                '+$lastWordPoints',
+                                style: TextStyle(
+                                  fontSize: pointsFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade800,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      Flexible(
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: isVerySmallScreen ? 80 : 90,
+                        ),
                         child: Text(
                           lastWord.isEmpty ? '-' : lastWord,
                           style: TextStyle(
@@ -160,59 +192,45 @@ class ScoreDisplay extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                           overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      if (lastWordPoints > 0)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4.0),
-                          child: Text(
-                            '+$lastWordPoints',
-                            style: TextStyle(
-                              fontSize: pointsFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade800,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
 
                 // 구분선
-                Divider(
-                  height: isVerySmallScreen ? 8 : 12,
-                  thickness: 1,
+                Container(
+                  height: isVerySmallScreen ? 30 : 35,
+                  width: 1,
                   color: Colors.grey.shade300,
                 ),
 
                 // 레벨 섹션
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: isVerySmallScreen ? 2.0 : 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '레벨: ',
-                        style: TextStyle(
-                          fontSize: titleFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '레벨',
+                      style: TextStyle(
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
                       ),
-                      Text(
-                        '$level',
-                        style: TextStyle(
-                          fontSize: scoreFontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    Text(
+                      '$level',
+                      style: TextStyle(
+                        fontSize: scoreFontSize,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             )
-          // 가로 레이아웃 (기존)
+          // 일반 레이아웃 (데스크톱)
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
