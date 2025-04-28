@@ -18,21 +18,46 @@ class GameLayout extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // 화면 크기에 따라 레이아웃 조정
-        // 반응형 브레이크포인트 구분을 더 상세하게 설정
         final screenWidth = constraints.maxWidth;
+        final screenHeight = constraints.maxHeight;
 
-        // 모바일/태블릿: 0-899px, 데스크톱: 900px+
-        if (screenWidth < 900) {
-          // MobileGameLayout 위젯 반환
-          return MobileGameLayout(
-            wordSuggestionsKey: wordSuggestionsKey,
-          );
-        } else {
-          // DesktopGameLayout 위젯 반환
-          return DesktopGameLayout(
-            wordSuggestionsKey: wordSuggestionsKey,
-          );
+        // 목표 가로세로 비율 설정 (9:16)
+        const aspectRatio = 9 / 16;
+
+        // 실제 화면에 맞는 게임 영역 크기 계산
+        double gameWidth = screenWidth;
+        double gameHeight = screenWidth / aspectRatio;
+
+        // 세로가 화면을 벗어나면 높이 기준으로 다시 계산
+        if (gameHeight > screenHeight) {
+          gameHeight = screenHeight;
+          gameWidth = screenHeight * aspectRatio;
         }
+
+        // 게임 영역을 화면 중앙에 배치하는 컨테이너
+        return Center(
+          child: Container(
+            width: gameWidth,
+            height: gameHeight,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: screenWidth < 900
+                ? MobileGameLayout(
+                    wordSuggestionsKey: wordSuggestionsKey,
+                  )
+                : DesktopGameLayout(
+                    wordSuggestionsKey: wordSuggestionsKey,
+                  ),
+          ),
+        );
       },
     );
   }
