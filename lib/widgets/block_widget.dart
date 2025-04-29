@@ -44,13 +44,13 @@ class BlockWidget extends StatelessWidget {
     bool isWildcardBlock = block.isWildcard;
 
     // 컴팩트 모드에서는 더 작은 여백 사용
-    final containerPadding = isCompactMode ? 2.0 : 8.0;
-    final borderRadius = isCompactMode ? 6.0 : 12.0;
+    final containerPadding = isCompactMode ? 2.0 : 6.0;
+    final borderRadius = isCompactMode ? 6.0 : 10.0;
 
     // 컴팩트 모드에서는 더 작은 너비/높이 계산
     // 모바일에서 더 많은 블록이 보이도록 크기 축소
-    final widthFactor = isCompactMode ? 2.6 : 3.5;
-    final heightFactor = isCompactMode ? 2.6 : 3.5;
+    final widthFactor = isCompactMode ? 2.8 : 3.5;
+    final heightFactor = isCompactMode ? 2.8 : 3.5;
 
     // 모바일 화면에서 더 눈에 띄는 배경색 사용
     final bgColor = isCompactMode
@@ -172,7 +172,7 @@ class BlockWidget extends StatelessWidget {
                                       : isWildcardBlock
                                           ? WildcardStarWidget(
                                               size: Math.min(
-                                                  actualCellSize * 0.8, 28),
+                                                  actualCellSize * 0.7, 24),
                                               opacity: opacity,
                                             )
                                           : FittedBox(

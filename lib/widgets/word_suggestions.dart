@@ -110,131 +110,158 @@ class WordSuggestionsState extends State<WordSuggestions> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 600;
     final isVerySmallScreen = screenWidth < 320;
+    final isDesktopMode = screenWidth >= 900;
+
+    // 데스크톱 모드에서 확장된 경우 오버레이 스타일 적용
+    final desktopExpandedStyle = isDesktopMode && _isExpanded;
 
     return Container(
-      width: double.infinity, // 항상 부모의 너비에 맞춤
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+            color: Colors.black.withOpacity(desktopExpandedStyle ? 0.3 : 0.1),
+            blurRadius: desktopExpandedStyle ? 10 : 3,
+            spreadRadius: desktopExpandedStyle ? 3 : 0,
+            offset: const Offset(0, 2),
           ),
         ],
+        border: desktopExpandedStyle
+            ? Border.all(color: Colors.blue.shade300, width: 1.5)
+            : null,
       ),
       margin: widget.isCompactMode
-          ? const EdgeInsets.symmetric(vertical: 2.0) // 세로 마진만 약간 추가
+          ? const EdgeInsets.symmetric(vertical: 2.0)
           : const EdgeInsets.all(8),
       padding: widget.isCompactMode
-          ? const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0) // 패딩 증가
+          ? const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0)
           : const EdgeInsets.all(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: widget.isCompactMode && isVerySmallScreen
-            ? [
-                // 매우 작은 화면에서는 최소한의 요소만 표시
-                InkWell(
-                  onTap: toggleExpanded,
-                  child: Row(
-                    children: [
-                      const Text(
-                        '추천 단어',
-                        style: TextStyle(
-                          fontSize: 12, // 폰트 크기 증가
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo,
+      child: Material(
+        color: desktopExpandedStyle
+            ? Colors.blue.shade50.withOpacity(0.8) // 확장 시 배경색 변경
+            : Colors.transparent,
+        elevation: desktopExpandedStyle ? 8 : 0,
+        borderRadius: BorderRadius.circular(8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // 데스크톱에서는 최소 크기 사용
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: widget.isCompactMode && isVerySmallScreen
+              ? [
+                  // 매우 작은 화면에서는 최소한의 요소만 표시
+                  InkWell(
+                    onTap: toggleExpanded,
+                    child: Row(
+                      children: [
+                        const Text(
+                          '추천 단어',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.indigo,
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        _isExpanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        size: 16, // 아이콘 크기 증가
-                        color: Colors.grey.shade600,
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 확장/축소 가능한 내용 부분
-                if (_isExpanded)
-                  SizedBox(
-                    height: 120, // 높이 증가
-                    child: filteredWords.isEmpty
-                        ? const Center(
-                            child: Text(
-                              '표시할 단어가 없습니다',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12, // 폰트 크기 증가
-                              ),
-                            ),
-                          )
-                        : _buildCompactWordList(
-                            filteredWords, isSmallScreen, isVerySmallScreen),
-                  ),
-              ]
-            : [
-                // 헤더 부분 (제목 + 확장/축소 버튼)
-                InkWell(
-                  onTap: toggleExpanded,
-                  child: Row(
-                    children: [
-                      Text(
-                        '추천 단어',
-                        style: TextStyle(
-                          fontSize: isVerySmallScreen
-                              ? 12
-                              : (isSmallScreen ? 13 : 14),
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo,
+                        const Spacer(),
+                        Icon(
+                          _isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          size: 16,
+                          color: Colors.grey.shade600,
                         ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        _isExpanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        size: isVerySmallScreen ? 16 : 18,
-                        color: Colors.grey.shade600,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // 작은 화면에서는 구분선 제거
-                if (!isVerySmallScreen) const SizedBox(height: 2),
-
-                if (!isVerySmallScreen)
-                  const Divider(height: 4, thickness: 0.5),
-
-                // 확장/축소 가능한 내용 부분
-                if (_isExpanded)
-                  SizedBox(
-                    // 펼쳤을 때 더 많은 단어를 보여줄 수 있도록 높이 증가
-                    height: widget.isCompactMode
-                        ? (isVerySmallScreen ? 120 : 160)
-                        : (isSmallScreen ? 240 : 300),
-                    child: filteredWords.isEmpty
-                        ? Center(
-                            child: Text(
-                              '표시할 단어가 없습니다',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: isVerySmallScreen ? 12 : 14,
+                  // 확장/축소 가능한 내용 부분
+                  if (_isExpanded)
+                    SizedBox(
+                      height: 120,
+                      child: filteredWords.isEmpty
+                          ? const Center(
+                              child: Text(
+                                '표시할 단어가 없습니다',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          )
-                        : widget.isCompactMode
-                            ? _buildCompactWordList(
-                                filteredWords, isSmallScreen, isVerySmallScreen)
-                            : _buildNormalWordList(filteredWords),
+                            )
+                          : _buildCompactWordList(
+                              filteredWords, isSmallScreen, isVerySmallScreen),
+                    ),
+                ]
+              : [
+                  // 헤더 부분 (제목 + 확장/축소 버튼)
+                  InkWell(
+                    onTap: toggleExpanded,
+                    child: Row(
+                      children: [
+                        Text(
+                          '추천 단어',
+                          style: TextStyle(
+                            fontSize: isVerySmallScreen
+                                ? 12
+                                : (isSmallScreen ? 13 : 14),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.indigo,
+                          ),
+                        ),
+                        const Spacer(),
+                        Icon(
+                          _isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          size: isVerySmallScreen ? 16 : 18,
+                          color: Colors.grey.shade600,
+                        ),
+                      ],
+                    ),
                   ),
-              ],
+
+                  // 작은 화면에서는 구분선 제거
+                  if (!isVerySmallScreen) const SizedBox(height: 2),
+
+                  if (!isVerySmallScreen)
+                    const Divider(height: 4, thickness: 0.5),
+
+                  // 확장/축소 가능한 내용 부분
+                  if (_isExpanded)
+                    GestureDetector(
+                      // 추천 단어 목록 내부 클릭 시 이벤트 버블링 방지
+                      onTap: () {
+                        // 이벤트 소비
+                      },
+                      child: Container(
+                        // 데스크톱 모드에서는 더 큰 높이 제공
+                        height: widget.isCompactMode
+                            ? (isVerySmallScreen ? 120 : 160)
+                            : (isDesktopMode ? 300 : 240),
+                        decoration: desktopExpandedStyle
+                            ? BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              )
+                            : null,
+                        child: filteredWords.isEmpty
+                            ? Center(
+                                child: Text(
+                                  '표시할 단어가 없습니다',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: isVerySmallScreen ? 12 : 14,
+                                  ),
+                                ),
+                              )
+                            : widget.isCompactMode
+                                ? _buildCompactWordList(filteredWords,
+                                    isSmallScreen, isVerySmallScreen)
+                                : _buildNormalWordList(filteredWords),
+                      ),
+                    ),
+                ],
+        ),
       ),
     );
   }

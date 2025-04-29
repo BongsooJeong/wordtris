@@ -84,8 +84,8 @@ class BlockTray extends StatelessWidget {
 
     // 트레이 높이를 약간 증가시키고 모바일에서 더 잘 보이게 함
     final trayHeight = isCompactMode
-        ? dynamicCellSize * (isVerySmallScreen ? 5.0 : 5.5)
-        : dynamicCellSize * 6.0;
+        ? dynamicCellSize * (isVerySmallScreen ? 5.5 : 6.0)
+        : dynamicCellSize * 6.5;
 
     // 하이라이트 핸들러 생성
     final highlightHandler =

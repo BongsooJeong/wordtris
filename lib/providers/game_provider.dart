@@ -241,6 +241,7 @@ class GameProvider with ChangeNotifier {
 
   /// 게임 재시작
   void restartGame() {
+    print('🔵 GameProvider.restartGame() 호출됨');
     _usedCharacters.clear(); // 사용된 글자 목록 초기화
     _lastCompletedWord = ''; // 최근 완성 단어 초기화
     _lastWordPoints = 0; // 최근 단어 점수 초기화
